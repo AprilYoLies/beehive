@@ -1,4 +1,4 @@
-package top.aprilyolies.curator.framework;
+package top.aprilyolies.curator.leader;
 
 import com.google.common.collect.Lists;
 import org.apache.curator.framework.CuratorFramework;

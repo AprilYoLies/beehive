@@ -1,4 +1,4 @@
-package top.aprilyolies.curator.framework;
+package top.aprilyolies.curator.cache;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

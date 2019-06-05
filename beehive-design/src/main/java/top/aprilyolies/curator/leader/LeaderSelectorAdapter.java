@@ -1,4 +1,4 @@
-package top.aprilyolies.curator.framework;
+package top.aprilyolies.curator.leader;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.recipes.leader.LeaderSelector;
