@@ -27,8 +27,7 @@ public class LeaderLatchDemo {
         TestingServer server = new TestingServer();
         try {
             for (int i = 0; i < CLIENT_QTY; i++) {
-                CuratorFramework client
-                        = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(20000, 3));
+                CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(20000, 3));
                 clients.add(client);
                 LeaderLatch latch = new LeaderLatch(client, PATH, "Client #" + i);
                 latch.addListener(new LeaderLatchListener() {

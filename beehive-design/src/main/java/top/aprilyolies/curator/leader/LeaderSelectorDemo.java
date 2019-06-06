@@ -28,8 +28,7 @@ public class LeaderSelectorDemo {
         TestingServer server = new TestingServer();
         try {
             for (int i = 0; i < CLIENT_QTY; i++) {
-                CuratorFramework client
-                        = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(20000, 3));
+                CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(20000, 3));
                 clients.add(client);
                 LeaderSelectorAdapter selectorAdapter = new LeaderSelectorAdapter(client, PATH, "Client #" + i);
                 examples.add(selectorAdapter);
