@@ -1,4 +1,4 @@
-package top.aprilyolies.curator.Barrier;
+package top.aprilyolies.curator.barrier;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

@@ -1,4 +1,4 @@
-package top.aprilyolies.curator.Barrier;
+package top.aprilyolies.curator.barrier;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
@@ -36,7 +36,7 @@ public class DistributedBarrierExample {
                     public Void call() throws Exception {
 
                         Thread.sleep((long) (3 * Math.random()));
-                        System.out.println("Client #" + index + " waits on Barrier");
+                        System.out.println("Client #" + index + " waits on barrier");
                         barrier.waitOnBarrier();
                         System.out.println("Client #" + index + " begins");
                         return null;
@@ -46,7 +46,7 @@ public class DistributedBarrierExample {
             }
 
             Thread.sleep(10000);
-            System.out.println("all Barrier instances should wait the condition");
+            System.out.println("all barrier instances should wait the condition");
 
 
             controlBarrier.removeBarrier();
