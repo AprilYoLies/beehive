@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  * @Date 2019-06-05
  * @Email g863821569@gmail.com
  */
-public class InterProcessSemaphoreDemo {
+public class InterProcessSemaphoreExample {
 
     private static final int MAX_LEASE = 10;
     private static final String PATH = "/examples/locks";

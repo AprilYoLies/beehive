@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * @Date 2019-06-05
  * @Email g863821569@gmail.com
  */
-public class ReentrantReadWriteLockDemo {
+public class ReentrantReadWriteLockExample {
 
     private final InterProcessReadWriteLock lock;
     private final InterProcessMutex readLock;
@@ -26,7 +26,7 @@ public class ReentrantReadWriteLockDemo {
     private final FakeLimitedResource resource;
     private final String clientName;
 
-    public ReentrantReadWriteLockDemo(CuratorFramework client, String lockPath, FakeLimitedResource resource, String clientName) {
+    public ReentrantReadWriteLockExample(CuratorFramework client, String lockPath, FakeLimitedResource resource, String clientName) {
         this.resource = resource;
         this.clientName = clientName;
         lock = new InterProcessReadWriteLock(client, lockPath);
@@ -71,7 +71,7 @@ public class ReentrantReadWriteLockDemo {
                         CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(1000, 3));
                         try {
                             client.start();
-                            final ReentrantReadWriteLockDemo example = new ReentrantReadWriteLockDemo(client, PATH, resource, "Client " + index);
+                            final ReentrantReadWriteLockExample example = new ReentrantReadWriteLockExample(client, PATH, resource, "Client " + index);
                             for (int j = 0; j < REPETITIONS; ++j) {
                                 example.doWork(10, TimeUnit.MILLISECONDS);
                             }

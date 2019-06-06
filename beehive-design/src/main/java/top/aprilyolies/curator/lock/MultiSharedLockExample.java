@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
  * @Date 2019-06-05
  * @Email g863821569@gmail.com
  */
-public class MultiSharedLockDemo {
+public class MultiSharedLockExample {
 
     private static final String PATH1 = "/examples/locks1";
     private static final String PATH2 = "/examples/locks2";

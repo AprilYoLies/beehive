@@ -16,7 +16,7 @@ import java.util.List;
  * @Date 2019-06-05
  * @Email g863821569@gmail.com
  */
-public class LeaderSelectorDemo {
+public class LeaderSelectorExample {
 
     protected static String PATH = "/francis/leader";
     private static final int CLIENT_QTY = 10;

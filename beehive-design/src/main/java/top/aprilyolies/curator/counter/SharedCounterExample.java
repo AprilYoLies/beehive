@@ -23,14 +23,14 @@ import java.util.concurrent.TimeUnit;
  * @Date 2019-06-05
  * @Email g863821569@gmail.com
  */
-public class SharedCounterDemo implements SharedCountListener {
+public class SharedCounterExample implements SharedCountListener {
 
     private static final int QTY = 5;
     private static final String PATH = "/examples/counter";
 
     public static void main(String[] args) throws IOException, Exception {
         final Random rand = new Random();
-        SharedCounterDemo example = new SharedCounterDemo();
+        SharedCounterExample example = new SharedCounterExample();
         CuratorFramework client = null;
         try (TestingServer server = new TestingServer()) {
             client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(1000, 3));

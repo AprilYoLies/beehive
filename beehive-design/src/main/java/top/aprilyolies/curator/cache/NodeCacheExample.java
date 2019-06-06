@@ -10,10 +10,10 @@ import org.apache.curator.test.TestingServer;
 
 /**
  * @Author EvaJohnson
- * @Date 2019-06-05
+ * @Date 2019-06-06
  * @Email g863821569@gmail.com
  */
-public class PathCacheDemo {
+public class NodeCacheExample {
 
     private static final String PATH = "/example/pathCache";
 

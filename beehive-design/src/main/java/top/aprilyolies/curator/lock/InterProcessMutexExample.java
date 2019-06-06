@@ -2,7 +2,7 @@ package top.aprilyolies.curator.lock;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
-import org.apache.curator.framework.recipes.locks.InterProcessSemaphoreMutex;
+import org.apache.curator.framework.recipes.locks.InterProcessMutex;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
 import org.apache.curator.utils.CloseableUtils;
@@ -17,34 +17,31 @@ import java.util.concurrent.TimeUnit;
  * @Date 2019-06-05
  * @Email g863821569@gmail.com
  */
-public class InterProcessSemaphoreMutexDemo {
+public class InterProcessMutexExample {
 
-    private InterProcessSemaphoreMutex lock;
+    private InterProcessMutex lock;
     private final FakeLimitedResource resource;
     private final String clientName;
 
-    public InterProcessSemaphoreMutexDemo(CuratorFramework client, String lockPath, FakeLimitedResource resource, String clientName) {
+    public InterProcessMutexExample(CuratorFramework client, String lockPath, FakeLimitedResource resource, String clientName) {
         this.resource = resource;
         this.clientName = clientName;
-        this.lock = new InterProcessSemaphoreMutex(client, lockPath);
+        this.lock = new InterProcessMutex(client, lockPath);
     }
 
     public void doWork(long time, TimeUnit unit) throws Exception {
         if (!lock.acquire(time, unit)) {
-            throw new IllegalStateException(clientName + " 不能得到互斥锁");
+            throw new IllegalStateException(clientName + " could not acquire the lock");
         }
-        System.out.println(clientName + " 已获取到互斥锁");
-        if (!lock.acquire(time, unit)) {
-            throw new IllegalStateException(clientName + " 不能得到互斥锁");
-        }
-        System.out.println(clientName + " 再次获取到互斥锁");
         try {
             System.out.println(clientName + " get the lock");
+            if (lock.acquire(time, unit)) {
+                System.out.println(clientName + " could reacquire the lock");
+            }
             resource.use(); //access resource exclusively
         } finally {
             System.out.println(clientName + " releasing the lock");
             lock.release(); // always release the lock in a finally block
-            lock.release(); // 获取锁几次 释放锁也要几次
         }
     }
 
@@ -56,7 +53,6 @@ public class InterProcessSemaphoreMutexDemo {
         final FakeLimitedResource resource = new FakeLimitedResource();
         ExecutorService service = Executors.newFixedThreadPool(QTY);
         final TestingServer server = new TestingServer();
-        System.out.println("Start testing server success..");
         try {
             for (int i = 0; i < QTY; ++i) {
                 final int index = i;
@@ -66,9 +62,9 @@ public class InterProcessSemaphoreMutexDemo {
                         CuratorFramework client = CuratorFrameworkFactory.newClient(server.getConnectString(), new ExponentialBackoffRetry(1000, 3));
                         try {
                             client.start();
-                            final InterProcessSemaphoreMutexDemo example = new InterProcessSemaphoreMutexDemo(client, PATH, resource, "Client " + index);
+                            final InterProcessMutexExample example = new InterProcessMutexExample(client, PATH, resource, "Client " + index);
                             for (int j = 0; j < REPETITIONS; ++j) {
-                                example.doWork(10, TimeUnit.MILLISECONDS);
+                                example.doWork(10, TimeUnit.SECONDS);
                             }
                         } catch (Throwable e) {
                             e.printStackTrace();
@@ -81,10 +77,9 @@ public class InterProcessSemaphoreMutexDemo {
                 service.submit(task);
             }
             service.shutdown();
-            service.awaitTermination(10, TimeUnit.SECONDS);
+            service.awaitTermination(10, TimeUnit.MINUTES);
         } finally {
             CloseableUtils.closeQuietly(server);
         }
-        Thread.sleep(Integer.MAX_VALUE);
     }
 }
