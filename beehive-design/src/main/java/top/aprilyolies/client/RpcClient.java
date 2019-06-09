@@ -1,4 +1,4 @@
-package top.aprilyolies.server;
+package top.aprilyolies.client;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.PooledByteBufAllocator;
