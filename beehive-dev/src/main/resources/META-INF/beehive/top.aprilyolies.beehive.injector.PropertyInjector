@@ -1,0 +1,2 @@
+selector=top.aprilyolies.beehive.injector.PropertyInjectorSelector
+spi=top.aprilyolies.beehive.injector.SpiPropertyInjector
