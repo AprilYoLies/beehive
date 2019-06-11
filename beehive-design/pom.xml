@@ -80,5 +80,12 @@
             <artifactId>hessian-lite</artifactId>
             <version>3.2.5</version>
         </dependency>
+
+        <!-- javassist -->
+        <dependency>
+            <groupId>org.javassist</groupId>
+            <artifactId>javassist</artifactId>
+            <version>3.20.0-GA</version>
+        </dependency>
     </dependencies>
 </project>

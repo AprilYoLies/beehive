@@ -1,4 +1,4 @@
-package top.aprilyolies.extension.testextension;
+package top.aprilyolies.beehive.extension.testextension;
 
 import top.aprilyolies.beehive.common.URL;
 
@@ -8,18 +8,18 @@ import top.aprilyolies.beehive.common.URL;
  * @Email g863821569@gmail.com
  */
 public class TestExtensionImpl implements TestExtension {
-    @Override
-    public String methodWithSelectorAnnotation() {
-        return "methodWithSelectorAnnotation";
-    }
+//    @Override
+//    public String methodWithSelectorAnnotation() {
+//        return "methodWithSelectorAnnotation";
+//    }
 
     @Override
     public String methodWithSelectorAnnotationAndUrlParam(String param1, URL url, String param2) {
         return "methodWithSelectorAnnotationAndUrlParam";
     }
 
-    @Override
-    public String methodWithoutSelectorAnnotation() {
-        return "methodWithoutSelectorAnnotation";
-    }
+//    @Override
+//    public String methodWithoutSelectorAnnotation() {
+//        return "methodWithoutSelectorAnnotation";
+//    }
 }

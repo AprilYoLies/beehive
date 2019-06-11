@@ -14,14 +14,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package top.aprilyolies.beehive.compiler;
-
-import top.aprilyolies.beehive.extension.annotation.SPI;
+package top.aprilyolies.javassist;
 
 /**
  * Compiler. (SPI, Singleton, ThreadSafe)
  */
-@SPI("javassist")
 public interface Compiler {
 
     /**

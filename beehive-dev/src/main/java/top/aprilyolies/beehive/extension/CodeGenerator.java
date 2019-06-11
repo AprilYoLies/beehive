@@ -135,7 +135,7 @@ public class CodeGenerator {
 
     private String getClassInfo() {
         // 对于数组或者内部类 getCanonicalName 获取的名字才是我们所理解的名字
-        return String.format("public class %s$Selector implements %s {", type.getSimpleName(), type.getCanonicalName());
+        return String.format("public class %s$Selector implements %s {\n", type.getSimpleName(), type.getCanonicalName());
     }
 
     private String getImportInfo() {

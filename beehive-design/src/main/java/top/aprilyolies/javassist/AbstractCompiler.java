@@ -14,9 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package top.aprilyolies.beehive.compiler;
-
-import top.aprilyolies.beehive.utils.ClassUtils;
+package top.aprilyolies.javassist;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,7 +47,7 @@ public abstract class AbstractCompiler implements Compiler {
         }
         String className = pkg != null && pkg.length() > 0 ? pkg + "." + cls : cls;
         try {
-            return Class.forName(className, true, ClassUtils.getCallerClassLoader(getClass()));
+            return Class.forName(className, true,ClassUtils.getCallerClassLoader(getClass()));
         } catch (ClassNotFoundException e) {
             if (!code.endsWith("}")) {
                 throw new IllegalStateException("The java code not endsWith \"}\", code: \n" + code + "\n");

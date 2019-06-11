@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package top.aprilyolies.beehive.compiler;
+package top.aprilyolies.javassist;
 
 
 import javassist.CtClass;
-import top.aprilyolies.beehive.utils.ClassUtils;
 
 import java.util.Arrays;
 import java.util.regex.Matcher;

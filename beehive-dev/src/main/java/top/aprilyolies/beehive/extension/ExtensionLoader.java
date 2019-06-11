@@ -24,7 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ExtensionLoader<T> {
     private static final Logger logger = Logger.getLogger(ExtensionLoader.class);
     // 默认的 extension 配置加载路径
-    private final String BEEHIVE_EXTENSION_DIRECTORY = "META-INF/beehive/";
+    private static final String BEEHIVE_EXTENSION_DIRECTORY = "META-INF/beehive/";
     // ExtensionLoader 缓存
     private static final Map<Class<?>, ExtensionLoader<?>> extensionLoaderCache = new ConcurrentHashMap<>();
     // ExtensionClass 缓存
@@ -64,26 +64,32 @@ public class ExtensionLoader<T> {
      * @return
      */
     public T getExtensionSelectorInstance() {
-        Class<T> extension = this.extensionSelectorClassCache;
-        if (extension == null) {
+        Class<T> clazz = this.extensionSelectorClassCache;
+        if (clazz == null) {
             synchronized (extensionSelectorClassMonitor) {
                 if (extensionSelectorClassCache == null) {
                     // 这里不是直接调用 loadExtensionClasses() 是因为可能配置文件未指定 selector，如果是这样，我们就需要通过 javassist 动态生成
                     // extension selector class，并进行缓存
                     extensionSelectorClassCache = createExtensionSelector();
-                    extension = this.extensionSelectorClassCache;
+                    clazz = this.extensionSelectorClassCache;
                 }
             }
         }
         try {
-            if (extension == null)
-                throw new IllegalStateException("The extension class is null");
-            T instance = extension.newInstance();
-            injectProperty(instance);
-            this.extensionSelectorInstanceCache = instance;
+            T instance = this.extensionSelectorInstanceCache;
+            if (instance == null) {
+                synchronized (extensionSelectorInstanceMonitor) {
+                    instance = this.extensionSelectorInstanceCache;
+                    if (instance == null) {
+                        instance = clazz.newInstance();
+                        injectProperty(instance);
+                        this.extensionSelectorInstanceCache = instance;
+                    }
+                }
+            }
             return instance;
         } catch (Exception e) {
-            throw new IllegalStateException("Can't create extension selector instance via class " + extension.getName(), e);
+            throw new IllegalStateException("Can't create extension selector instance via class " + clazz.getName(), e);
         }
     }
 
@@ -136,7 +142,7 @@ public class ExtensionLoader<T> {
     // 加载相应路径下的 SPI 配置
     private Map<String, Class<T>> doLoadExtensionClasses() {
         Map<String, Class<T>> extensionClasses = new HashMap<>();
-        String resourcePath = this.BEEHIVE_EXTENSION_DIRECTORY + type.getName();
+        String resourcePath = BEEHIVE_EXTENSION_DIRECTORY + type.getName();
         try {
             ClassLoader cl = ClassUtils.getClassLoader(ExtensionLoader.class);
             if (cl != null) {
@@ -150,7 +156,7 @@ public class ExtensionLoader<T> {
                 }
             }
         } catch (IOException e) {
-            logger.error("Can't load resources of path: " + resourcePath);
+            throw new IllegalStateException("Can't load extension classes for could not get resources from resource path " + resourcePath);
         }
         return extensionClasses;
     }
@@ -163,24 +169,24 @@ public class ExtensionLoader<T> {
             while ((line = reader.readLine()) != null) {
                 int i = line.indexOf("=");
                 if (i < 0) {
-                    logger.info("Invalid extension-name and extension-class couple: " + line + ",ignore this record.");
+                    logger.warn("Invalid extension-name and extension-class couple: " + line + ",ignore this record.");
                     continue;
                 }
                 String extensionName = line.substring(0, i).trim();
                 String extensionClassName = line.substring(i + 1).trim();
                 try {
                     if (StringUtils.isEmpty(extensionName)) {
-                        logger.error("The extension name must not be empty.");
+                        logger.warn("The extension name must not be empty, ignore this record.");
                         continue;
                     }
                     @SuppressWarnings("unchecked") Class<T> clazz = (Class<T>) Class.forName(extensionClassName);
                     check(clazz, extensionClasses, extensionName);
                 } catch (ClassNotFoundException e) {
-                    logger.error("Can't load class named " + extensionClassName + ",ignore this record.");
+                    logger.warn("Can't load class named " + extensionClassName + ",ignore this record.");
                 }
             }
         } catch (IOException e) {
-            logger.error("Can't open stream from specified resource" + resource.getPath());
+            logger.warn("Can't open stream from specified resource" + resource.getPath() + ", ignore this resource");
         }
     }
 
