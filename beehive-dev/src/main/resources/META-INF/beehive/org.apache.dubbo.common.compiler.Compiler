@@ -1,0 +1,2 @@
+selector=top.aprilyolies.beehive.compiler.CompilerSelector
+javassist=top.aprilyolies.beehive.compiler.JavassistCompiler

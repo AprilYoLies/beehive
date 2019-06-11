@@ -14,7 +14,7 @@ import java.util.List;
  * @Email g863821569@gmail.com
  */
 public class ServiceProvider {
-    private static final String DEMO_SERVICE = "/beehive/provider/demo-service";
+    private static final String DEMO_SERVICE = "/META-INF/provider/demo-service";
 
     public static void main(String[] args) throws Exception {
         TestingServer server = new TestingServer();
