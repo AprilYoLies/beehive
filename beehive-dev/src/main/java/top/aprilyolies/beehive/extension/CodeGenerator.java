@@ -23,7 +23,7 @@ public class CodeGenerator {
         this.type = type;
     }
 
-    String generateCode() {
+    public String generateCode() {
         StringBuilder sb = new StringBuilder();
         sb.append(getPackageInfo());
         sb.append(getImportInfo());
