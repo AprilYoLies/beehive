@@ -67,7 +67,7 @@ public class ExtensionLoader<T> {
      *
      * @return
      */
-    private T getExtensionSelectorInstance() {
+    public T getExtensionSelectorInstance() {
         Class<T> extension = this.extensionSelectorClassCache;
         if (extension == null) {
             synchronized (extensionSelectorClassMonitor) {
@@ -95,12 +95,12 @@ public class ExtensionLoader<T> {
     private Class<T> createExtensionSelector() {
         try {
             loadExtensionClasses();
-            Class<T> instance = this.extensionSelectorClassCache;
-            if (instance == null) {
+            Class<T> clazz = this.extensionSelectorClassCache;
+            if (clazz == null) {
                 // 如果没有指定 ExtensionSelector，那么就通过代码生成一个
-                instance = createInterExtensionSelector();
+                clazz = createInterExtensionSelector();
             }
-            return instance;
+            return clazz;
         } catch (Exception e) {
             throw new IllegalStateException("Can't get the extension selector", e.getCause());
         }
@@ -137,7 +137,7 @@ public class ExtensionLoader<T> {
         String methodContent = getMethodContent(method);
         String methodArgs = getMethodArgsInfo(method);
         String exceptionInfo = getExceptionInfo(method);
-        return String.format("public %s %s() %s {\n%s}\n", returnType, methodName, methodArgs, exceptionInfo, methodContent);
+        return String.format("public %s %s(%s) %s {\n%s}\n", returnType, methodName, methodArgs, exceptionInfo, methodContent);
     }
 
     // 获取抛出的异常串
@@ -156,7 +156,7 @@ public class ExtensionLoader<T> {
         Class<?>[] pts = method.getParameterTypes();
         return IntStream.range(0, pts.length)
                 .mapToObj(i -> String.format("%s arg%d", pts[i].getCanonicalName(), i))
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining(", "));
     }
 
     // 生成方法的内容信息
@@ -169,13 +169,13 @@ public class ExtensionLoader<T> {
             int urlParaIndex = getUrlParaIndex(method);
             if (urlParaIndex != -1) {
                 sb.append(getUrlCheck(urlParaIndex));
+                sb.append(getExtensionNameInfo());
+                sb.append(getExtensionNameCheck());
+                sb.append(getExtensionAssignment());
+                sb.append(getReturnInfo(method));
             } else {
                 sb.append(getUnsupportedInfo(method));
             }
-            sb.append(getExtensionNameInfo());
-            sb.append(getExtensionNameCheck());
-            sb.append(getExtensionAssignment());
-            sb.append(getReturnInfo(method));
         }
         return sb.toString();
     }
@@ -194,7 +194,7 @@ public class ExtensionLoader<T> {
     }
 
     private String getExtensionNameCheck() {
-        return "if (extName == null) throw new IllegalStateException(\"The extension name got from url should not be empty.\")\n";
+        return "if (extName == null) throw new IllegalStateException(\"The extension name got from url should not be empty.\");\n";
     }
 
     private String getExtensionNameInfo() {
@@ -235,7 +235,7 @@ public class ExtensionLoader<T> {
     }
 
     private String getPackageInfo() {
-        return String.format("package %s;\n", type.getPackage());
+        return String.format("%s;\n", type.getPackage());
     }
 
     // 为 instance 注入相关的属性

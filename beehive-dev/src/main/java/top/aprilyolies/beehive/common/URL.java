@@ -6,4 +6,13 @@ package top.aprilyolies.beehive.common;
  * @Email g863821569@gmail.com
  */
 public class URL {
+    private String protocol;
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
+    }
 }

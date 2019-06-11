@@ -2,8 +2,8 @@ package top.aprilyolies.extension;
 
 import org.junit.Before;
 import org.junit.Test;
-import top.aprilyolies.beehive.compiler.Compiler;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
+import top.aprilyolies.extension.testextension.TestExtension;
 
 /**
  * @Author EvaJohnson
@@ -15,11 +15,16 @@ public class ExtensionTest {
 
     @Before
     public void testGetExtensionLoader() {
-        extensionLoader = ExtensionLoader.getExtensionLoader(Compiler.class);
+        extensionLoader = ExtensionLoader.getExtensionLoader(TestExtension.class);
     }
 
     @Test
     public void testGetDefaultExtensionName() {
         extensionLoader.getDefaultExtensionName();
+    }
+
+    @Test
+    public void test() {
+        extensionLoader.getExtensionSelectorInstance();
     }
 }
