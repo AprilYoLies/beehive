@@ -24,7 +24,7 @@ public class ExtensionTest {
     }
 
     @Test
-    public void test() {
+    public void testGetExtensionSelectorInstance() {
         extensionLoader.getExtensionSelectorInstance();
     }
 }
