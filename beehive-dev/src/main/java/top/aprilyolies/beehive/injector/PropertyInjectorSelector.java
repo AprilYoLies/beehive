@@ -15,7 +15,7 @@ import java.util.List;
 @Selector
 public class PropertyInjectorSelector implements PropertyInjector {
     // SpiExtensionFactory 和 SpringExtensionFactory
-    private final List<PropertyInjector> factories;
+    private final List<PropertyInjector> injectors;
 
     public PropertyInjectorSelector() {
         // loader 为 AdaptiveExtensionFactory 实例
@@ -26,7 +26,7 @@ public class PropertyInjectorSelector implements PropertyInjector {
             // 通过 loader 获取 Extension 实例添加到 list 集合中
             list.add(loader.getExtension(name));
         }
-        factories = Collections.unmodifiableList(list);
+        injectors = Collections.unmodifiableList(list);
     }
 
     /**
@@ -39,10 +39,10 @@ public class PropertyInjectorSelector implements PropertyInjector {
      */
     @Override
     public <T> T inject(Class<T> type, String name) {
-        // 这里的 factories 对应不同的 Extension 加载策略
+        // 这里的 injectors 对应不同的 Extension 加载策略
         // SpiExtensionFactory 和 SpringExtensionFactory
         // 这里可以看出来 AdaptiveExtensionFactory 就类似于一个适配器
-        for (PropertyInjector factory : factories) {
+        for (PropertyInjector factory : injectors) {
             T extension = factory.inject(type, name);
             if (extension != null) {
                 return extension;

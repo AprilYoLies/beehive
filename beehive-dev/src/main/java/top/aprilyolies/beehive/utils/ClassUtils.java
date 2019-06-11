@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.Date;
 
 /**
  * @Author EvaJohnson
@@ -156,5 +157,17 @@ public class ClassUtils {
 
         int i = qualifiedName.lastIndexOf('.');
         return i < 0 ? qualifiedName : qualifiedName.substring(i + 1);
+    }
+
+    public static boolean isPrimitives(Class<?> cls) {
+        if (cls.isArray()) {
+            return isPrimitive(cls.getComponentType());
+        }
+        return isPrimitive(cls);
+    }
+
+    public static boolean isPrimitive(Class<?> cls) {
+        return cls.isPrimitive() || cls == String.class || cls == Boolean.class || cls == Character.class
+                || Number.class.isAssignableFrom(cls) || Date.class.isAssignableFrom(cls);
     }
 }

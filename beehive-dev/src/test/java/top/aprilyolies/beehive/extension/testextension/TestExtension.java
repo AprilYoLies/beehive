@@ -11,11 +11,11 @@ import top.aprilyolies.beehive.extension.annotation.Selector;
  */
 @SPI("test")
 public interface TestExtension {
-//    @Selector
-//    String methodWithSelectorAnnotation();
+    @Selector
+    String methodWithSelectorAnnotation();
 
     @Selector
     String methodWithSelectorAnnotationAndUrlParam(String param1, URL url, String param2);
 
-//    String methodWithoutSelectorAnnotation();
+    String methodWithoutSelectorAnnotation();
 }

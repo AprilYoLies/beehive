@@ -11,6 +11,8 @@ import top.aprilyolies.beehive.utils.StringUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -48,14 +50,14 @@ public class ExtensionLoader<T> {
     // 当前 ExtensionLoader 所述的类型
     private Class<T> type;
     // 属性注入器
-    private PropertyInjector injector;
+    private PropertyInjector propertyInjector;
     // 默认的 extension 名字
     private String defaultExtensionName;
 
     public ExtensionLoader(Class<T> type) {
         this.type = type;
         this.defaultExtensionName = getDefaultExtensionName();
-        injector = type == PropertyInjector.class ? null : ExtensionLoader.getExtensionLoader(PropertyInjector.class).getExtensionSelectorInstance();
+        propertyInjector = type == PropertyInjector.class ? null : ExtensionLoader.getExtensionLoader(PropertyInjector.class).getExtensionSelectorInstance();
     }
 
     /**
@@ -123,7 +125,38 @@ public class ExtensionLoader<T> {
 
     // 为 instance 注入相关的属性
     private void injectProperty(T instance) {
+        if (this.propertyInjector != null) {
+            Method[] methods = instance.getClass().getMethods();
+            for (Method method : methods) {
+                try {
+                    // 如果方法是 setter 方法
+                    if (isSetterMethod(method)) {
+                        // 去掉一些基本类型的属性注入
+                        Class<?> paramType = method.getParameterTypes()[0];
+                        if (ClassUtils.isPrimitives(paramType))
+                            continue;
+                        // 根据
+                        String property = getter2property(method.getName());
+                        Object propertyObj = propertyInjector.inject(paramType, property);
+                        if (propertyObj != null) {
+                            method.invoke(instance, propertyObj);
+                        }
+                    }
+                } catch (Exception e) {
+                    logger.warn("Inject property failed, the target is " + instance);
+                }
+            }
+        }
+    }
 
+    // 根据 getter 方法名获取对应的属性名
+    private String getter2property(String getter) {
+        return getter.length() > 3 ? getter.substring(3, 4).toLowerCase() + getter.substring(4) : "";
+    }
+
+    // 用于判断方法是否是 setter 方法（set 开头，参数个数为 1，修饰符为 public）
+    private boolean isSetterMethod(Method method) {
+        return method.getModifiers() == Modifier.PUBLIC && method.getParameters().length == 1 && method.getName().startsWith("set");
     }
 
     // 完成配置项的 classes 的加载，同时对不同类型的 class 进行缓存

@@ -2,7 +2,6 @@ package top.aprilyolies.beehive.extension;
 
 import org.junit.Before;
 import org.junit.Test;
-import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.compiler.JavassistCompiler;
 import top.aprilyolies.beehive.extension.testextension.TestExtension;
 import top.aprilyolies.beehive.utils.ClassUtils;
@@ -48,6 +47,5 @@ public class ExtensionTest {
         String name = obj.getClass().getName();
         Class<?>[] interfaces = obj.getClass().getInterfaces();
         TestExtension instance = (TestExtension) obj;
-        System.out.println(instance.methodWithSelectorAnnotationAndUrlParam("param1", new URL(), "param3"));
     }
 }
