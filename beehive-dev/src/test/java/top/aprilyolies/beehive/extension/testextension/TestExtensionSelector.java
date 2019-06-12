@@ -1,22 +1,15 @@
 package top.aprilyolies.beehive.extension.testextension;
 
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.extension.annotation.Selector;
 
 /**
  * @Author EvaJohnson
  * @Date 2019-06-11
  * @Email g863821569@gmail.com
  */
-public class TestExtensionImpl implements TestExtension {
-    TestExtension testExtension;
-
-    public TestExtension getTestExtension() {
-        return testExtension;
-    }
-
-    public void setTestExtension(TestExtension testExtension) {
-        this.testExtension = testExtension;
-    }
+@Selector
+public class TestExtensionSelector implements TestExtension {
 
     @Override
     public String methodWithSelectorAnnotation() {

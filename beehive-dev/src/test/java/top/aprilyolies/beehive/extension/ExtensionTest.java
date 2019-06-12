@@ -48,4 +48,10 @@ public class ExtensionTest {
         Class<?>[] interfaces = obj.getClass().getInterfaces();
         TestExtension instance = (TestExtension) obj;
     }
+
+    @Test
+    public void test() {
+        TestExtension extension = (TestExtension) extensionLoader.getExtension("test");
+        System.out.println(extension.methodWithSelectorAnnotation());
+    }
 }

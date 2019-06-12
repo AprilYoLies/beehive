@@ -234,7 +234,7 @@ public class ExtensionLoader<T> {
                 if (extensionSelectorClassCache == null) {
                     extensionSelectorClassCache = clazz;
                 } else {
-                    logger.error("Selector extension class should no more than one, ignore " + clazz.getName() + " extension class");
+                    logger.warn("Selector extension class should no more than one, ignore " + clazz.getName() + " extension class");
                 }
                 return;
             }
@@ -246,7 +246,7 @@ public class ExtensionLoader<T> {
             clazz.getConstructor();
             // 不能存在同名的不同 extension class
             if (extensionClasses.get(extensionName) != null && extensionClasses.get(extensionName) != clazz) {
-                logger.error("There is an ambiguous for an extension-name " + extensionName + " matched two " +
+                logger.warn("There is an ambiguous for an extension-name " + extensionName + " matched two " +
                         "different extension class");
             }
             extensionClasses.putIfAbsent(extensionName, clazz);
@@ -308,21 +308,21 @@ public class ExtensionLoader<T> {
 
     // 根据 extensionName 获取 extension 实例，优先从缓存中获取，没有的话，就根据 extension class 进行构建
     public T getExtension(String extensionName) {
+        T instance = null;
         if (extensionInstanceCache == null) {
-            extensionInstanceCache = new HashMap<>();
-        }
-        T instance = extensionInstanceCache.get(extensionName);
-        if (instance != null)
-            return instance;
-        synchronized (extensionInstanceMonitor) {
-            if (extensionInstanceCache.get(extensionName) == null) {
-                Map<String, Class<T>> cache = this.extensionClassCache;
-                try {
-                    instance = cache.get(extensionName).newInstance();
-                    injectProperty(instance);
-                    extensionInstanceCache.putIfAbsent(extensionName, instance);
-                } catch (Exception e) {
-                    throw new IllegalStateException("Can't get extension instance for extensionName " + extensionName, e.getCause());
+            synchronized (extensionInstanceMonitor) {
+                if (extensionInstanceCache == null) {
+                    extensionInstanceCache = new HashMap<>();
+                    if (extensionClassCache == null)
+                        loadExtensionClasses();
+                    Map<String, Class<T>> cache = this.extensionClassCache;
+                    try {
+                        instance = cache.get(extensionName).newInstance();
+                        injectProperty(instance);
+                        extensionInstanceCache.putIfAbsent(extensionName, instance);
+                    } catch (Exception e) {
+                        throw new IllegalStateException("Can't get extension instance for extensionName " + extensionName, e.getCause());
+                    }
                 }
             }
         }
