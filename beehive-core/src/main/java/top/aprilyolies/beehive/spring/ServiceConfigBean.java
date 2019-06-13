@@ -16,6 +16,16 @@ public class ServiceConfigBean {
     private Integer id;
     // 服务的名字
     private String name;
+    // 注册配置 bean
+    private RegistryConfigBean registry;
+
+    public RegistryConfigBean getRegistry() {
+        return registry;
+    }
+
+    public void setRegistry(RegistryConfigBean registry) {
+        this.registry = registry;
+    }
 
     public String getProtocol() {
         return protocol;
