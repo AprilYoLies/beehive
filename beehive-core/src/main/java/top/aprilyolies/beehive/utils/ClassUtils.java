@@ -195,4 +195,43 @@ public class ClassUtils {
             return "";
         return name.substring(3, 4).toLowerCase() + name.substring(4);
     }
+
+    /**
+     * get name.
+     * java.lang.Object[][].class => "java.lang.Object[][]"
+     *
+     * @param c class.
+     * @return name.
+     */
+    public static String getName(Class<?> c) {
+        if (c.isArray()) {
+            StringBuilder sb = new StringBuilder();
+            do {
+                sb.append("[]");
+                c = c.getComponentType();
+            }
+            while (c.isArray());
+
+            return c.getName() + sb.toString();
+        }
+        return c.getName();
+    }
+
+    /**
+     * Return the default ClassLoader to use: typically the thread context
+     * ClassLoader, if available; the ClassLoader that loaded the ClassUtils
+     * class will be used as fallback.
+     * <p>
+     * Call this method if you intend to use the thread context ClassLoader in a
+     * scenario where you absolutely need a non-null ClassLoader reference: for
+     * example, for class path resource loading (but not necessarily for
+     * <code>Class.forName</code>, which accepts a <code>null</code> ClassLoader
+     * reference as well).
+     *
+     * @return the default ClassLoader (never <code>null</code>)
+     * @see java.lang.Thread#getContextClassLoader()
+     */
+    public static ClassLoader getClassLoader() {
+        return getClassLoader(ClassUtils.class);
+    }
 }

@@ -3,6 +3,8 @@ package top.aprilyolies.beehive.registry;
 import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.extension.ExtensionLoader;
+import top.aprilyolies.beehive.proxy.ProxyFactory;
 import top.aprilyolies.beehive.utils.StringUtils;
 
 /**
@@ -13,16 +15,21 @@ import top.aprilyolies.beehive.utils.StringUtils;
 public abstract class AbstractRegistry implements Registry {
     protected final Logger logger = Logger.getLogger(getClass().getName());
 
+    protected final ProxyFactory selectorInstance = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getExtensionSelectorInstance();
+
     @Override
     public void registry(URL url) {
         if (url == null)
             throw new IllegalArgumentException("Can't publish a service for null url");
         try {
             doPublish(url);
+            createProxy(url);
         } catch (Exception e) {
             logger.error("publish service failed", e.getCause());
         }
     }
+
+    protected abstract void createProxy(URL url);
 
     protected abstract void doPublish(URL url) throws Exception;
 

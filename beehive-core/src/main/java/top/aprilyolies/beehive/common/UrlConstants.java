@@ -26,4 +26,8 @@ public class UrlConstants {
     public static final String CATEGORY = "category";
     // 表示分类的 provider 类型
     public static final String PROVIDERS = "providers";
+    // 表示分类的 provider 类型
+    public static final String SERVICE_REF = "ref";
+    // 代理工厂
+    public static final String PROXY_FACTORY = "proxy_factory";
 }

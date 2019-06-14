@@ -6,6 +6,8 @@ import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.invoker.Invoker;
+import top.aprilyolies.beehive.proxy.ProxyFactory;
 
 import static top.aprilyolies.beehive.common.UrlConstants.*;
 
@@ -42,10 +44,16 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
+    protected void createProxy(URL url) {
+        ProxyFactory proxyFactory = selectorInstance.createProxyFactory(url);
+        Invoker<?> proxy = proxyFactory.createProxy(url);
+    }
+
+    @Override
     protected void doPublish(URL url) throws Exception {
         try {
             String registryPath = getRegistryPath(url);
-            createPath(registryPath, false);
+            createPath(registryPath, true);
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -46,6 +46,7 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
                     fillParameters(registryUrls, this);
                     checkRegistryUrls(registryUrls);
                     registryService(registryUrls);
+
                 }
                 published = true;
             }
@@ -125,13 +126,14 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
         }
     }
 
+    // 向注册中心注册要发布的服务
     private void registryService(List<URL> registryUrls) {
         if (registryUrls == null || registryUrls.size() == 0) {
             logger.warn("None of url was registered");
             return;
         }
         for (URL registryUrl : registryUrls) {
-            registryUrl = convertToRegistryUrl(registryUrl);
+            convertToRegistryUrl(registryUrl);
             protocol.publish(registryUrl);
         }
     }
@@ -140,13 +142,11 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
      * 将原 url 转换为 registry url
      *
      * @param registryUrl 原 url 实例
-     * @return 转换后得到的 registry url
      */
-    private URL convertToRegistryUrl(URL registryUrl) {
+    private void convertToRegistryUrl(URL registryUrl) {
         URL originUrl = URL.copyFromUrl(registryUrl);
         registryUrl.setOriginUrl(originUrl);
         registryUrl.setProtocol(UrlConstants.REGISTRY_PROTOCOL);
-        return registryUrl;
     }
 
     /**
