@@ -22,5 +22,8 @@ public class UrlConstants {
     public static final String SERVICE = "service";
     // 默认服务端口号
     public static final String SERVICE_PORT = "7440";
-
+    // 用于表示注册的类型
+    public static final String CATEGORY = "category";
+    // 表示分类的 provider 类型
+    public static final String PROVIDERS = "providers";
 }

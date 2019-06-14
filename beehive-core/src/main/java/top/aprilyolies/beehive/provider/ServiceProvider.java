@@ -74,6 +74,9 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
                 String providerInfo = getProviderInfo();
                 registryUrl.putParameter(UrlConstants.PROVIDER, providerInfo);
             }
+            if (StringUtils.isEmpty(registryUrl.getParameter(UrlConstants.CATEGORY))) {
+                registryUrl.putParameter(UrlConstants.CATEGORY, UrlConstants.PROVIDERS);
+            }
         }
     }
 

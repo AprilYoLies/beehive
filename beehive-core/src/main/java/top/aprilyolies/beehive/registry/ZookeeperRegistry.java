@@ -45,7 +45,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
     protected void doPublish(URL url) throws Exception {
         try {
             String registryPath = getRegistryPath(url);
-            createPath(registryPath, true);
+            createPath(registryPath, false);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -111,8 +111,16 @@ public class ZookeeperRegistry extends AbstractRegistry {
         String group = url.getParameterElseDefault(GROUP_KEY, DEFAULT_GROUP);
         String serviceName = url.getPath();
         String provider = url.getParameter(UrlConstants.PROVIDER);
+        String category = url.getParameter(CATEGORY);
         StringBuilder sb = new StringBuilder();
-        sb.append(PATH_SEPARATOR).append(group).append(PATH_SEPARATOR).append(serviceName).append(PATH_SEPARATOR).append(provider);
+        sb.append(PATH_SEPARATOR)
+                .append(group)
+                .append(PATH_SEPARATOR)
+                .append(serviceName)
+                .append(PATH_SEPARATOR)
+                .append(category)
+                .append(PATH_SEPARATOR)
+                .append(provider);
         return sb.toString();
     }
 }
