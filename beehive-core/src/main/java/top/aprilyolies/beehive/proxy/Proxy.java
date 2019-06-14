@@ -1,6 +1,5 @@
 package top.aprilyolies.beehive.proxy;
 
-import top.aprilyolies.beehive.Exception.NoSuchPropertyException;
 import top.aprilyolies.beehive.proxy.support.ClassGenerator;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.ReflectUtils;
@@ -12,14 +11,13 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.regex.Matcher;
 
 /**
  * @Author EvaJohnson
  * @Date 2019-06-14
  * @Email g863821569@gmail.com
  */
-public class Proxy {
+public abstract class Proxy {
     private static final Map<Class<?>, Proxy> proxyCache = new ConcurrentHashMap<>();
     private static final AtomicLong PROXY_CLASS_COUNTER = new AtomicLong(0);
 
@@ -39,42 +37,10 @@ public class Proxy {
         String name = clazz.getName();
         ClassLoader cl = ClassUtils.getClassLoader(clazz);
 
-        // 主要是对三个函数进行拼接
-        // setPropertyValue
-        // getPropertyValue
         // invokeMethod
-        // public void setPropertyValue (Object o, String n, Object v){
-        StringBuilder c1 = new StringBuilder("public void setPropertyValue(Object o, String n, Object v){ ");
-        // public Object getPropertyValue(Object o, String n){
-        StringBuilder c2 = new StringBuilder("public Object getPropertyValue(Object o, String n){ ");
         // public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException{
-        StringBuilder c3 = new StringBuilder("public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws " + InvocationTargetException.class.getName() + "{ ");
+        StringBuilder c3 = new StringBuilder("public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws " + InvocationTargetException.class.getName() + ", java.lang.NoSuchMethodException { ");
 
-        // 根据 name 构造出这样的代码
-        // public void setPropertyValue (Object o, String n, Object v){
-        //     org.apache.dubbo.demo.DemoService w;
-        //     try {
-        //         w = ((org.apache.dubbo.demo.DemoService) $1);
-        //     } catch (Throwable e) {
-        //         throw new IllegalArgumentException(e);
-        //     }
-        c1.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
-        // public Object getPropertyValue (Object o, String n){
-        //     org.apache.dubbo.demo.DemoService w;
-        //     try {
-        //         w = ((org.apache.dubbo.demo.DemoService) $1);
-        //     } catch (Throwable e) {
-        //         throw new IllegalArgumentException(e);
-        //     }
-        c2.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
-        // public Object invokeMethod (Object o, String n, Class[]p, Object[]v) throws
-        // java.lang.reflect.InvocationTargetException {
-        //     org.apache.dubbo.demo.DemoService w;
-        //     try {
-        //         w = ((org.apache.dubbo.demo.DemoService) $1);
-        //     } catch (Throwable e) {
-        //         throw new IllegalArgumentException(e);
-        //     }
         c3.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
 
         // 保存字段的 name 和 type
@@ -98,30 +64,6 @@ public class Proxy {
                 continue;
             }
 
-            // 根据 field 进行构建
-            // public void setPropertyValue (Object o, String n, Object v){
-            //     org.apache.dubbo.demo.DemoService w;
-            //     try {
-            //         w = ((org.apache.dubbo.demo.DemoService) $1);
-            //     } catch (Throwable e) {
-            //         throw new IllegalArgumentException(e);
-            //     }
-            //     if( $2.equals("serviceName")){
-            //         w.serviceName=(org.apache.dubbo.demo.DemoService) $3;
-            //         return;
-            //     }
-            c1.append(" if( $2.equals(\"").append(fn).append("\") ){ w.").append(fn).append("=").append(arg(ft, "$3")).append("; return; }");
-            // public Object getPropertyValue (Object o, String n){
-            //     org.apache.dubbo.demo.DemoService w;
-            //     try {
-            //         w = ((org.apache.dubbo.demo.DemoService) $1);
-            //     } catch (Throwable e) {
-            //         throw new IllegalArgumentException(e);
-            //     }
-            //     if( $2.equals("serviceName")){
-            //         return ($w)w.serviceName;
-            //     }
-            c2.append(" if( $2.equals(\"").append(fn).append("\") ){ return ($w)w.").append(fn).append("; }");
             // 保存字段的 name 和 type
             pts.put(fn, ft);
         }
@@ -144,15 +86,6 @@ public class Proxy {
                 c3.append(" if( \"").append(mn).append("\".equals( $2 ) ");
                 int len = m.getParameterTypes().length;
                 // 补上方法参数信息
-                // public Object invokeMethod (Object o, String n, Class[]p, Object[]v) throws java.lang.reflect.InvocationTargetException {
-                //     org.apache.dubbo.demo.DemoService w;
-                //     try {
-                //         w = ((org.apache.dubbo.demo.DemoService) $1);
-                //     } catch (Throwable e) {
-                //         throw new IllegalArgumentException(e);
-                //     }
-                //     try {
-                //         if ("sayHello".equals($2) && $3.length == 1
                 c3.append(" && ").append(" $3.length == ").append(len);
 
                 boolean override = false;
@@ -167,30 +100,11 @@ public class Proxy {
                     if (len > 0) {
                         for (int l = 0; l < len; l++) {
                             // 补上方法参数信息
-                            // public Object invokeMethod (Object o, String n, Class[]p, Object[]v) throws java.lang.reflect.InvocationTargetException {
-                            //     org.apache.dubbo.demo.DemoService w;
-                            //     try {
-                            //         w = ((org.apache.dubbo.demo.DemoService) $1);
-                            //     } catch (Throwable e) {
-                            //         throw new IllegalArgumentException(e);
-                            //     }
-                            //     try {
-                            //         if ("sayHello".equals($2) && $3.length == 1 && $3[l].getName().equals("java.lang.String")){;
-
                             c3.append(" && ").append(" $3[").append(l).append("].getName().equals(\"")
                                     .append(m.getParameterTypes()[l].getName()).append("\")");
                         }
                     }
                 }
-                // public Object invokeMethod (Object o, String n, Class[]p, Object[]v) throws java.lang.reflect.InvocationTargetException {
-                //     org.apache.dubbo.demo.DemoService w;
-                //     try {
-                //         w = ((org.apache.dubbo.demo.DemoService) $1);
-                //     } catch (Throwable e) {
-                //         throw new IllegalArgumentException(e);
-                //     }
-                //     try {
-                //         if ("sayHello".equals($2) && $3.length == 1) {
                 c3.append(" ) { ");
 
                 // 拼接方法的返回值
@@ -201,17 +115,6 @@ public class Proxy {
                 }
 
                 // 拼接完返回值后
-                // public Object invokeMethod (Object o, String n, Class[]p, Object[]v) throws java.lang.reflect.InvocationTargetException {
-                //     org.apache.dubbo.demo.DemoService w;
-                //     try {
-                //         w = ((org.apache.dubbo.demo.DemoService) $1);
-                //     } catch (Throwable e) {
-                //         throw new IllegalArgumentException(e);
-                //     }
-                //     try {
-                //         if ("sayHello".equals($2) && $3.length == 1) {
-                //             return ($w) w.sayHello((java.lang.String) $4[0]);
-                //         }
                 c3.append(" }");
 
                 // 保存拼接的方法名
@@ -221,9 +124,6 @@ public class Proxy {
                     dmns.add(mn);
                 }
                 // 保存方法的签名和方法实例
-                // get method desc.
-                // int do(int arg1) => "do(I)I"
-                // void do(String arg1,boolean arg2) => "do(Ljava/lang/String;Z)V"
                 ms.put(ReflectUtils.getDesc(m), m);
             }
             c3.append(" } catch(Throwable e) { ");
@@ -232,74 +132,7 @@ public class Proxy {
         }
 
         // 补全括号即剩余信息
-        // o 方法调用的目标对象，n 方法名，p 方法的参数类型，v 方法的参数
-        // public Object invokeMethod (Object o, String n, Class[]p, Object[]v) throws java.lang.reflect.InvocationTargetException {
-        //     org.apache.dubbo.demo.DemoService w;
-        //     try {
-        //         w = ((org.apache.dubbo.demo.DemoService) $1);
-        //     } catch (Throwable e) {
-        //         throw new IllegalArgumentException(e);
-        //     }
-        //     try {
-        //         if ("sayHello".equals($2) && $3.length == 1) {
-        //             return ($w) w.sayHello((java.lang.String) $4[0]);
-        //         }
-        //     } catch (Throwable e) {
-        //         throw new java.lang.reflect.InvocationTargetException(e);
-        //     }
-        //     throw new org.apache.dubbo.common.bytecode.NoSuchMethodException("Not found method \"" + $2 + "\" in class org.apache.dubbo.demo.DemoService.");
-        // }
         c3.append(" throw new " + NoSuchMethodException.class.getName() + "(\"Not found method \\\"\"+$2+\"\\\" in class " + clazz.getName() + ".\"); }");
-
-        // deal with get/set method.
-        Matcher matcher;
-        // 这里 ms 保存的是接口中非 Object 类方法的签名和方法实例
-        for (Map.Entry<String, Method> entry : ms.entrySet()) {
-            // 方法签名
-            String md = entry.getKey();
-            // 方法实例
-            Method method = entry.getValue();
-            // 匹配 getter 方法
-            if ((matcher = ReflectUtils.GETTER_METHOD_DESC_PATTERN.matcher(md)).matches()) {
-                String pn = propertyName(matcher.group(1));
-                c2.append(" if( $2.equals(\"").append(pn).append("\") ){ return ($w)w.").append(method.getName()).append("(); }");
-                pts.put(pn, method.getReturnType());
-            } else if ((matcher = ReflectUtils.IS_HAS_CAN_METHOD_DESC_PATTERN.matcher(md)).matches()) {
-                // 匹配 is、has、can 方法
-                String pn = propertyName(matcher.group(1));
-                c2.append(" if( $2.equals(\"").append(pn).append("\") ){ return ($w)w.").append(method.getName()).append("(); }");
-                pts.put(pn, method.getReturnType());
-            } else if ((matcher = ReflectUtils.SETTER_METHOD_DESC_PATTERN.matcher(md)).matches()) {
-                // 匹配 setter 方法
-                Class<?> pt = method.getParameterTypes()[0];
-                String pn = propertyName(matcher.group(1));
-                c1.append(" if( $2.equals(\"").append(pn).append("\") ){ w.").append(method.getName()).append("(").append(arg(pt, "$3")).append("); return; }");
-                pts.put(pn, pt);
-            }
-        }
-        // c1 的拼接结果
-        // public void setPropertyValue (Object o, String n, Object v){
-        //     org.apache.dubbo.demo.DemoService w;
-        //     try {
-        //         w = ((org.apache.dubbo.demo.DemoService) $1);
-        //     } catch (Throwable e) {
-        //         throw new IllegalArgumentException(e);
-        //     }
-        //     throw new org.apache.dubbo.common.bytecode.NoSuchPropertyException("Not found property \"" + $2 + "\" field or setter method in class org.apache.dubbo.demo.DemoService.");
-        // }
-        c1.append(" throw new " + NoSuchPropertyException.class.getName() + "(\"Not found property \\\"\"+$2+\"\\\" field or setter method in class " + clazz.getName() + ".\"); }");
-
-        // c2 的拼接结果
-        //  public Object getPropertyValue (Object o, String n){
-        //      org.apache.dubbo.demo.DemoService w;
-        //      try {
-        //          w = ((org.apache.dubbo.demo.DemoService) $1);
-        //      } catch (Throwable e) {
-        //          throw new IllegalArgumentException(e);
-        //      }
-        //      throw new org.apache.dubbo.common.bytecode.NoSuchPropertyException("Not found property \"" + $2 + "\" field or setter method in class org.apache.dubbo.demo.DemoService.");
-        //  }
-        c2.append(" throw new " + NoSuchPropertyException.class.getName() + "(\"Not found property \\\"\"+$2+\"\\\" field or setter method in class " + clazz.getName() + ".\"); }");
 
         // make class
         // 对构建的 Proxy 类进行计数
@@ -324,8 +157,6 @@ public class Proxy {
         cc.addMethod("public Class getPropertyType(String n){ return (Class)pts.get($1); }");
         cc.addMethod("public String[] getMethodNames(){ return mns; }");
         cc.addMethod("public String[] getDeclaredMethodNames(){ return dmns; }");
-        cc.addMethod(c1.toString());
-        cc.addMethod(c2.toString());
         cc.addMethod(c3.toString());
 
         try {
@@ -361,10 +192,6 @@ public class Proxy {
             mns.clear();
             dmns.clear();
         }
-    }
-
-    private static String propertyName(String pn) {
-        return pn.length() == 1 || Character.isLowerCase(pn.charAt(1)) ? Character.toLowerCase(pn.charAt(0)) + pn.substring(1) : pn;
     }
 
     // methods 方法不为空，且不全为 Object 声明的方法
@@ -426,4 +253,16 @@ public class Proxy {
         }
         return "(" + ReflectUtils.getName(cl) + ")" + name;
     }
+
+    /**
+     * invoke method.
+     *
+     * @param instance instance.
+     * @param mn       method name.
+     * @param types
+     * @param args     argument array.
+     * @return return value.
+     */
+    abstract public Object invokeMethod(Object instance, String mn, Class<?>[] types, Object[] args) throws
+            NoSuchMethodException, InvocationTargetException;
 }
