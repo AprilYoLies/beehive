@@ -18,6 +18,8 @@ package top.aprilyolies.beehive.compiler;
 
 
 import javassist.CtClass;
+import top.aprilyolies.beehive.compiler.support.AbstractCompiler;
+import top.aprilyolies.beehive.compiler.support.CtClassBuilder;
 import top.aprilyolies.beehive.utils.ClassUtils;
 
 import java.util.Arrays;

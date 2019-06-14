@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package top.aprilyolies.beehive.compiler;
+package top.aprilyolies.beehive.compiler.support;
 
+import top.aprilyolies.beehive.compiler.Compiler;
 import top.aprilyolies.beehive.utils.ClassUtils;
 
 import java.util.regex.Matcher;

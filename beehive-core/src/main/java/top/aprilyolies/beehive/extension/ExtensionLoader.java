@@ -12,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -119,6 +118,7 @@ public class ExtensionLoader<T> {
             //noinspection unchecked
             return (Class<T>) compilerSelector.compile(code, classLoader);
         } catch (Exception e) {
+            e.printStackTrace();
             throw new IllegalStateException("Can't create extension instance.", e);
         }
     }
@@ -130,7 +130,7 @@ public class ExtensionLoader<T> {
             for (Method method : methods) {
                 try {
                     // 如果方法是 setter 方法
-                    if (isSetterMethod(method)) {
+                    if (ClassUtils.isSetterMethod(method)) {
                         // 去掉一些基本类型的属性注入
                         Class<?> paramType = method.getParameterTypes()[0];
                         if (ClassUtils.isPrimitives(paramType))
@@ -152,11 +152,6 @@ public class ExtensionLoader<T> {
     // 根据 getter 方法名获取对应的属性名
     private String getter2property(String getter) {
         return getter.length() > 3 ? getter.substring(3, 4).toLowerCase() + getter.substring(4) : "";
-    }
-
-    // 用于判断方法是否是 setter 方法（set 开头，参数个数为 1，修饰符为 public）
-    private boolean isSetterMethod(Method method) {
-        return method.getModifiers() == Modifier.PUBLIC && method.getParameters().length == 1 && method.getName().startsWith("set");
     }
 
     // 完成配置项的 classes 的加载，同时对不同类型的 class 进行缓存
@@ -242,8 +237,6 @@ public class ExtensionLoader<T> {
                 extensionWrapperCache.add(clazz);
                 return;
             }
-            // 确保获得的 clazz 有默认构造函数
-            clazz.getConstructor();
             // 不能存在同名的不同 extension class
             if (extensionClasses.get(extensionName) != null && extensionClasses.get(extensionName) != clazz) {
                 logger.warn("There is an ambiguous for an extension-name " + extensionName + " matched two " +
@@ -326,7 +319,7 @@ public class ExtensionLoader<T> {
                 }
             }
         }
-        return instance;
+        return extensionInstanceCache.get(extensionName);
     }
 
     public Set<String> getSupportedExtensions() {
@@ -334,5 +327,17 @@ public class ExtensionLoader<T> {
             loadExtensionClasses();
         }
         return extensionClassCache.keySet();
+    }
+
+    public Class<T> getExtensionClass(String extName) {
+        if (extensionClassCache != null) {
+            return extensionClassCache.get(extName);
+        }
+        synchronized (extensionClassMonitor) {
+            loadExtensionClasses();
+            if (extensionClassCache == null)
+                throw new IllegalStateException("Can't find extension class for extension name " + extName);
+            return extensionClassCache.get(extName);
+        }
     }
 }

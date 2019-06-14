@@ -11,10 +11,15 @@ import top.aprilyolies.beehive.extension.annotation.SPI;
 import top.aprilyolies.beehive.extension.annotation.Selector;
 
 /**
- * TODO
+ * beehive 程序内部的逻辑走向的向导，程序会根据 url 的协议类型来决定接下来该进行什么操作
  */
 @SPI
 public interface Protocol {
+    /**
+     * 发布服务的函数逻辑，依赖于 url 的协议类型
+     *
+     * @param url
+     */
     @Selector
     void publish(URL url);
 }

@@ -4,6 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import top.aprilyolies.beehive.compiler.JavassistCompiler;
 import top.aprilyolies.beehive.extension.testextension.TestExtension;
+import top.aprilyolies.beehive.protocol.Protocol;
+import top.aprilyolies.beehive.registry.factory.RegistryFactory;
 import top.aprilyolies.beehive.utils.ClassUtils;
 
 /**
@@ -50,8 +52,18 @@ public class ExtensionTest {
     }
 
     @Test
-    public void test() {
+    public void testPropertyInjection() {
         TestExtension extension = (TestExtension) extensionLoader.getExtension("test");
         System.out.println(extension.methodWithSelectorAnnotation());
+    }
+
+    @Test
+    public void testGetProtocolExtension() {
+        Protocol registry = ExtensionLoader.getExtensionLoader(Protocol.class).getExtension("registry");
+    }
+
+    @Test
+    public void test() {
+        RegistryFactory registry = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtensionSelectorInstance();
     }
 }

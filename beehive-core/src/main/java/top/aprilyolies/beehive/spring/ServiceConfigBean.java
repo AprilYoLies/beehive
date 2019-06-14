@@ -7,7 +7,7 @@ package top.aprilyolies.beehive.spring;
  */
 public class ServiceConfigBean {
     // 服务使用的协议，默认为 beehive
-    private String protocol = "beehive";
+    private String protocol;
     // 待发布服务的接口全限定名
     private String service;
     // 服务的实现类

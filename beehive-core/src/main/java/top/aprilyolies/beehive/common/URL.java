@@ -1,7 +1,11 @@
 package top.aprilyolies.beehive.common;
 
+import org.apache.log4j.Logger;
+import top.aprilyolies.beehive.utils.StringUtils;
+
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * @Author EvaJohnson
@@ -9,23 +13,43 @@ import java.util.Map;
  * @Email g863821569@gmail.com
  */
 public class URL {
+    private final Logger logger = Logger.getLogger(URL.class);
     // 协议
     private String protocol;
     // 主机地址
     private String host;
     // 端口号
-    private int port;
+    private int port = -1;
     // 路径
     private String path;
     // 参数集合
-    private Map<String, String> parameters;
+    private final Map<String, String> parameters = new ConcurrentHashMap<>();
+
+    private URL originUrl;
 
     public URL(String protocol, String host, int port, String path, Map<String, String> parameters) {
         this.protocol = protocol;
         this.host = host;
-        this.parameters = parameters;
+        if (parameters != null)
+            this.parameters.putAll(parameters);
         this.path = path;
         this.port = port;
+    }
+
+    public URL(URL from) {
+        this.protocol = from.getProtocol();
+        this.host = from.getHost();
+        this.port = from.getPort();
+        this.parameters.putAll(from.getParameters());
+        this.path = from.getPath();
+    }
+
+    public URL getOriginUrl() {
+        return originUrl;
+    }
+
+    public void setOriginUrl(URL originUrl) {
+        this.originUrl = originUrl;
     }
 
     public String getProtocol() {
@@ -62,10 +86,6 @@ public class URL {
 
     public Map<String, String> getParameters() {
         return parameters;
-    }
-
-    public void setParameters(Map<String, String> parameters) {
-        this.parameters = parameters;
     }
 
     // 直接通过 address 构建 URL
@@ -141,7 +161,35 @@ public class URL {
         return new URL(protocol, host, port, path, parameters);
     }
 
+    // 获取 url 的参数
     public String getParameter(String key) {
         return parameters.get(key);
+    }
+
+    public void putParameter(String key, String value) {
+        if (StringUtils.isEmpty(key) || StringUtils.isEmpty(value)) {
+            logger.warn("The key and value should not be null");
+        }
+        parameters.putIfAbsent(key, value);
+    }
+
+    // 复制一个 URL
+    public static URL copyFromUrl(URL from) {
+        return new URL(from);
+    }
+
+    /**
+     * 尝试从 parameters 中获取 key 对应的值，如果获取的值为空，那么就返回缺省值
+     *
+     * @param key 属性的 key
+     * @param dft 缺省值
+     * @return
+     */
+    public String getParameterElseDefault(String key, String dft) {
+        String s = parameters.get(key);
+        if (StringUtils.isEmpty(s)) {
+            s = dft;
+        }
+        return s;
     }
 }

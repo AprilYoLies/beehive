@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Date;
 
 /**
@@ -169,5 +171,28 @@ public class ClassUtils {
     public static boolean isPrimitive(Class<?> cls) {
         return cls.isPrimitive() || cls == String.class || cls == Boolean.class || cls == Character.class
                 || Number.class.isAssignableFrom(cls) || Date.class.isAssignableFrom(cls);
+    }
+
+    // 用于判断方法是否是 setter 方法（set 开头，参数个数为 1，修饰符为 public）
+    public static boolean isSetterMethod(Method method) {
+        return method.getModifiers() == Modifier.PUBLIC && method.getParameters().length == 1 && method.getName().startsWith("set");
+    }
+
+    // 用于判断方法是否是 getter 方法（get 开头，参数个数为 0，修饰符为 public）
+    public static boolean isGetterrMethod(Method method) {
+        return method.getModifiers() == Modifier.PUBLIC && method.getParameters().length == 0 && method.getName().startsWith("get");
+    }
+
+    /**
+     * 根据 getter 或者 setter 方法获取对应的属性值
+     *
+     * @param method 方法类
+     * @return 方法对应的属性名
+     */
+    public static String method2Property(Method method) {
+        String name = method.getName();
+        if (!name.startsWith("get") && !name.startsWith("set") && name.length() <= 3)
+            return "";
+        return name.substring(3, 4).toLowerCase() + name.substring(4);
     }
 }

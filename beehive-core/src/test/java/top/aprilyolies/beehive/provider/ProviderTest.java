@@ -1,6 +1,8 @@
 package top.aprilyolies.beehive.provider;
 
 import org.junit.Test;
+import top.aprilyolies.beehive.provider.service.DemoService;
+import top.aprilyolies.beehive.provider.service.DemoServiceImpl;
 import top.aprilyolies.beehive.spring.RegistryConfigBean;
 
 /**
@@ -15,6 +17,8 @@ public class ProviderTest {
         RegistryConfigBean registry = new RegistryConfigBean();
         registry.setAddress(new String[]{"zookeeper://127.0.0.1:2181"});
         provider.setRegistry(registry);
+        provider.setRef(DemoServiceImpl.class.getName());
+        provider.setService(DemoService.class.getName());
         provider.exportService();
     }
 }
