@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.proxy;
 
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.proxy.support.Proxy;
 
 /**
  * @Author EvaJohnson

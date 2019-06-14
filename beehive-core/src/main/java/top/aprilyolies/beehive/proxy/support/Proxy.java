@@ -1,14 +1,12 @@
-package top.aprilyolies.beehive.proxy;
+package top.aprilyolies.beehive.proxy.support;
 
-import top.aprilyolies.beehive.proxy.support.ClassGenerator;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.ReflectUtils;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -39,34 +37,9 @@ public abstract class Proxy {
 
         // invokeMethod
         // public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException{
-        StringBuilder c3 = new StringBuilder("public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws " + InvocationTargetException.class.getName() + ", java.lang.NoSuchMethodException { ");
+        StringBuilder sb = new StringBuilder("public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws " + InvocationTargetException.class.getName() + ", java.lang.NoSuchMethodException { ");
 
-        c3.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
-
-        // 保存字段的 name 和 type
-        Map<String, Class<?>> pts = new HashMap<>(); // <property name, property types>
-        // 保存方法的 desc（签名） 和 instance
-        // get method desc.
-        // int do(int arg1) => "do(I)I"
-        // void do(String arg1,boolean arg2) => "do(Ljava/lang/String;Z)V"
-        Map<String, Method> ms = new LinkedHashMap<>(); // <method desc, Method instance>
-        // 保存方法名，包括 Object 类声明的方法
-        List<String> mns = new ArrayList<>(); // method names.
-        // 保存方法名，仅限服务接口声明的方法
-        List<String> dmns = new ArrayList<>(); // declaring method names.
-
-        // get all public field.
-        for (Field f : clazz.getFields()) {
-            String fn = f.getName();
-            Class<?> ft = f.getType();
-            // 避开 static 和 transient 修饰的字段
-            if (Modifier.isStatic(f.getModifiers()) || Modifier.isTransient(f.getModifiers())) {
-                continue;
-            }
-
-            // 保存字段的 name 和 type
-            pts.put(fn, ft);
-        }
+        sb.append(name).append(" w; try{ w = ((").append(name).append(")$1); }catch(Throwable e){ throw new IllegalArgumentException(e); }");
 
         Method[] methods = clazz.getMethods();
         // get all public method.
@@ -74,7 +47,7 @@ public abstract class Proxy {
         boolean hasMethod = hasMethods(methods);
         if (hasMethod) {
             // 通过 methods 对 c3 进行构造
-            c3.append(" try{");
+            sb.append(" try{");
             for (Method m : methods) {
                 //ignore Object's method.
                 if (m.getDeclaringClass() == Object.class) {
@@ -83,10 +56,10 @@ public abstract class Proxy {
 
                 // 通过方法名进行构造
                 String mn = m.getName();
-                c3.append(" if( \"").append(mn).append("\".equals( $2 ) ");
+                sb.append(" if( \"").append(mn).append("\".equals( $2 ) ");
                 int len = m.getParameterTypes().length;
                 // 补上方法参数信息
-                c3.append(" && ").append(" $3.length == ").append(len);
+                sb.append(" && ").append(" $3.length == ").append(len);
 
                 boolean override = false;
                 for (Method m2 : methods) {
@@ -100,39 +73,30 @@ public abstract class Proxy {
                     if (len > 0) {
                         for (int l = 0; l < len; l++) {
                             // 补上方法参数信息
-                            c3.append(" && ").append(" $3[").append(l).append("].getName().equals(\"")
+                            sb.append(" && ").append(" $3[").append(l).append("].getName().equals(\"")
                                     .append(m.getParameterTypes()[l].getName()).append("\")");
                         }
                     }
                 }
-                c3.append(" ) { ");
+                sb.append(" ) { ");
 
                 // 拼接方法的返回值
                 if (m.getReturnType() == Void.TYPE) {
-                    c3.append(" w.").append(mn).append('(').append(args(m.getParameterTypes(), "$4")).append(");").append(" return null;");
+                    sb.append(" w.").append(mn).append('(').append(args(m.getParameterTypes(), "$4")).append(");").append(" return null;");
                 } else {
-                    c3.append(" return ($w)w.").append(mn).append('(').append(args(m.getParameterTypes(), "$4")).append(");");
+                    sb.append(" return ($w)w.").append(mn).append('(').append(args(m.getParameterTypes(), "$4")).append(");");
                 }
 
                 // 拼接完返回值后
-                c3.append(" }");
-
-                // 保存拼接的方法名
-                mns.add(mn);
-                if (m.getDeclaringClass() == clazz) {
-                    // 保存方法名，仅限服务接口声明的方法
-                    dmns.add(mn);
-                }
-                // 保存方法的签名和方法实例
-                ms.put(ReflectUtils.getDesc(m), m);
+                sb.append(" }");
             }
-            c3.append(" } catch(Throwable e) { ");
-            c3.append("     throw new java.lang.reflect.InvocationTargetException(e); ");
-            c3.append(" }");
+            sb.append(" } catch(Throwable e) { ");
+            sb.append("     throw new java.lang.reflect.InvocationTargetException(e); ");
+            sb.append(" }");
         }
 
         // 补全括号即剩余信息
-        c3.append(" throw new " + NoSuchMethodException.class.getName() + "(\"Not found method \\\"\"+$2+\"\\\" in class " + clazz.getName() + ".\"); }");
+        sb.append(" throw new " + NoSuchMethodException.class.getName() + "(\"Not found method \\\"\"+$2+\"\\\" in class " + clazz.getName() + ".\"); }");
 
         // make class
         // 对构建的 Proxy 类进行计数
@@ -144,42 +108,14 @@ public abstract class Proxy {
         cc.setSuperClass(Proxy.class);
 
         cc.addDefaultConstructor();
-        cc.addField("public static String[] pns;"); // property name array.
-        cc.addField("public static " + Map.class.getName() + " pts;"); // property type map.
-        cc.addField("public static String[] mns;"); // all method name array.
-        cc.addField("public static String[] dmns;"); // declared method name array.
-        for (int i = 0, len = ms.size(); i < len; i++) {    // 方法的参数类型数组，有几个函数就会有几个数组
-            cc.addField("public static Class[] mts" + i + ";");
-        }
 
-        cc.addMethod("public String[] getPropertyNames(){ return pns; }");
-        cc.addMethod("public boolean hasProperty(String n){ return pts.containsKey($1); }");
-        cc.addMethod("public Class getPropertyType(String n){ return (Class)pts.get($1); }");
-        cc.addMethod("public String[] getMethodNames(){ return mns; }");
-        cc.addMethod("public String[] getDeclaredMethodNames(){ return dmns; }");
-        cc.addMethod(c3.toString());
+        cc.addMethod(sb.toString());
 
         try {
             // 根据 ClassGenerator 生成真正的 Class 对象
             Class<?> wc = cc.toClass();
             // setup static field.
             // 根据上边获取的信息对 Class 对象的某些属性进行填充
-            // 字段的 name 和 type
-            wc.getField("pts").set(null, pts);
-            // pns 集合专门用来保存字段的名字
-            wc.getField("pns").set(null, pts.keySet().toArray(new String[0]));
-            // mns 集合专门用来保存方法名
-            wc.getField("mns").set(null, mns.toArray(new String[0]));
-            // 保存方法名，仅限服务接口声明的方法
-            wc.getField("dmns").set(null, dmns.toArray(new String[0]));
-            int ix = 0;
-            // ms 保存的是方法签名和方法实例
-            // 遍历方法实例
-            for (Method m : ms.values()) {
-                // mts 字段用来保存方法的参数类型
-                wc.getField("mts" + ix++).set(null, m.getParameterTypes());
-            }
-            // 返回构建的 Proxy 实例
             return (Proxy) wc.newInstance();
         } catch (RuntimeException e) {
             throw e;
@@ -188,9 +124,6 @@ public abstract class Proxy {
         } finally {
             // 对相关资源进行释放
             cc.release();
-            ms.clear();
-            mns.clear();
-            dmns.clear();
         }
     }
 

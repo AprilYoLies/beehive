@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.invoker.Invoker;
+import top.aprilyolies.beehive.proxy.support.Proxy;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.StringUtils;
 

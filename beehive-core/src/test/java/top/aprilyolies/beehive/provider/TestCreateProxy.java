@@ -3,7 +3,7 @@ package top.aprilyolies.beehive.provider;
 import org.junit.Test;
 import top.aprilyolies.beehive.provider.service.DemoService;
 import top.aprilyolies.beehive.provider.service.DemoServiceImpl;
-import top.aprilyolies.beehive.proxy.Proxy;
+import top.aprilyolies.beehive.proxy.support.Proxy;
 
 import java.lang.reflect.InvocationTargetException;
 

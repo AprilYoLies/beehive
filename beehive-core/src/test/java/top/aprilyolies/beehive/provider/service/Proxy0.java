@@ -5,33 +5,13 @@ package top.aprilyolies.beehive.provider.service;
  * @Date 2019-06-14
  * @Email g863821569@gmail.com
  */
-public class Proxy0 extends top.aprilyolies.beehive.proxy.Proxy {
-    public static String[] pns;
-    public static java.util.Map pts;
-    public static String[] mns;
-    public static String[] dmns;
-    public static Class[] mts0;
 
-    public String[] Proxy() {
-        return pns;
-    }
+import top.aprilyolies.beehive.proxy.support.Proxy;
 
-    public boolean hasProperty(String n) {
-        return pts.containsKey(n);
-    }
-
-    public Class getPropertyType(String n) {
-        return (Class) pts.get(n);
-    }
-
-    public String[] getMethodNames() {
-        return mns;
-    }
-
-    public String[] getDeclaredMethodNames() {
-        return dmns;
-    }
-
+/**
+ * 根据 DemoService 构建出来的代理类的代码
+ */
+public class Proxy0 extends Proxy {
     public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException, java.lang.NoSuchMethodException {
         top.aprilyolies.beehive.provider.service.DemoService w;
         try {
