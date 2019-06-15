@@ -30,4 +30,12 @@ public class UrlConstants {
     public static final String SERVICE_REF = "ref";
     // 代理工厂
     public static final String PROXY_FACTORY = "proxy_factory";
+    // 服务发布使用的协议，这个参数将会决定服务调用的性能
+    public static final String SERVICE_PROTOCOL = "service_protocol";
+    // 默认的服务发布协议，该协议会使用 netty 作为底层通信
+    public static final String DEFAULT_SERVICE_PROTOCOL = "beehive";
+    // 默认的服务发布协议，该协议会使用 netty 作为底层通信
+    public static final String TRANSPORTER = "transporterSelector";
+    // 通信的编解码器
+    public static final String CODEC = "codec";
 }

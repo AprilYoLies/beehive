@@ -1,1 +1,2 @@
 registry=top.aprilyolies.beehive.protocol.RegistryProtocol
+beehive=top.aprilyolies.beehive.protocol.BeehiveProtocol

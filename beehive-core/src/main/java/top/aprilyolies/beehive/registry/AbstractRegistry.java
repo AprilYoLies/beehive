@@ -2,10 +2,9 @@ package top.aprilyolies.beehive.registry;
 
 import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.URL;
-import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
+import top.aprilyolies.beehive.protocol.Protocol;
 import top.aprilyolies.beehive.proxy.ProxyFactory;
-import top.aprilyolies.beehive.utils.StringUtils;
 
 /**
  * @Author EvaJohnson
@@ -14,8 +13,10 @@ import top.aprilyolies.beehive.utils.StringUtils;
  */
 public abstract class AbstractRegistry implements Registry {
     protected final Logger logger = Logger.getLogger(getClass().getName());
-
-    protected final ProxyFactory selectorInstance = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getExtensionSelectorInstance();
+    // 该 protocol selector 将会根据 url 来决定使用何种服务发布协议
+    Protocol protocolSelector = ExtensionLoader.getExtensionLoader(Protocol.class).getExtensionSelectorInstance();
+    // 该 proxy factory selector 将会决定使用那种方式来生成代理类，现在支持 javassist 和 jdk 代理方法
+    final ProxyFactory proxyFactorySelector = ExtensionLoader.getExtensionLoader(ProxyFactory.class).getExtensionSelectorInstance();
 
     @Override
     public void registry(URL url) {
@@ -24,35 +25,15 @@ public abstract class AbstractRegistry implements Registry {
         try {
             doPublish(url);
             createInvoker(url);
+            openServer(url);
         } catch (Exception e) {
             logger.error("publish service failed", e.getCause());
         }
     }
 
+    protected abstract void openServer(URL url);
+
     protected abstract void createInvoker(URL url);
 
     protected abstract void doPublish(URL url) throws Exception;
-
-    protected String serviceKey(URL url) {
-        // 获取 url 端口号
-        int port = url.getPort();
-        // 通过 port、servieName、serviceVersion、serviceGroup 构建 serviceKey
-        return serviceKey(port, url.getPath(), url.getParameter(UrlConstants.VERSION_KEY), url.getParameter(UrlConstants.GROUP_KEY));
-    }
-
-    private String serviceKey(int port, String path, String version, String group) {
-        StringBuilder buf = new StringBuilder();
-        if (!StringUtils.isEmpty(group)) {
-            buf.append(group);
-            buf.append("/");
-        }
-        buf.append(path);
-        if (version != null && version.length() > 0 && !"0.0.0".equals(version)) {
-            buf.append(":");
-            buf.append(version);
-        }
-        buf.append(":");
-        buf.append(port);
-        return buf.toString();
-    }
 }

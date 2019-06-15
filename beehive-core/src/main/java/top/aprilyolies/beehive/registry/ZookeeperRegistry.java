@@ -51,8 +51,22 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
+    protected void openServer(URL url) {
+        String protocol = url.getOriginUrl().getParameterElseDefault(UrlConstants.SERVICE_PROTOCOL, UrlConstants.DEFAULT_SERVICE_PROTOCOL);
+        URL serviceUrl = URL.copyFromUrl(url.getOriginUrl());
+        serviceUrl.setOriginUrl(url.getOriginUrl());
+        serviceUrl.setProtocol(protocol);
+        protocolSelector.publish(serviceUrl);
+    }
+
+    /**
+     * 创建 invoker 并进行缓存
+     *
+     * @param url
+     */
+    @Override
     protected void createInvoker(URL url) {
-        ProxyFactory proxyFactory = selectorInstance.createProxyFactory(url);
+        ProxyFactory proxyFactory = proxyFactorySelector.createProxyFactory(url);
         Invoker<?> invoker = proxyFactory.createProxy(url);
         Invoker<?> chain = buildInvokerChain(invoker);
         BeehiveContext.safePut(BeehiveConstants.INVOKER_CHAIN, chain);

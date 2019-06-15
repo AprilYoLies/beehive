@@ -46,7 +46,6 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
                     fillParameters(registryUrls, this);
                     checkRegistryUrls(registryUrls);
                     registryService(registryUrls);
-
                 }
                 published = true;
             }
