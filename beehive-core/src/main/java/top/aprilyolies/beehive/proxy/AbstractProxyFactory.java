@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.invoker.Invoker;
+import top.aprilyolies.beehive.invoker.ProxyWrapperInvoker;
 import top.aprilyolies.beehive.proxy.support.Proxy;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.StringUtils;
@@ -23,14 +24,21 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
         if (url == null || StringUtils.isEmpty(url.getParameter(UrlConstants.SERVICE_REF))) {
             throw new RuntimeException("Can't create proxy invoker for the given url");
         }
-        String ref = url.getParameter(UrlConstants.SERVICE_REF);
-        @SuppressWarnings("unchecked") Class<T> clazz = (Class<T>) ClassUtils.forName(ref);
-        return createInvoker(clazz);
+        try {
+            String ref = url.getParameter(UrlConstants.SERVICE_REF);
+            String service = url.getParameter(UrlConstants.SERVICE);
+            @SuppressWarnings("unchecked") Class<T> clazz = (Class<T>) ClassUtils.forName(service);
+            Object target = ClassUtils.forName(ref).newInstance();
+            return createInvoker(clazz, target);
+        } catch (Exception e) {
+            throw new IllegalStateException("Can't create invoker");
+        }
     }
 
-    private <T> Invoker<T> createInvoker(Class<T> clazz) {
+    private <T> Invoker<T> createInvoker(Class<T> clazz, Object target) {
         Proxy proxy = createProxy(clazz);
-        return null;
+        //noinspection unchecked
+        return new ProxyWrapperInvoker<T>(proxy, clazz, target);
     }
 
     protected abstract Proxy createProxy(Class<?> clazz);

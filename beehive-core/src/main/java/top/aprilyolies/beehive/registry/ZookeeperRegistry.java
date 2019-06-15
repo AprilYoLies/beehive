@@ -4,10 +4,19 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
+import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.common.result.Result;
+import top.aprilyolies.beehive.filter.AccessLogFilter;
+import top.aprilyolies.beehive.filter.Filter;
+import top.aprilyolies.beehive.filter.MonitorFilter;
+import top.aprilyolies.beehive.invoker.AbstractInvoker;
 import top.aprilyolies.beehive.invoker.Invoker;
 import top.aprilyolies.beehive.proxy.ProxyFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static top.aprilyolies.beehive.common.UrlConstants.*;
 
@@ -44,9 +53,38 @@ public class ZookeeperRegistry extends AbstractRegistry {
     }
 
     @Override
-    protected void createProxy(URL url) {
+    protected void createInvoker(URL url) {
         ProxyFactory proxyFactory = selectorInstance.createProxyFactory(url);
-        Invoker<?> proxy = proxyFactory.createProxy(url);
+        Invoker<?> invoker = proxyFactory.createProxy(url);
+        Invoker<?> wrapperedInvoker = wrapperInvoker(invoker);
+    }
+
+    /**
+     * 通过 filter 构建 invoker 链，最后一个 invoker 就是我们创建的 ProxyWrapperInvoker，它封装了我们真正的调用逻辑
+     *
+     * @param invoker 原始的 invoker
+     * @return 通过 filter 构建出来的 invoker 链
+     */
+    private Invoker wrapperInvoker(Invoker<?> invoker) {
+        // TODO 这里的 filter 获取应该通过 ExtensionLoader
+        List<Filter> filters = new ArrayList<>();
+        filters.add(new AccessLogFilter());
+        filters.add(new MonitorFilter());
+        Invoker ptr = invoker;
+        if (filters.size() > 0) {
+            for (Filter filter : filters) {
+                final Invoker next = ptr;
+                Invoker pre = new AbstractInvoker() {
+                    @Override
+                    protected Result doInvoke(InvokeInfo info) {
+                        return filter.doFilter(next, info);
+                    }
+                };
+                ptr = pre;
+            }
+        }
+        //noinspection unchecked
+        return ptr;
     }
 
     @Override

@@ -23,13 +23,13 @@ public abstract class AbstractRegistry implements Registry {
             throw new IllegalArgumentException("Can't publish a service for null url");
         try {
             doPublish(url);
-            createProxy(url);
+            createInvoker(url);
         } catch (Exception e) {
             logger.error("publish service failed", e.getCause());
         }
     }
 
-    protected abstract void createProxy(URL url);
+    protected abstract void createInvoker(URL url);
 
     protected abstract void doPublish(URL url) throws Exception;
 
