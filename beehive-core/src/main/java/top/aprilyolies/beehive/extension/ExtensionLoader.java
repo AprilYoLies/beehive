@@ -319,7 +319,18 @@ public class ExtensionLoader<T> {
                 }
             }
         }
-        return extensionInstanceCache.get(extensionName);
+        instance = extensionInstanceCache.get(extensionName);
+        if (instance == null) {
+            try {
+                instance = extensionClassCache.get(extensionName).newInstance();
+                extensionInstanceCache.putIfAbsent(extensionName, instance);
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (logger.isDebugEnabled())
+                    logger.error("There is no extension instance named " + extensionName + " for type" + type.getName());
+            }
+        }
+        return instance;
     }
 
     public Set<String> getSupportedExtensions() {

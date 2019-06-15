@@ -1,7 +1,11 @@
 package top.aprilyolies.beehive.protocol;
 
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.transporter.server.Server;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 /**
  * @Author EvaJohnson
@@ -26,6 +30,33 @@ public class BeehiveProtocol extends AbstractProtocol {
     }
 
     private Server doPublish(URL url) {
+        prepareServiceUrl(url);
         return transporterSelector.bind(url);
+    }
+
+    /**
+     * 准备 service url，主要是准备一些和服务器启动相关的参数
+     *
+     * @param url
+     */
+    private void prepareServiceUrl(URL url) {
+        url.putParameterIfAbsent(UrlConstants.CODEC, UrlConstants.DEFAULT_CODEC);
+        String host = getServiceHost();
+        url.setHost(host);
+        url.setPort(Integer.parseInt(UrlConstants.SERVICE_PORT));
+    }
+
+    /**
+     * 获取服务主机 ip
+     *
+     * @return
+     */
+    private String getServiceHost() {
+        try {
+            return InetAddress.getLocalHost().getCanonicalHostName();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Can't get service host");
+        }
     }
 }

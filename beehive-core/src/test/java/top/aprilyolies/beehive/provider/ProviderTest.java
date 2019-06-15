@@ -74,5 +74,17 @@ public class ProviderTest {
             Invoker chain1 = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
             Assert.assertNotSame(chain, chain1);
         }).start();
+
+    }
+
+    @Test
+    public void testStartServer() {
+        ServiceProvider provider = new ServiceProvider();
+        RegistryConfigBean registry = new RegistryConfigBean();
+        registry.setAddress(new String[]{"zookeeper://127.0.0.1:2181"});
+        provider.setRegistry(registry);
+        provider.setRef(DemoServiceImpl.class.getName());
+        provider.setService(DemoService.class.getName());
+        provider.exportService();
     }
 }

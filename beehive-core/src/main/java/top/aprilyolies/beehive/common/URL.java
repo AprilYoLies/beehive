@@ -232,4 +232,10 @@ public class URL {
         return port <= 0 ? host : host + ":" + port;
     }
 
+    public void putParameterIfAbsent(String codec, String defaultCodec) {
+        String p = parameters.get(codec);
+        if (StringUtils.isEmpty(p)) {
+            parameters.putIfAbsent(codec, defaultCodec);
+        }
+    }
 }

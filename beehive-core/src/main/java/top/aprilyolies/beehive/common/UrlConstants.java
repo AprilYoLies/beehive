@@ -35,7 +35,9 @@ public class UrlConstants {
     // 默认的服务发布协议，该协议会使用 netty 作为底层通信
     public static final String DEFAULT_SERVICE_PROTOCOL = "beehive";
     // 默认的服务发布协议，该协议会使用 netty 作为底层通信
-    public static final String TRANSPORTER = "transporterSelector";
+    public static final String TRANSPORTER = "transporter";
     // 通信的编解码器
     public static final String CODEC = "codec";
+    // 通默认的编解码器
+    public static final String DEFAULT_CODEC = "hessian";
 }

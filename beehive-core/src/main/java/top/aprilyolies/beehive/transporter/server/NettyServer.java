@@ -73,9 +73,12 @@ public class NettyServer extends AbstracServer implements Server {
                     }
                 });
         // bind
-        ChannelFuture channelFuture = bootstrap.bind(getBindAddress());
+        InetSocketAddress bindAddress = getBindAddress();
+        ChannelFuture channelFuture = bootstrap.bind(bindAddress);
         channelFuture.syncUninterruptibly();
         channel = channelFuture.channel();
+        if (logger.isDebugEnabled())
+            logger.debug("Server started on " + bindAddress);
     }
 
     private InetSocketAddress getBindAddress() {
