@@ -1,6 +1,11 @@
 package top.aprilyolies.beehive.provider;
 
+import org.junit.Assert;
 import org.junit.Test;
+import top.aprilyolies.beehive.common.BeehiveConstants;
+import top.aprilyolies.beehive.common.BeehiveContext;
+import top.aprilyolies.beehive.common.InvokeInfo;
+import top.aprilyolies.beehive.invoker.Invoker;
 import top.aprilyolies.beehive.provider.service.DemoService;
 import top.aprilyolies.beehive.provider.service.DemoServiceImpl;
 import top.aprilyolies.beehive.spring.RegistryConfigBean;
@@ -31,5 +36,43 @@ public class ProviderTest {
         provider.setRef(DemoServiceImpl.class.getName());
         provider.setService(DemoService.class.getName());
         provider.exportService();
+    }
+
+    @Test
+    public void testCallInvokerChain() {
+        ServiceProvider provider = new ServiceProvider();
+        RegistryConfigBean registry = new RegistryConfigBean();
+        registry.setAddress(new String[]{"zookeeper://127.0.0.1:2181"});
+        provider.setRegistry(registry);
+        provider.setRef(DemoServiceImpl.class.getName());
+        provider.setService(DemoService.class.getName());
+        provider.exportService();
+
+        DemoServiceImpl target = new DemoServiceImpl();
+        String methodName = "say";
+        Class<?>[] pts = new Class[]{String.class};
+        Object[] pvs = new Object[]{"beehive"};
+        InvokeInfo invokeInfo = new InvokeInfo(methodName, pts, pvs, target);
+
+        Invoker chain = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
+        chain.invoke(invokeInfo);
+    }
+
+    @Test
+    public void testCacheInvokerChain() {
+        ServiceProvider provider = new ServiceProvider();
+        RegistryConfigBean registry = new RegistryConfigBean();
+        registry.setAddress(new String[]{"zookeeper://127.0.0.1:2181"});
+        provider.setRegistry(registry);
+        provider.setRef(DemoServiceImpl.class.getName());
+        provider.setService(DemoService.class.getName());
+        provider.exportService();
+
+        final Invoker chain = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
+
+        new Thread(() -> {
+            Invoker chain1 = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
+            Assert.assertNotSame(chain, chain1);
+        }).start();
     }
 }

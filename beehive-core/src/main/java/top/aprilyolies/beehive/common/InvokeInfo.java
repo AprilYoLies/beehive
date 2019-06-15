@@ -15,6 +15,13 @@ public class InvokeInfo {
     // 方法调用的实例对象
     private Object target;
 
+    public InvokeInfo(String methodName, Class<?>[] pts, Object[] pvs, Object target) {
+        this.methodName = methodName;
+        this.pts = pts;
+        this.pvs = pvs;
+        this.target = target;
+    }
+
     public String getMethodName() {
         return methodName;
     }

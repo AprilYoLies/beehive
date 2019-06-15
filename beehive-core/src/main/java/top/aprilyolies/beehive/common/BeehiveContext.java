@@ -3,6 +3,7 @@ package top.aprilyolies.beehive.common;
 
 import org.apache.log4j.Logger;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -17,13 +18,46 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 public class BeehiveContext {
     private final Logger logger = Logger.getLogger(BeehiveContext.class);
-
-    public static final BeehiveContext BEEHIVE_CONTEXT = new BeehiveContext();
-
     // 线程本地变量
     @SuppressWarnings("unchecked")
-    public static final ThreadLocal<Map<String, Object>> safeProperties = new ThreadLocal();
+    private static final ThreadLocal<Map<String, Object>> safeProperties = new ThreadLocal();
 
     // 非线程本地变量
-    public static final Map<String, Object> unsafeProperties = new ConcurrentHashMap<>();
+    private static final Map<String, Object> unsafeProperties = new ConcurrentHashMap<>();
+
+    static {
+        safeProperties.set(new HashMap<>());
+    }
+
+    public static Object safeGet(String key) {
+        return safeProperties.get().get(key);
+    }
+
+    public static <T> T safeGet(String key, Class<T> type) {
+        //noinspection unchecked
+        try {
+            return (T) safeProperties.get().get(key);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public static void safePut(String key, Object value) {
+        safeProperties.get().putIfAbsent(key, value);
+    }
+
+    public static Object unsafeGet(String key) {
+        return unsafeProperties.get(key);
+    }
+
+    public static <T> T unsafeGet(String key, Class<T> type) {
+        //noinspection unchecked
+        return (T) unsafeProperties.get(key);
+    }
+
+    public static void unsafePut(String key, Object value) {
+        unsafeProperties.putIfAbsent(key, value);
+    }
+
+
 }

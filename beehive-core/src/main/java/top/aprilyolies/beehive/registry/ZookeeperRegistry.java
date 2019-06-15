@@ -4,9 +4,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
-import top.aprilyolies.beehive.common.InvokeInfo;
-import top.aprilyolies.beehive.common.URL;
-import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.common.*;
 import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.filter.AccessLogFilter;
 import top.aprilyolies.beehive.filter.Filter;
@@ -56,7 +54,8 @@ public class ZookeeperRegistry extends AbstractRegistry {
     protected void createInvoker(URL url) {
         ProxyFactory proxyFactory = selectorInstance.createProxyFactory(url);
         Invoker<?> invoker = proxyFactory.createProxy(url);
-        Invoker<?> wrapperedInvoker = wrapperInvoker(invoker);
+        Invoker<?> chain = buildInvokerChain(invoker);
+        BeehiveContext.safePut(BeehiveConstants.INVOKER_CHAIN, chain);
     }
 
     /**
@@ -65,7 +64,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
      * @param invoker 原始的 invoker
      * @return 通过 filter 构建出来的 invoker 链
      */
-    private Invoker wrapperInvoker(Invoker<?> invoker) {
+    private Invoker buildInvokerChain(Invoker<?> invoker) {
         // TODO 这里的 filter 获取应该通过 ExtensionLoader
         List<Filter> filters = new ArrayList<>();
         filters.add(new AccessLogFilter());
