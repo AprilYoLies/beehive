@@ -41,7 +41,11 @@ public class BeehiveProtocol extends AbstractProtocol {
      */
     private void prepareServiceUrl(URL url) {
         url.putParameterIfAbsent(UrlConstants.CODEC, UrlConstants.DEFAULT_CODEC);
-        String host = getServiceHost();
+        String providerInfo = url.getParameterElseDefault(UrlConstants.PROVIDER, getServiceHost());
+        if (providerInfo.indexOf(":") > 0) {
+            providerInfo = providerInfo.substring(0, providerInfo.indexOf(":"));
+        }
+        String host = providerInfo;
         url.setHost(host);
         url.setPort(Integer.parseInt(UrlConstants.SERVICE_PORT));
     }
