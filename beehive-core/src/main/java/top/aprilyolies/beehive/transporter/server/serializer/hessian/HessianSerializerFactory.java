@@ -1,4 +1,4 @@
-package top.aprilyolies.beehive.transporter.server.serializer;
+package top.aprilyolies.beehive.transporter.server.serializer.hessian;
 
 import com.alibaba.com.caucho.hessian.io.SerializerFactory;
 
@@ -7,11 +7,11 @@ import com.alibaba.com.caucho.hessian.io.SerializerFactory;
  * @Date 2019-06-09
  * @Email g863821569@gmail.com
  */
-public class Hessian2SerializerFactory extends SerializerFactory {
+public class HessianSerializerFactory extends SerializerFactory {
 
-    public static final SerializerFactory SERIALIZER_FACTORY = new Hessian2SerializerFactory();
+    public static final SerializerFactory SERIALIZER_FACTORY = new HessianSerializerFactory();
 
-    private Hessian2SerializerFactory() {
+    private HessianSerializerFactory() {
     }
 
     @Override

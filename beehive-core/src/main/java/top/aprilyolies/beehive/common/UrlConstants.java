@@ -40,4 +40,6 @@ public class UrlConstants {
     public static final String CODEC = "codec";
     // 通默认的编解码器
     public static final String DEFAULT_CODEC = "hessian";
+    // beehive 底层的序列化器
+    public static final String SERIALIZER = "serializer";
 }
