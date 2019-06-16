@@ -15,6 +15,7 @@ import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.transporter.server.codec.NettyDecoder;
 import top.aprilyolies.beehive.transporter.server.codec.NettyEncoder;
+import top.aprilyolies.beehive.transporter.server.handler.HeartbeatHandler;
 import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetSocketAddress;
@@ -68,8 +69,8 @@ public class NettyServer extends AbstracServer implements Server {
                         ch.pipeline()//.addLast("logging",new LoggingHandler(LogLevel.INFO))//for debug
                                 .addLast("decoder", new NettyDecoder(getUrl()))   // InternalDecoder
                                 .addLast("encoder", new NettyEncoder(getUrl()))   // InternalEncoder
-                                .addLast("server-idle-handler", new IdleStateHandler(0, 0, IDLE_TIMEOUT, MILLISECONDS));
-//                                .addLast("handler", nettyServerHandler);
+                                .addLast("server-idle-handler", new IdleStateHandler(0, 0, IDLE_TIMEOUT, MILLISECONDS))
+                                .addLast("heartbeat-handler", new HeartbeatHandler());
                     }
                 });
         // bind
