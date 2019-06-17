@@ -28,8 +28,8 @@ public class NettyEncoder extends MessageToByteEncoder {
     private final URL url;
     // 请求标志
     protected static final byte REQUEST_FLAG = (byte) 0x80; // request 消息的标志    1000 0000
-    // 事件标志
-    protected static final byte FLAG_EVENT = (byte) 0x20;   // event 消息的标志      0010 0000
+    // 事件标志V
+    protected static final byte EVENT_FLAG = (byte) 0x20;   // event 消息的标志      0010 0000
     // 序列化器
     private OutputSerializer serializer;
     // 请求头长度
@@ -66,7 +66,7 @@ public class NettyEncoder extends MessageToByteEncoder {
         out.writerIndex(bodyIndex);
         // 对于 rpc 请求的编码和事件消息的编码是不一样的
         if (request.isEvent()) {
-            header[2] = (byte) (header[2] | FLAG_EVENT);
+            header[2] = (byte) (header[2] | EVENT_FLAG);
             encodeEventRequest(request.getMsg());
         } else {
             encodeRpcRequest(request.getMsg());
@@ -129,7 +129,7 @@ public class NettyEncoder extends MessageToByteEncoder {
         out.writerIndex(bodyIndex);
         // 对于事件消息和 rpc 响应消息，采用不同的方式编码
         if (response.isEvent()) {
-            header[2] = (byte) (header[2] | FLAG_EVENT);
+            header[2] = (byte) (header[2] | EVENT_FLAG);
             encodeEventResponse(msg);
         } else {
             encodeRpcResponse(msg);

@@ -20,6 +20,10 @@ public class Request {
         this.id = getRequestId();
     }
 
+    public Request(long id) {
+        this.id = id;
+    }
+
     private long getRequestId() {
         return requestId.getAndIncrement();
     }
