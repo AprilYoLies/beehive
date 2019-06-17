@@ -13,8 +13,8 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
-import top.aprilyolies.beehive.transporter.server.codec.NettyDecoder;
-import top.aprilyolies.beehive.transporter.server.codec.NettyEncoder;
+import top.aprilyolies.beehive.transporter.server.handler.NettyDecoderHandler;
+import top.aprilyolies.beehive.transporter.server.handler.NettyEncoderHandler;
 import top.aprilyolies.beehive.transporter.server.handler.HeartbeatHandler;
 import top.aprilyolies.beehive.utils.StringUtils;
 
@@ -67,8 +67,8 @@ public class NettyServer extends AbstracServer implements Server {
                         // FIXME: should we use getTimeout()?
                         // 从 url 中获取 idleTimeout 时长，如果 url 参数中没有指定，那么就直接使用三倍的 heartBeat 时长
                         ch.pipeline()//.addLast("logging",new LoggingHandler(LogLevel.INFO))//for debug
-                                .addLast("decoder", new NettyDecoder(getUrl()))   // InternalDecoder
-                                .addLast("encoder", new NettyEncoder(getUrl()))   // InternalEncoder
+                                .addLast("decoder", new NettyDecoderHandler(getUrl()))   // InternalDecoder
+                                .addLast("encoder", new NettyEncoderHandler(getUrl()))   // InternalEncoder
                                 .addLast("server-idle-handler", new IdleStateHandler(0, 0, IDLE_TIMEOUT, MILLISECONDS))
                                 .addLast("heartbeat-handler", new HeartbeatHandler());
                     }

@@ -1,4 +1,4 @@
-package top.aprilyolies.beehive.transporter.server.codec;
+package top.aprilyolies.beehive.transporter.server.handler;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -20,7 +20,7 @@ import java.io.IOException;
  * @Date 2019-06-15
  * @Email g863821569@gmail.com
  */
-public class NettyEncoder extends MessageToByteEncoder {
+public class NettyEncoderHandler extends MessageToByteEncoder {
     private SerializerFactory extensionSelector = ExtensionLoader.getExtensionLoader(SerializerFactory.class).getExtensionSelectorInstance();
     // 魔幻头，十进制为 7440
     private final short MAGIC = 0x4A28;
@@ -35,7 +35,7 @@ public class NettyEncoder extends MessageToByteEncoder {
     // 请求头长度
     private int HEADER_LENGTH = 16;
 
-    public NettyEncoder(URL url) {
+    public NettyEncoderHandler(URL url) {
         this.url = url;
     }
 

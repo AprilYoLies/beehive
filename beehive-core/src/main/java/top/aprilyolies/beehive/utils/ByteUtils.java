@@ -67,6 +67,20 @@ public class ByteUtils {
     }
 
     /**
+     * 从 src 偏移量为 offset 的位置读取四个字节，拼成一个整型返回
+     *
+     * @param src
+     * @param offset
+     * @return
+     */
+    public static short readShort(byte[] src, int offset) {
+        if (offset + 3 >= src.length)
+            throw new IllegalArgumentException("Cant't read int from " + Arrays.toString(src) + ", there is no enough space to do this");
+        return (short) ((src[offset] & 0xff) +
+                ((src[offset + 1] & 0xff) << 8));
+    }
+
+    /**
      * 从 src 偏移量为 offset 的位置读取八个字节，拼成一个长整型返回
      *
      * @param src
