@@ -44,6 +44,10 @@ public class URL {
         this.path = from.getPath();
     }
 
+    public URL() {
+
+    }
+
     public URL getOriginUrl() {
         return originUrl;
     }
