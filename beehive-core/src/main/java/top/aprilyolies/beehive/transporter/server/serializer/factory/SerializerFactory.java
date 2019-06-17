@@ -3,8 +3,8 @@ package top.aprilyolies.beehive.transporter.server.serializer.factory;
 import io.netty.buffer.ByteBuf;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.extension.annotation.SPI;
-import top.aprilyolies.beehive.extension.annotation.Selector;
-import top.aprilyolies.beehive.transporter.server.serializer.Serializer;
+import top.aprilyolies.beehive.transporter.server.serializer.InputSerializer;
+import top.aprilyolies.beehive.transporter.server.serializer.OutputSerializer;
 
 /**
  * @Author EvaJohnson
@@ -21,12 +21,24 @@ public interface SerializerFactory {
      * 获取对应的序列化工厂
      *
      * @param url 优先获取 url 的 SERIALIZER 参数对应的 serializer，默认为 hessian
-     * @param buf 序列化的
+     * @param buf 序列化的结果将会存入其中
+     * @return 真正的序列化器
+     */
+    OutputSerializer serializer(URL url, ByteBuf buf);
+
+    /**
+     * 获取对应的反序列化工厂
+     *
+     * @param url 优先获取 url 的 SERIALIZER 参数对应的 serializer，默认为 hessian
+     * @param buf 将从该 buf 中获取必要的数据然后反序列化得到相应的结果
+     * @return 真正的反序列化器
+     */
+    InputSerializer deserializer(URL url, ByteBuf buf);
+
+    /**
+     * 序列化器的 id 号，注意这里是一个字节来表示，并且只能使用其低 5 位，也就是说理论上最多支持 2^5 种序列化器
+     *
      * @return
      */
-    @Selector
-    Serializer serializer(URL url, ByteBuf buf);
-
-    @Selector
-    Serializer deserializer(URL url, ByteBuf buf);
+    byte getSerializerId(URL url);
 }

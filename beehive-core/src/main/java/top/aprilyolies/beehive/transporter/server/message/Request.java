@@ -11,9 +11,9 @@ public class Request {
     private final long id;
     // 全局的 id 生成器
     private static final AtomicLong requestId = new AtomicLong(0);
-
+    // 消息类型
     private MessageType type;
-
+    // 消息附带的内容
     private Object msg;
 
     public Request() {
@@ -42,5 +42,9 @@ public class Request {
 
     public long getId() {
         return id;
+    }
+
+    public boolean isEvent() {
+        return type == MessageType.HEARTBEAT_RESPONSE || type == MessageType.HEARTBEAT_REQUEST;
     }
 }

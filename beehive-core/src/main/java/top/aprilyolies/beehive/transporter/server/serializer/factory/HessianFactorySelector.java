@@ -4,7 +4,8 @@ import io.netty.buffer.ByteBuf;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
-import top.aprilyolies.beehive.transporter.server.serializer.Serializer;
+import top.aprilyolies.beehive.transporter.server.serializer.InputSerializer;
+import top.aprilyolies.beehive.transporter.server.serializer.OutputSerializer;
 
 /**
  * @Author EvaJohnson
@@ -15,15 +16,21 @@ public class HessianFactorySelector implements SerializerFactory {
     private ExtensionLoader extensionLoader = ExtensionLoader.getExtensionLoader(SerializerFactory.class);
 
     @Override
-    public Serializer serializer(URL url, ByteBuf buf) {
+    public OutputSerializer serializer(URL url, ByteBuf buf) {
         SerializerFactory extension = getSerializerFactory(url);
         return extension.serializer(url, buf);
     }
 
     @Override
-    public Serializer deserializer(URL url, ByteBuf buf) {
+    public InputSerializer deserializer(URL url, ByteBuf buf) {
         SerializerFactory extension = getSerializerFactory(url);
         return extension.deserializer(url, buf);
+    }
+
+    @Override
+    public byte getSerializerId(URL url) {
+        SerializerFactory extension = getSerializerFactory(url);
+        return extension.getSerializerId(url);
     }
 
     private SerializerFactory getSerializerFactory(URL url) {

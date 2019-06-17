@@ -7,9 +7,18 @@ package top.aprilyolies.beehive.transporter.server.message;
  */
 public class Response {
     private long id;
+
     private MessageType type;
 
     private Object msg;
+
+    private byte status;
+
+    /**
+     * ok.
+     */
+    public static final byte OK = 20;
+
 
     public Response() {
     }
@@ -40,5 +49,17 @@ public class Response {
 
     public void setId(long id) {
         this.id = id;
+    }
+
+    public byte getStatus() {
+        return status;
+    }
+
+    public void setStatus(byte status) {
+        this.status = status;
+    }
+
+    public boolean isEvent() {
+        return type == MessageType.HEARTBEAT_RESPONSE || type == MessageType.HEARTBEAT_REQUEST;
     }
 }

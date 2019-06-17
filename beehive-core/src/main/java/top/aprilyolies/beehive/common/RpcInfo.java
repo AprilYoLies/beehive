@@ -2,26 +2,23 @@ package top.aprilyolies.beehive.common;
 
 /**
  * @Author EvaJohnson
- * @Date 2019-06-10
+ * @Date 2019-06-16
  * @Email g863821569@gmail.com
  */
-public class InvokeInfo {
+public class RpcInfo {
     // 待调用的方法的名字
     private String methodName;
     // 方法的餐宿类型
     private Class<?>[] pts;
     // 方法的参数值
     private Object[] pvs;
-    // 方法调用的实例对象
-    private Object target;
     // 服务名字
     private String serviceName;
 
-    public InvokeInfo(String methodName, Class<?>[] pts, Object[] pvs, Object target, String serviceName) {
+    public RpcInfo(String methodName, Class<?>[] pts, Object[] pvs, String serviceName) {
         this.methodName = methodName;
         this.pts = pts;
         this.pvs = pvs;
-        this.target = target;
         this.serviceName = serviceName;
     }
 
@@ -47,14 +44,6 @@ public class InvokeInfo {
 
     public void setPvs(Object[] pvs) {
         this.pvs = pvs;
-    }
-
-    public Object getTarget() {
-        return target;
-    }
-
-    public void setTarget(Object target) {
-        this.target = target;
     }
 
     public String getServiceName() {

@@ -11,7 +11,7 @@ import java.io.OutputStream;
  * @Email g863821569@gmail.com
  */
 public class OutputStreamAdapter extends OutputStream {
-    ByteBuf buf;
+    private ByteBuf buf;
 
     public OutputStreamAdapter(ByteBuf out) {
         this.buf = out;

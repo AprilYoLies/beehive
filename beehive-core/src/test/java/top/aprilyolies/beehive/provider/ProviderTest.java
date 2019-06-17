@@ -52,7 +52,8 @@ public class ProviderTest {
         String methodName = "say";
         Class<?>[] pts = new Class[]{String.class};
         Object[] pvs = new Object[]{"beehive"};
-        InvokeInfo invokeInfo = new InvokeInfo(methodName, pts, pvs, target);
+        String serviceName = "top.aprilyolies.beehive.provider.service.DemoService";
+        InvokeInfo invokeInfo = new InvokeInfo(methodName, pts, pvs, target, serviceName);
 
         Invoker chain = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
         chain.invoke(invokeInfo);
