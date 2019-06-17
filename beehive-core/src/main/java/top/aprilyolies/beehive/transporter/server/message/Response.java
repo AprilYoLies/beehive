@@ -10,7 +10,7 @@ public class Response {
 
     private MessageType type;
 
-    private Object msg;
+    private Object data;
 
     private byte status;
 
@@ -35,12 +35,12 @@ public class Response {
         this.type = type;
     }
 
-    public Object getMsg() {
-        return msg;
+    public Object getData() {
+        return data;
     }
 
-    public void setMsg(Object msg) {
-        this.msg = msg;
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public long getId() {

@@ -33,8 +33,8 @@ public class BeehiveContext {
         return safeProperties.get().get(key);
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> T safeGet(String key, Class<T> type) {
-        //noinspection unchecked
         try {
             return (T) safeProperties.get().get(key);
         } catch (Exception e) {

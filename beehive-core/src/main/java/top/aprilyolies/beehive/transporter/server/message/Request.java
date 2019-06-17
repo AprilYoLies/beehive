@@ -14,7 +14,7 @@ public class Request {
     // 消息类型
     private MessageType type;
     // 消息附带的内容
-    private Object msg;
+    private Object data;
 
     public Request() {
         this.id = getRequestId();
@@ -36,12 +36,12 @@ public class Request {
         this.type = type;
     }
 
-    public Object getMsg() {
-        return msg;
+    public Object getData() {
+        return data;
     }
 
-    public void setMsg(Object msg) {
-        this.msg = msg;
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public long getId() {

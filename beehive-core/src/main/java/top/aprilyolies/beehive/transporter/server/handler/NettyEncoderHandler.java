@@ -67,9 +67,9 @@ public class NettyEncoderHandler extends MessageToByteEncoder {
         // 对于 rpc 请求的编码和事件消息的编码是不一样的
         if (request.isEvent()) {
             header[2] = (byte) (header[2] | EVENT_FLAG);
-            encodeEventRequest(request.getMsg());
+            encodeEventRequest(request.getData());
         } else {
-            encodeRpcRequest(request.getMsg());
+            encodeRpcRequest(request.getData());
         }
         serializer.flushBuffer();
         int len = out.writerIndex() - bodyIndex;
@@ -146,7 +146,7 @@ public class NettyEncoderHandler extends MessageToByteEncoder {
 
     private void encodeRpcResponse(Object msg) throws IOException {
         Response response = (Response) msg;
-        serializer.writeObject(response.getMsg());
+        serializer.writeObject(response.getData());
     }
 
     private void encodeEventResponse(Object msg) throws IOException {

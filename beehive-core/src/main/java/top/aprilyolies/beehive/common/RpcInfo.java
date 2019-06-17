@@ -53,4 +53,8 @@ public class RpcInfo {
     public void setServiceName(String serviceName) {
         this.serviceName = serviceName;
     }
+
+    public InvokeInfo createInvokeInfo(Object target) {
+        return new InvokeInfo(methodName, pts, pvs, target, serviceName);
+    }
 }

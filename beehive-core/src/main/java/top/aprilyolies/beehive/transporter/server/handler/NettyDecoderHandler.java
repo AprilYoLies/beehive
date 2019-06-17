@@ -120,11 +120,11 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
                 if ((flag & EVENT_FLAG) == 0) {
                     res.setType(MessageType.RESPONSE);
                     Object msg = serializer.readObject();
-                    res.setMsg(msg);
+                    res.setData(msg);
                 } else {
                     res.setType(MessageType.HEARTBEAT_RESPONSE);
                     Object msg = serializer.readObject();
-                    res.setMsg(msg);
+                    res.setData(msg);
                 }
             } catch (Throwable e) {
                 e.printStackTrace();
@@ -151,10 +151,10 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
                     }
                     // 重构 RpcInfo 信息
                     RpcInfo info = new RpcInfo(methodName, pts, pvs, serviceName);
-                    req.setMsg(info);
+                    req.setData(info);
                 } else {
                     Object msg = serializer.readObject();
-                    req.setMsg(msg);
+                    req.setData(msg);
                 }
             } catch (Exception e) {
                 e.printStackTrace();
