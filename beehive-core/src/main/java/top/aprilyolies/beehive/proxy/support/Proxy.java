@@ -102,18 +102,18 @@ public abstract class Proxy {
         // 对构建的 Proxy 类进行计数
         long id = PROXY_CLASS_COUNTER.getAndIncrement();
         // 根据 classLoader 构建 ClassGenerator
-        ClassGenerator cc = ClassGenerator.newInstance(cl);
+        ClassGenerator cg = ClassGenerator.newInstance(cl);
         // 补全一些类信息
-        cc.setClassName((Modifier.isPublic(clazz.getModifiers()) ? Proxy.class.getName() : clazz.getName() + "$sw") + id);
-        cc.setSuperClass(Proxy.class);
+        cg.setClassName((Modifier.isPublic(clazz.getModifiers()) ? Proxy.class.getName() : clazz.getName() + "$sw") + id);
+        cg.setSuperClass(Proxy.class);
 
-        cc.addDefaultConstructor();
+        cg.addDefaultConstructor();
 
-        cc.addMethod(sb.toString());
+        cg.addMethod(sb.toString());
 
         try {
             // 根据 ClassGenerator 生成真正的 Class 对象
-            Class<?> wc = cc.toClass();
+            Class<?> wc = cg.toClass();
             // setup static field.
             // 根据上边获取的信息对 Class 对象的某些属性进行填充
             return (Proxy) wc.newInstance();
@@ -123,7 +123,7 @@ public abstract class Proxy {
             throw new RuntimeException(e.getMessage(), e);
         } finally {
             // 对相关资源进行释放
-            cc.release();
+            cg.release();
         }
     }
 

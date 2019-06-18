@@ -2,7 +2,6 @@ package top.aprilyolies.beehive.provider;
 
 import org.junit.Assert;
 import org.junit.Test;
-import top.aprilyolies.beehive.common.BeehiveConstants;
 import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.invoker.Invoker;
@@ -55,7 +54,7 @@ public class ProviderTest {
         String serviceName = "top.aprilyolies.beehive.provider.service.DemoService";
         InvokeInfo invokeInfo = new InvokeInfo(methodName, pts, pvs, target, serviceName);
 
-        Invoker chain = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
+        Invoker chain = BeehiveContext.safeGet(serviceName, Invoker.class);
         chain.invoke(invokeInfo);
     }
 
@@ -69,10 +68,10 @@ public class ProviderTest {
         provider.setService(DemoService.class.getName());
         provider.exportService();
 
-        final Invoker chain = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
+        final Invoker chain = BeehiveContext.safeGet(provider.getService(), Invoker.class);
 
         new Thread(() -> {
-            Invoker chain1 = BeehiveContext.safeGet(BeehiveConstants.INVOKER_CHAIN, Invoker.class);
+            Invoker chain1 = BeehiveContext.safeGet(provider.getService(), Invoker.class);
             Assert.assertNotSame(chain, chain1);
         }).start();
 

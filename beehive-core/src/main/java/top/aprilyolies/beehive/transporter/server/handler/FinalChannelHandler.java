@@ -22,7 +22,7 @@ public class FinalChannelHandler extends ChannelDuplexHandler {
     // 共享的 executor
     private static final ExecutorService SHARED_EXECUTOR = Executors.newCachedThreadPool(new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true));
     private final URL url;
-    // TODO 这里是属于每个实例的 executor，构建方式直接写死，应该修改为根据 url 参数信息来构建对应的 Executor
+    // TODO 这里是属于每个实例的 executor，构建方式属于硬编码，应该修改为根据 url 参数信息来构建对应的 Executor
     private final ExecutorService executor = new ThreadPoolExecutor(20, 20, 0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(20), new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
             new ThreadPoolExecutor.DiscardPolicy());

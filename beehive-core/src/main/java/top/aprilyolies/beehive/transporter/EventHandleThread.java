@@ -58,11 +58,17 @@ public class EventHandleThread implements Runnable {
                 // 如果 request 携带的数据为 RpcInfo，那么就根据其进行相应的 invoker 调用
                 if (data instanceof RpcInfo) {
                     RpcInfo info = (RpcInfo) data;
+                    // 尝试从 BeehiveContext 中获取 invoker 实例
                     Invoker invoker = BeehiveContext.safeGet(info.getServiceName(), Invoker.class);
+                    // 根据 url 信息获取 invoke target 实例
                     Class<?> clazz = ClassUtils.forName(url.getParameter(UrlConstants.SERVICE_REF));
                     Object target = clazz.newInstance();
+                    // 进行真正的 invoke 操作
                     Result result = invoker.invoke(info.createInvokeInfo(target));
+                    // 将 invoke 的结果填充到 response 中
                     response.setData(result);
+                    // 将响应结果写回
+                    ctx.writeAndFlush(response);
                 }
             }
         } else if (msg instanceof Response) {
