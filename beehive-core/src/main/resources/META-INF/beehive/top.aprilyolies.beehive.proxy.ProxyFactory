@@ -1,2 +1,2 @@
-selector=top.aprilyolies.beehive.proxy.ProxyFactorySelector
-javassist=top.aprilyolies.beehive.proxy.JavassitProxyFactory
+selector=top.aprilyolies.beehive.providerProxy.ProxyFactorySelector
+javassist=top.aprilyolies.beehive.providerProxy.JavassitProxyFactory

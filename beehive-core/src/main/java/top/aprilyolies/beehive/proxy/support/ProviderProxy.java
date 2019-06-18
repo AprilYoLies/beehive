@@ -15,21 +15,21 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Date 2019-06-14
  * @Email g863821569@gmail.com
  */
-public abstract class Proxy {
-    private static final Map<Class<?>, Proxy> proxyCache = new ConcurrentHashMap<>();
+public abstract class ProviderProxy {
+    private static final Map<Class<?>, ProviderProxy> proxyCache = new ConcurrentHashMap<>();
     private static final AtomicLong PROXY_CLASS_COUNTER = new AtomicLong(0);
 
-    public static Proxy getProxy(Class<?> clazz) {
+    public static ProviderProxy getProxy(Class<?> clazz) {
         if (proxyCache.get(clazz) != null)
             return proxyCache.get(clazz);
         proxyCache.computeIfAbsent(clazz, t -> createProxy(clazz));
         return proxyCache.get(clazz);
     }
 
-    private static Proxy createProxy(Class<?> clazz) {
-        // 不能对 9 中基本类型的包装类型构建 Proxy
+    private static ProviderProxy createProxy(Class<?> clazz) {
+        // 不能对 9 中基本类型的包装类型构建 ProviderProxy
         if (clazz.isPrimitive()) {
-            throw new IllegalArgumentException("Can not create Proxy for primitive type: " + clazz);
+            throw new IllegalArgumentException("Can not create ProviderProxy for primitive type: " + clazz);
         }
 
         String name = clazz.getName();
@@ -99,13 +99,13 @@ public abstract class Proxy {
         sb.append(" throw new " + NoSuchMethodException.class.getName() + "(\"Not found method \\\"\"+$2+\"\\\" in class " + clazz.getName() + ".\"); }");
 
         // make class
-        // 对构建的 Proxy 类进行计数
+        // 对构建的 ProviderProxy 类进行计数
         long id = PROXY_CLASS_COUNTER.getAndIncrement();
         // 根据 classLoader 构建 ClassGenerator
         ClassGenerator cg = ClassGenerator.newInstance(cl);
         // 补全一些类信息
-        cg.setClassName((Modifier.isPublic(clazz.getModifiers()) ? Proxy.class.getName() : clazz.getName() + "$sw") + id);
-        cg.setSuperClass(Proxy.class);
+        cg.setClassName((Modifier.isPublic(clazz.getModifiers()) ? ProviderProxy.class.getName() : clazz.getName() + "$sw") + id);
+        cg.setSuperClass(ProviderProxy.class);
 
         cg.addDefaultConstructor();
 
@@ -116,7 +116,7 @@ public abstract class Proxy {
             Class<?> wc = cg.toClass();
             // setup static field.
             // 根据上边获取的信息对 Class 对象的某些属性进行填充
-            return (Proxy) wc.newInstance();
+            return (ProviderProxy) wc.newInstance();
         } catch (RuntimeException e) {
             throw e;
         } catch (Throwable e) {

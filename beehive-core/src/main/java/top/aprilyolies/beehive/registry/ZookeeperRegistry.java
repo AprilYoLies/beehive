@@ -69,7 +69,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
         ProxyFactory proxyFactory = proxyFactorySelector.createProxyFactory(url);
         Invoker<?> invoker = proxyFactory.createProxy(url);
         Invoker<?> chain = buildInvokerChain(invoker);
-        BeehiveContext.safePut(url.getParameter(SERVICE_REF), chain);
+        BeehiveContext.safePut(url.getParameter(SERVICE), chain);
     }
 
     /**

@@ -1,7 +1,7 @@
 package top.aprilyolies.beehive.proxy;
 
 import top.aprilyolies.beehive.common.URL;
-import top.aprilyolies.beehive.proxy.support.Proxy;
+import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 
 /**
  * @Author EvaJohnson
@@ -16,7 +16,7 @@ public class JavassitProxyFactory extends AbstractProxyFactory {
     }
 
     @Override
-    protected Proxy createProxy(Class<?> clazz) {
-        return Proxy.getProxy(clazz);
+    protected ProviderProxy createProxy(Class<?> clazz) {
+        return ProviderProxy.getProxy(clazz);
     }
 }

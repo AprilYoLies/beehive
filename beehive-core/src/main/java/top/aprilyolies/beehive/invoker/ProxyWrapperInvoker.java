@@ -1,7 +1,7 @@
 package top.aprilyolies.beehive.invoker;
 
 import top.aprilyolies.beehive.common.InvokeInfo;
-import top.aprilyolies.beehive.proxy.support.Proxy;
+import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -12,11 +12,11 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class ProxyWrapperInvoker<T> extends AbstractInvoker<T> {
     // 发布的服务的代理类
-    private final Proxy proxy;
+    private final ProviderProxy proxy;
     // 发布的服务的类型
     private final Class<T> type;
 
-    public ProxyWrapperInvoker(Proxy proxy, Class<T> type, Object target) {
+    public ProxyWrapperInvoker(ProviderProxy proxy, Class<T> type, Object target) {
         this.proxy = proxy;
         this.type = type;
     }

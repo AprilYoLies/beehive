@@ -5,7 +5,7 @@ import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.invoker.Invoker;
 import top.aprilyolies.beehive.invoker.ProxyWrapperInvoker;
-import top.aprilyolies.beehive.proxy.support.Proxy;
+import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.StringUtils;
 
@@ -36,10 +36,10 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
     }
 
     private <T> Invoker<T> createInvoker(Class<T> clazz, Object target) {
-        Proxy proxy = createProxy(clazz);
+        ProviderProxy providerProxy = createProxy(clazz);
         //noinspection unchecked
-        return new ProxyWrapperInvoker<T>(proxy, clazz, target);
+        return new ProxyWrapperInvoker<T>(providerProxy, clazz, target);
     }
 
-    protected abstract Proxy createProxy(Class<?> clazz);
+    protected abstract ProviderProxy createProxy(Class<?> clazz);
 }

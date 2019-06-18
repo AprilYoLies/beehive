@@ -6,12 +6,12 @@ package top.aprilyolies.beehive.provider.service;
  * @Email g863821569@gmail.com
  */
 
-import top.aprilyolies.beehive.proxy.support.Proxy;
+import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 
 /**
  * 根据 DemoService 构建出来的代理类的代码
  */
-public class Proxy0 extends Proxy {
+public class ProviderProxy0 extends ProviderProxy {
     public Object invokeMethod(Object o, String n, Class[] p, Object[] v) throws java.lang.reflect.InvocationTargetException, java.lang.NoSuchMethodException {
         top.aprilyolies.beehive.provider.service.DemoService w;
         try {
