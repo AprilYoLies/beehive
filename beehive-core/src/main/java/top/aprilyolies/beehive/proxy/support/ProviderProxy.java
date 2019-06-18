@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Date 2019-06-14
  * @Email g863821569@gmail.com
  */
-public abstract class ProviderProxy {
+public abstract class ProviderProxy implements Proxy {
     private static final Map<Class<?>, ProviderProxy> proxyCache = new ConcurrentHashMap<>();
     private static final AtomicLong PROXY_CLASS_COUNTER = new AtomicLong(0);
 

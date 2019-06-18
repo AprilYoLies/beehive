@@ -34,7 +34,6 @@ import java.util.concurrent.atomic.AtomicLong;
  * ClassGenerator
  */
 public final class ClassGenerator {
-
     private static final AtomicLong CLASS_NAME_COUNTER = new AtomicLong(0);
     private static final String SIMPLE_NAME_TAG = "<init>";
     private static final Map<ClassLoader, ClassPool> POOL_MAP = new ConcurrentHashMap<ClassLoader, ClassPool>(); //ClassLoader - ClassPool

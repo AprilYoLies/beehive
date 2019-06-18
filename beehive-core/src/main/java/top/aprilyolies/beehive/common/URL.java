@@ -242,4 +242,23 @@ public class URL {
             parameters.putIfAbsent(codec, defaultCodec);
         }
     }
+
+    /**
+     * 判断该 url 是否是由 provider 构建
+     *
+     * @param url
+     * @return
+     */
+    public static boolean isProvider(URL url) {
+        return UrlConstants.PROVIDERS.equals(url.getParameter(UrlConstants.CATEGORY));
+    }
+
+    /**
+     * 判断该 url 是否是由 provider 构建
+     *
+     * @return
+     */
+    public boolean isProvider() {
+        return UrlConstants.PROVIDERS.equals(parameters.get(UrlConstants.CATEGORY));
+    }
 }

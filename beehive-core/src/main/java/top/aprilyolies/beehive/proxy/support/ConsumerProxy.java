@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Date 2019-06-18
  * @Email g863821569@gmail.com
  */
-public abstract class ConsumerProxy {
+public abstract class ConsumerProxy implements Proxy {
     private static final Map<ClassLoader, Map<String, Object>> PROXY_CACHE_MAP = new WeakHashMap<>();
 
     private static final Object PENDING_GENERATION_MARKER = new Object();
@@ -30,11 +30,11 @@ public abstract class ConsumerProxy {
     /**
      * Get proxy.这里获取的 proxy 是 Proxy0，只有一个 newInstance 方法，用来构建 proxy0
      *
-     * @param ics interface class array.
+     * @param clazz interface class array.
      * @return Proxy instance.
      */
-    public static ConsumerProxy getProxy(Class<?>... ics) {
-        return getProxy(ClassUtils.getClassLoader(ConsumerProxy.class), ics);
+    public static ConsumerProxy getProxy(Class<?>... clazz) {
+        return getProxy(ClassUtils.getClassLoader(ConsumerProxy.class), clazz);
     }
 
     /**
@@ -151,29 +151,6 @@ public abstract class ConsumerProxy {
             ccp.addField("private " + InvocationHandler.class.getName() + " handler;");
             ccp.addConstructor(Modifier.PUBLIC, new Class<?>[]{InvocationHandler.class}, new Class<?>[0], "handler=$1;");
             ccp.addDefaultConstructor();
-            // 这里是 ccp 所代表的 class 的源代码
-            // public class org.apache.dubbo.common.bytecode.proxy0 implements com.alibaba.dubbo.rpc.service.EchoService, org.apache.dubbo.demo.DemoService {
-            //     public static java.lang.reflect.Method[] methods;
-            //     private java.lang.reflect.InvocationHandler handler;
-            //     public <init>(java.lang.reflect.InvocationHandler arg0)
-            //     {
-            //         handler = $1;
-            //     }
-            //
-            //     public java.lang.String sayHello(java.lang.String arg0) {
-            //         Object[] args = new Object[1];
-            //         args[0] = ($w) $1;
-            //         Object ret = handler.invoke(this, methods[0], args);
-            //         return (java.lang.String) ret;
-            //     }
-            //
-            //     public java.lang.Object $echo(java.lang.Object arg0) {
-            //         Object[] args = new Object[1];
-            //         args[0] = ($w) $1;
-            //         Object ret = handler.invoke(this, methods[1], args);
-            //         return (java.lang.Object) ret;
-            //     }
-            // }
             Class<?> clazz = ccp.toClass();
             clazz.getField("methods").set(null, methods.toArray(new Method[0]));
 

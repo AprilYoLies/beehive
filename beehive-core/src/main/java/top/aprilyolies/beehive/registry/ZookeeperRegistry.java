@@ -4,13 +4,17 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
-import top.aprilyolies.beehive.common.*;
+import top.aprilyolies.beehive.common.BeehiveContext;
+import top.aprilyolies.beehive.common.InvokeInfo;
+import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.filter.AccessLogFilter;
 import top.aprilyolies.beehive.filter.Filter;
 import top.aprilyolies.beehive.filter.MonitorFilter;
 import top.aprilyolies.beehive.invoker.AbstractInvoker;
 import top.aprilyolies.beehive.invoker.Invoker;
+import top.aprilyolies.beehive.invoker.ProxyWrapperInvoker;
 import top.aprilyolies.beehive.proxy.ProxyFactory;
 
 import java.util.ArrayList;
@@ -68,8 +72,18 @@ public class ZookeeperRegistry extends AbstractRegistry {
     protected void createInvoker(URL url) {
         ProxyFactory proxyFactory = proxyFactorySelector.createProxyFactory(url);
         Invoker<?> invoker = proxyFactory.createProxy(url);
-        Invoker<?> chain = buildInvokerChain(invoker);
-        BeehiveContext.safePut(url.getParameter(SERVICE), chain);
+        Invoker<?> chain;
+        if (url.isProvider()) {
+            chain = buildInvokerChain(invoker);
+            BeehiveContext.safePut(url.getParameter(SERVICE), chain);
+        } else {
+            if (invoker instanceof ProxyWrapperInvoker) {
+                ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;
+                BeehiveContext.safePut(url.getParameter(SERVICE), proxyWrapperInvoker.getProxy());
+            }
+
+        }
+
     }
 
     /**
@@ -169,8 +183,13 @@ public class ZookeeperRegistry extends AbstractRegistry {
             throw new IllegalArgumentException("url should not be null");
         String group = url.getParameterElseDefault(GROUP_KEY, DEFAULT_GROUP);
         String serviceName = url.getPath();
-        String provider = url.getParameter(UrlConstants.PROVIDER);
         String category = url.getParameter(CATEGORY);
+        String registorInfo;
+        if (CONSUMERS.equals(category)) {
+            registorInfo = url.getParameter(CONSUMER);
+        } else {
+            registorInfo = url.getParameter(PROVIDER);
+        }
         StringBuilder sb = new StringBuilder();
         sb.append(PATH_SEPARATOR)
                 .append(group)
@@ -179,7 +198,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
                 .append(PATH_SEPARATOR)
                 .append(category)
                 .append(PATH_SEPARATOR)
-                .append(provider);
+                .append(registorInfo);
         return sb.toString();
     }
 }

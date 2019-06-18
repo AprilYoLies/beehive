@@ -1,7 +1,10 @@
 package top.aprilyolies.beehive.invoker;
 
 import top.aprilyolies.beehive.common.InvokeInfo;
+import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.proxy.support.ConsumerProxy;
 import top.aprilyolies.beehive.proxy.support.ProviderProxy;
+import top.aprilyolies.beehive.proxy.support.Proxy;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -12,13 +15,27 @@ import java.lang.reflect.InvocationTargetException;
  */
 public class ProxyWrapperInvoker<T> extends AbstractInvoker<T> {
     // 发布的服务的代理类
-    private final ProviderProxy proxy;
+    private final Proxy proxy;
     // 发布的服务的类型
     private final Class<T> type;
+    private final URL url;
 
-    public ProxyWrapperInvoker(ProviderProxy proxy, Class<T> type, Object target) {
+    public Proxy getProxy() {
+        return proxy;
+    }
+
+    public Class<T> getType() {
+        return type;
+    }
+
+    public URL getUrl() {
+        return url;
+    }
+
+    public ProxyWrapperInvoker(Proxy proxy, Class<T> type, Object target, URL url) {
         this.proxy = proxy;
         this.type = type;
+        this.url = url;
     }
 
     @Override
@@ -27,6 +44,12 @@ public class ProxyWrapperInvoker<T> extends AbstractInvoker<T> {
         Class<?>[] pts = info.getPts();
         Object[] pvs = info.getPvs();
         Object target = info.getTarget();
-        return proxy.invokeMethod(target, methodName, pts, pvs);
+        if (url.isProvider()) {
+            ProviderProxy providerProxy = (ProviderProxy) proxy;
+            return providerProxy.invokeMethod(target, methodName, pts, pvs);
+        } else {
+            ConsumerProxy consumerProxy = (ConsumerProxy) proxy;
+            return consumerProxy.newInstance();
+        }
     }
 }

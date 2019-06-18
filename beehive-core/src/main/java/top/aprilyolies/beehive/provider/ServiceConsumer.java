@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.provider;
 
 import org.springframework.beans.factory.FactoryBean;
+import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.spring.ReferenceConfigBean;
@@ -20,26 +21,29 @@ public class ServiceConsumer extends ReferenceConfigBean implements FactoryBean 
 
     @Override
     public Object getObject() throws Exception {
-        registryConsumer();
-        return null;
+        return registryConsumer();
     }
 
-    private void registryConsumer() {
+    private Object registryConsumer() {
         List<URL> registryUrls = getRegistryUrl(getRegistry());
         fillParameters(registryUrls, this);
         checkRegistryUrls(registryUrls);
-        registryConsumer(registryUrls);
+        return registryConsumer(registryUrls);
     }
 
-    private void registryConsumer(List<URL> registryUrls) {
+    private Object registryConsumer(List<URL> registryUrls) {
         if (registryUrls == null || registryUrls.size() == 0) {
             logger.warn("None of url was registered");
-            return;
+            return null;
         }
+        // 此处限定只会取第一个 registry url 作为注册中心
         for (URL registryUrl : registryUrls) {
             convertToRegistryUrl(registryUrl);
             protocolSelector.publish(registryUrl);
+            String service = registryUrl.getParameter(UrlConstants.SERVICE);
+            return BeehiveContext.safeGet(service);
         }
+        return null;
     }
 
     /**
