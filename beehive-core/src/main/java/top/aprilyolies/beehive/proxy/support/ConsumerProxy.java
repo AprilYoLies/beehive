@@ -3,7 +3,6 @@ package top.aprilyolies.beehive.proxy.support;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.ReflectUtils;
 
-import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -47,6 +46,7 @@ public abstract class ConsumerProxy {
      */
     public static ConsumerProxy getProxy(ClassLoader cl, Class<?>... ics) {
         StringBuilder sb = new StringBuilder();
+        // 这个 for 循环就是根据 ics 构建缓存的 key
         for (int i = 0; i < ics.length; i++) {  // 这里拼接的就是 ics 每一项的全限定名
             String itf = ics[i].getName();
             if (!ics[i].isInterface()) {
@@ -79,13 +79,7 @@ public abstract class ConsumerProxy {
         synchronized (cache) {
             do {
                 Object value = cache.get(key);  // 这里是尝试从缓存中获取
-                if (value instanceof Reference<?>) {
-                    proxy = (ConsumerProxy) ((Reference<?>) value).get();
-                    if (proxy != null) {
-                        return proxy;
-                    }
-                }
-                // PENDING_GENERATION_MARKER，表明构建过程中，先 wait 一下
+                // PENDING_GENERATION_MARKER，表明构建过程中，先 wait 一下，避免重复构建
                 if (value == PENDING_GENERATION_MARKER) {
                     try {
                         cache.wait();

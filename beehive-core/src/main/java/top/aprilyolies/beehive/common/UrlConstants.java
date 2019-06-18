@@ -12,6 +12,8 @@ public class UrlConstants {
     public static final String VERSION_KEY = "version";
     // 服务的提供者信息
     public static final String PROVIDER = "provider";
+    // 服务的消费者信息
+    public static final String CONSUMER = "consumer";
     // 路径分隔符
     public static final String PATH_SEPARATOR = "/";
     // registry 协议
@@ -26,6 +28,8 @@ public class UrlConstants {
     public static final String CATEGORY = "category";
     // 表示分类的 provider 类型
     public static final String PROVIDERS = "providers";
+    // 表示分类的 consumer 类型
+    public static final String CONSUMERS = "consumers";
     // 表示分类的 provider 类型
     public static final String SERVICE_REF = "ref";
     // 代理工厂

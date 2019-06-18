@@ -1,10 +1,10 @@
 package top.aprilyolies.beehive.provider;
 
-import org.springframework.context.ApplicationEvent;
-import org.springframework.context.ApplicationListener;
+import org.springframework.beans.factory.FactoryBean;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
-import top.aprilyolies.beehive.spring.ServiceConfigBean;
+import top.aprilyolies.beehive.spring.ReferenceConfigBean;
+import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetAddress;
@@ -13,31 +13,32 @@ import java.util.List;
 
 /**
  * @Author EvaJohnson
- * @Date 2019-06-12
+ * @Date 2019-06-18
  * @Email g863821569@gmail.com
  */
-public class ServiceProvider extends ServiceConfigBean implements ApplicationListener {
-    // 用于记录当前 bean 所代表的服务是否已经发布
-    private boolean published = false;
-
-    private static final Object publishMonitor = new Object();
+public class ServiceConsumer extends ReferenceConfigBean implements FactoryBean {
 
     @Override
-    public void onApplicationEvent(ApplicationEvent event) {
-        exportService();
+    public Object getObject() throws Exception {
+        registryConsumer();
+        return null;
     }
 
-    public void exportService() {
-        if (!published) {
-            synchronized (publishMonitor) {
-                if (!published) {
-                    List<URL> registryUrls = getRegistryUrl(getRegistry());
-                    fillParameters(registryUrls, this);
-                    checkRegistryUrls(registryUrls);
-                    registryService(registryUrls);
-                }
-                published = true;
-            }
+    private void registryConsumer() {
+        List<URL> registryUrls = getRegistryUrl(getRegistry());
+        fillParameters(registryUrls, this);
+        checkRegistryUrls(registryUrls);
+        registryConsumer(registryUrls);
+    }
+
+    private void registryConsumer(List<URL> registryUrls) {
+        if (registryUrls == null || registryUrls.size() == 0) {
+            logger.warn("None of url was registered");
+            return;
+        }
+        for (URL registryUrl : registryUrls) {
+            convertToRegistryUrl(registryUrl);
+            protocolSelector.publish(registryUrl);
         }
     }
 
@@ -59,12 +60,12 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
                     throw new RuntimeException("The path of registry url should not be null");
                 registryUrl.setPath(registryUrl.getParameter(UrlConstants.SERVICE));
             }
-            if (StringUtils.isEmpty(registryUrl.getParameter(UrlConstants.PROVIDER))) {
-                String providerInfo = getProviderInfo();
-                registryUrl.putParameter(UrlConstants.PROVIDER, providerInfo);
+            if (StringUtils.isEmpty(registryUrl.getParameter(UrlConstants.CONSUMER))) {
+                String consumerInfo = getProviderInfo();
+                registryUrl.putParameter(UrlConstants.CONSUMER, consumerInfo);
             }
             if (StringUtils.isEmpty(registryUrl.getParameter(UrlConstants.CATEGORY))) {
-                registryUrl.putParameter(UrlConstants.CATEGORY, UrlConstants.PROVIDERS);
+                registryUrl.putParameter(UrlConstants.CATEGORY, UrlConstants.CONSUMERS);
             }
         }
     }
@@ -83,17 +84,15 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
         }
     }
 
-
-    // 向注册中心注册要发布的服务
-    private void registryService(List<URL> registryUrls) {
-        if (registryUrls == null || registryUrls.size() == 0) {
-            logger.warn("None of url was registered");
-            return;
-        }
-        for (URL registryUrl : registryUrls) {
-            convertToRegistryUrl(registryUrl);
-            protocolSelector.publish(registryUrl);
-        }
+    @Override
+    public Class<?> getObjectType() {
+        String service = getService();
+        Class<?> cls = ClassUtils.forName(service);
+        return cls;
     }
 
+    @Override
+    public boolean isSingleton() {
+        return true;
+    }
 }
