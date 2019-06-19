@@ -21,5 +21,5 @@ public abstract class AbstractProtocol implements Protocol {
     // transporterSelector 选择器
     protected final Transporter transporterSelector = ExtensionLoader.getExtensionLoader(Transporter.class).getExtensionSelectorInstance();
     // 用于缓存
-    protected final Map<String, Server> serverCache = new ConcurrentHashMap<>();
+    protected final Map<String, Server> transporterCache = new ConcurrentHashMap<>();
 }

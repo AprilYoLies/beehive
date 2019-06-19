@@ -22,4 +22,7 @@ public interface Protocol {
      */
     @Selector
     void publish(URL url);
+
+    @Selector
+    void subscribe(URL url);
 }

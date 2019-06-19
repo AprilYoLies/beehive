@@ -40,7 +40,7 @@ public class ServiceConsumer extends ReferenceConfigBean implements FactoryBean 
         // 此处限定只会取第一个 registry url 作为注册中心
         for (URL registryUrl : registryUrls) {
             convertToRegistryUrl(registryUrl);
-            protocolSelector.publish(registryUrl);
+            protocolSelector.subscribe(registryUrl);
             String service = registryUrl.getParameter(UrlConstants.SERVICE);
             return BeehiveContext.safeGet(service);
         }

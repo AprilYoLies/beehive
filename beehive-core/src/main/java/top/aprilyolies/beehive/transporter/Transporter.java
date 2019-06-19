@@ -16,10 +16,18 @@ import top.aprilyolies.beehive.transporter.server.Server;
 @SPI("netty")
 public interface Transporter {
     /**
-     * 服务器的绑定操作，对于 client 和
+     * 服务器的绑定操作
      *
      * @param url
      * @return
      */
     Server bind(URL url);
+
+    /**
+     * 客户端的准备
+     *
+     * @param url
+     * @return
+     */
+    Server connect(URL url);
 }

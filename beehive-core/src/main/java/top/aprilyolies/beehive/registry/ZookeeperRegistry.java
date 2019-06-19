@@ -60,7 +60,11 @@ public class ZookeeperRegistry extends AbstractRegistry {
         URL serviceUrl = URL.copyFromUrl(url.getOriginUrl());
         serviceUrl.setOriginUrl(url.getOriginUrl());
         serviceUrl.setProtocol(protocol);
-        protocolSelector.publish(serviceUrl);
+        if (url.isProvider()) {
+            protocolSelector.publish(serviceUrl);
+        } else if (!url.isProvider()) {
+            protocolSelector.subscribe(serviceUrl);
+        }
     }
 
     /**

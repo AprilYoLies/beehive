@@ -16,17 +16,29 @@ public class BeehiveProtocol extends AbstractProtocol {
 
     @Override
     public void publish(URL url) {
-        String serverKey = url.getAddress();
-        Server server = serverCache.get(serverKey);
+        String serverKey = url.getParameter(UrlConstants.SERVICE);
+        Server server = transporterCache.get(serverKey);
         if (server == null) {
             synchronized (this) {
-                server = serverCache.get(serverKey);
-                if (server == null) {
-                    server = doPublish(url);
-                    serverCache.put(serverKey, server);
-                }
+                transporterCache.computeIfAbsent(serverKey, k -> doPublish(url));
             }
         }
+    }
+
+    @Override
+    public void subscribe(URL url) {
+        String serverKey = url.getParameter(UrlConstants.SERVICE);
+        Server client = transporterCache.get(serverKey);
+        if (client == null) {
+            synchronized (this) {
+                transporterCache.computeIfAbsent(serverKey, k -> doSubscribe(url));
+            }
+        }
+    }
+
+    private Server doSubscribe(URL url) {
+        prepareServiceUrl(url);
+        return transporterSelector.connect(url);
     }
 
     private Server doPublish(URL url) {
