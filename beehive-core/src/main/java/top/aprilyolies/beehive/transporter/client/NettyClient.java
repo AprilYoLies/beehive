@@ -21,10 +21,12 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
  * @Email g863821569@gmail.com
  */
 public class NettyClient extends AbstracServer {
+    // 工作线程的数量，默认为 cpu 核心数加 1
+    private int WORKER_THREADS = Runtime.getRuntime().availableProcessors() + 1;
     // netty 客户端
     private Bootstrap bootstrap;
     // netty 客户端工作线程组
-    private NioEventLoopGroup workers;
+    private NioEventLoopGroup workers = new NioEventLoopGroup(WORKER_THREADS);
     // 默认的连接超时时间
     private final int DEFAULT_CONNECT_TIMEOUT = 3000;
     // 心跳时间间隔
