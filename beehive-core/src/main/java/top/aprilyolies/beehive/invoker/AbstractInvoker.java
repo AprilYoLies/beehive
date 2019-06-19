@@ -1,11 +1,11 @@
 package top.aprilyolies.beehive.invoker;
 
 import org.apache.log4j.Logger;
+import top.aprilyolies.beehive.cluster.loadbalance.LoadBalance;
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.common.result.RpcResult;
-
-import java.lang.reflect.InvocationTargetException;
+import top.aprilyolies.beehive.extension.ExtensionLoader;
 
 
 /**
@@ -15,6 +15,8 @@ import java.lang.reflect.InvocationTargetException;
  */
 public abstract class AbstractInvoker<T> implements Invoker {
     protected final Logger logger = Logger.getLogger(getClass());
+
+    protected LoadBalance loadBalanceSelector = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtensionSelectorInstance();
 
     @Override
     public Result invoke(InvokeInfo info) {
@@ -28,6 +30,6 @@ public abstract class AbstractInvoker<T> implements Invoker {
         }
     }
 
-    protected abstract Object doInvoke(InvokeInfo info) throws NoSuchMethodException, InvocationTargetException;
+    protected abstract Object doInvoke(InvokeInfo info);
 
 }

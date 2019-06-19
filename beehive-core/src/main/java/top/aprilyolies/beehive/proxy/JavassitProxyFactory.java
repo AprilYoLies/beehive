@@ -1,6 +1,9 @@
 package top.aprilyolies.beehive.proxy;
 
+import top.aprilyolies.beehive.cluster.Cluster;
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.extension.ExtensionLoader;
+import top.aprilyolies.beehive.invoker.Invoker;
 import top.aprilyolies.beehive.proxy.support.ConsumerProxy;
 import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 import top.aprilyolies.beehive.proxy.support.Proxy;
@@ -21,7 +24,17 @@ public class JavassitProxyFactory extends AbstractProxyFactory {
     protected Proxy createProxy(Class<?> clazz, URL url) {
         if (url.isProvider())
             return ProviderProxy.getProxy(clazz);
-        else
-            return (Proxy) ConsumerProxy.getProxy(clazz, Proxy.class).newInstance((proxy, method, args) -> args[0] + " world");
+        else {
+            Invoker invoker = getInvoker(url);
+            return (Proxy) ConsumerProxy.
+                    getProxy(clazz, Proxy.class).
+                    newInstance(new InvokerInvocationHandler(invoker, url));
+        }
+
+    }
+
+    private Invoker getInvoker(URL url) {
+        Cluster selector = ExtensionLoader.getExtensionLoader(Cluster.class).getExtensionSelectorInstance();
+        return selector.join(url);
     }
 }

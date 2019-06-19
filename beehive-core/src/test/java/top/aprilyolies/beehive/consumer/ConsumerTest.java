@@ -15,11 +15,11 @@ public class ConsumerTest {
     public void createConfigBean() throws Exception {
         ServiceConsumer consumer = new ServiceConsumer();
         RegistryConfigBean registry = new RegistryConfigBean();
+        consumer.setProtocol("beehive");
         registry.setAddress(new String[]{"zookeeper://127.0.0.1:2181"});
         consumer.setRegistry(registry);
         consumer.setService(DemoService.class.getName());
         Object obj = consumer.getObject();
         DemoService demoService = (DemoService) obj;
-        System.out.println(demoService.say("hello"));;
     }
 }

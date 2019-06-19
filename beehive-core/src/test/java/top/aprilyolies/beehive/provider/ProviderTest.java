@@ -9,6 +9,8 @@ import top.aprilyolies.beehive.provider.service.DemoService;
 import top.aprilyolies.beehive.provider.service.DemoServiceImpl;
 import top.aprilyolies.beehive.spring.RegistryConfigBean;
 
+import java.util.Scanner;
+
 /**
  * @Author EvaJohnson
  * @Date 2019-06-12
@@ -23,7 +25,9 @@ public class ProviderTest {
         provider.setRegistry(registry);
         provider.setRef(DemoServiceImpl.class.getName());
         provider.setService(DemoService.class.getName());
+        provider.setProtocol("beehive");
         provider.exportService();
+        new Scanner(System.in).nextLine();
     }
 
     @Test
@@ -34,6 +38,7 @@ public class ProviderTest {
         provider.setRegistry(registry);
         provider.setRef(DemoServiceImpl.class.getName());
         provider.setService(DemoService.class.getName());
+        provider.setProtocol("beehive");
         provider.exportService();
     }
 
@@ -45,6 +50,7 @@ public class ProviderTest {
         provider.setRegistry(registry);
         provider.setRef(DemoServiceImpl.class.getName());
         provider.setService(DemoService.class.getName());
+        provider.setProtocol("beehive");
         provider.exportService();
 
         DemoServiceImpl target = new DemoServiceImpl();
@@ -66,6 +72,7 @@ public class ProviderTest {
         provider.setRegistry(registry);
         provider.setRef(DemoServiceImpl.class.getName());
         provider.setService(DemoService.class.getName());
+        provider.setProtocol("beehive");
         provider.exportService();
 
         final Invoker chain = BeehiveContext.safeGet(provider.getService(), Invoker.class);
@@ -84,6 +91,7 @@ public class ProviderTest {
         registry.setAddress(new String[]{"zookeeper://127.0.0.1:2181"});
         provider.setRegistry(registry);
         provider.setRef(DemoServiceImpl.class.getName());
+        provider.setProtocol("beehive");
         provider.setService(DemoService.class.getName());
         provider.exportService();
     }

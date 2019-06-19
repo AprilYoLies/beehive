@@ -77,6 +77,14 @@ public class ZookeeperRegistry extends AbstractRegistry {
             chain = buildInvokerChain(invoker);
             BeehiveContext.safePut(url.getParameter(SERVICE), chain);
         } else {
+            String providerPath = getProviderPath(url);
+            try {
+                List<String> providerUrls = zkClient.getChildren().forPath(providerPath);
+                BeehiveContext.safePut(PROVIDERS, providerUrls);
+            } catch (Exception e) {
+                logger.error("Can't get provider information at " + providerPath);
+                throw new RuntimeException(e.getMessage(), e);
+            }
             if (invoker instanceof ProxyWrapperInvoker) {
                 ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;
                 BeehiveContext.safePut(url.getParameter(SERVICE), proxyWrapperInvoker.getProxy());
@@ -84,6 +92,25 @@ public class ZookeeperRegistry extends AbstractRegistry {
 
         }
 
+    }
+
+    /**
+     * 获取 provider 路径信息
+     *
+     * @param url
+     * @return
+     */
+    private String getProviderPath(URL url) {
+        String group = url.getParameterElseDefault(GROUP_KEY, DEFAULT_GROUP);
+        String service = url.getParameter(SERVICE);
+        String category = PROVIDERS;
+        StringBuilder sb = new StringBuilder(PATH_SEPARATOR).
+                append(group).
+                append(PATH_SEPARATOR).
+                append(service).
+                append(PATH_SEPARATOR).
+                append(category);
+        return sb.toString();
     }
 
     /**

@@ -8,6 +8,7 @@ import top.aprilyolies.beehive.spring.ServiceConfigBean;
 import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetAddress;
+import java.net.URLEncoder;
 import java.net.UnknownHostException;
 import java.util.List;
 
@@ -60,7 +61,7 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
                 registryUrl.setPath(registryUrl.getParameter(UrlConstants.SERVICE));
             }
             if (StringUtils.isEmpty(registryUrl.getParameter(UrlConstants.PROVIDER))) {
-                String providerInfo = getProviderInfo();
+                String providerInfo = getProviderInfo(registryUrl);
                 registryUrl.putParameter(UrlConstants.PROVIDER, providerInfo);
             }
             if (StringUtils.isEmpty(registryUrl.getParameter(UrlConstants.CATEGORY))) {
@@ -72,12 +73,14 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
     /**
      * 尝试获取 provider 信息，获取的形式为主机地址：端口号，获取失败将会抛出异常
      *
+     * @param registryUrl
      * @return
      */
-    private String getProviderInfo() {
+    private String getProviderInfo(URL registryUrl) {
         try {
+            String protocol = getProtocol();
             String ipAddress = InetAddress.getLocalHost().getCanonicalHostName();
-            return ipAddress + ":" + UrlConstants.SERVICE_PORT;
+            return URLEncoder.encode(protocol + "://" + ipAddress + ":" + UrlConstants.SERVICE_PORT + "/" + registryUrl.getParameter(UrlConstants.SERVICE));
         } catch (UnknownHostException e) {
             throw new RuntimeException("Can't get provider ip address", e);
         }

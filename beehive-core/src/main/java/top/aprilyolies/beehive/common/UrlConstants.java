@@ -46,4 +46,8 @@ public class UrlConstants {
     public static final String DEFAULT_CODEC = "hessian";
     // beehive 底层的序列化器
     public static final String SERIALIZER = "serializer";
+    // 表示 beehive 所模拟的集群，如容灾型或者是快速失败型
+    public static final String CLUSTER = "cluster";
+    // beehive 负载均衡参数
+    public static final String LOAD_BALANCE = "load_balance";
 }

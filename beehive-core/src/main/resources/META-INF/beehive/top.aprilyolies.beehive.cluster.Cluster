@@ -1,0 +1,2 @@
+failover=top.aprilyolies.beehive.cluster.FailoverCluster
+selector=top.aprilyolies.beehive.cluster.ClusterSelector

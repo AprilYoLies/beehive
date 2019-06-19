@@ -6,8 +6,6 @@ import top.aprilyolies.beehive.proxy.support.ConsumerProxy;
 import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 import top.aprilyolies.beehive.proxy.support.Proxy;
 
-import java.lang.reflect.InvocationTargetException;
-
 /**
  * @Author EvaJohnson
  * @Date 2019-06-14
@@ -39,14 +37,19 @@ public class ProxyWrapperInvoker<T> extends AbstractInvoker<T> {
     }
 
     @Override
-    protected Object doInvoke(InvokeInfo info) throws NoSuchMethodException, InvocationTargetException {
+    protected Object doInvoke(InvokeInfo info) {
         String methodName = info.getMethodName();
         Class<?>[] pts = info.getPts();
         Object[] pvs = info.getPvs();
         Object target = info.getTarget();
         if (url.isProvider()) {
             ProviderProxy providerProxy = (ProviderProxy) proxy;
-            return providerProxy.invokeMethod(target, methodName, pts, pvs);
+            try {
+                return providerProxy.invokeMethod(target, methodName, pts, pvs);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
+            }
         } else {
             ConsumerProxy consumerProxy = (ConsumerProxy) proxy;
             return consumerProxy.newInstance();
