@@ -1,7 +1,6 @@
 package top.aprilyolies.beehive.invoker;
 
 import top.aprilyolies.beehive.common.InvokeInfo;
-import top.aprilyolies.beehive.common.result.Result;
 
 /**
  * @Author EvaJohnson
@@ -21,5 +20,5 @@ public interface Invoker<T> {
      * @param info 这是 invoke 方法执行所需要的一些相关参数
      * @return
      */
-    Result invoke(InvokeInfo info);
+    Object invoke(InvokeInfo info);
 }

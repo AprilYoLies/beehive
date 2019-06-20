@@ -34,7 +34,7 @@ public class BeehiveProtocol extends AbstractProtocol {
         if (client == null) {
             synchronized (this) {
                 clientCache.computeIfAbsent(serverKey, k -> doSubscribe(url));
-                BeehiveContext.safePut(UrlConstants.CONSUMERS_TRANSPORT, serverCache);
+                BeehiveContext.safePut(UrlConstants.CONSUMERS_TRANSPORT, clientCache);
             }
         }
     }

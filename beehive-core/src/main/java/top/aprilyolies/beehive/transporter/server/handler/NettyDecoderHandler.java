@@ -34,9 +34,9 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
     // 请求头长度
     private int HEADER_LENGTH = 16;
     // 魔幻数字高字节
-    private byte MAGIC_HIGH = (byte) MAGIC;
+    private byte MAGIC_LOW = (byte) MAGIC;
     // 魔幻数字低字节
-    private byte MAGIC_LOW = (byte) (MAGIC >>> 8);
+    private byte MAGIC_HIGH = (byte) (MAGIC >>> 8);
     // 序列化器掩码
     protected static final int SERIALIZER_MASK = 0x1f;
     // 事件标志V
@@ -154,6 +154,7 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
                     req.setData(info);
                 } else {
                     Object msg = serializer.readObject();
+                    req.setType(MessageType.HEARTBEAT_REQUEST);
                     req.setData(msg);
                 }
             } catch (Exception e) {

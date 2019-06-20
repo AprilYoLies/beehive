@@ -1,7 +1,6 @@
 package top.aprilyolies.beehive.filter;
 
 import top.aprilyolies.beehive.common.InvokeInfo;
-import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.invoker.Invoker;
 
 /**
@@ -21,5 +20,5 @@ public interface Filter {
      * @param invokeInfo 执行的 invoker 的一些相关的参数
      * @return
      */
-    Result doFilter(Invoker next, InvokeInfo invokeInfo);
+    Object doFilter(Invoker next, InvokeInfo invokeInfo);
 }

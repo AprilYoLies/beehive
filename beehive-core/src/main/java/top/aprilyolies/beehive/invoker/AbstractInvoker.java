@@ -3,7 +3,6 @@ package top.aprilyolies.beehive.invoker;
 import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.cluster.loadbalance.LoadBalance;
 import top.aprilyolies.beehive.common.InvokeInfo;
-import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.common.result.RpcResult;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
 import top.aprilyolies.beehive.filter.AccessLogFilter;
@@ -25,10 +24,9 @@ public abstract class AbstractInvoker<T> implements Invoker {
     protected LoadBalance loadBalanceSelector = ExtensionLoader.getExtensionLoader(LoadBalance.class).getExtensionSelectorInstance();
 
     @Override
-    public Result invoke(InvokeInfo info) {
+    public Object invoke(InvokeInfo info) {
         try {
-            Object msg = doInvoke(info);
-            return new RpcResult(msg);
+            return doInvoke(info);
         } catch (Exception e) {
             e.printStackTrace();
             return new RpcResult();
@@ -54,7 +52,7 @@ public abstract class AbstractInvoker<T> implements Invoker {
                 final Invoker next = ptr;
                 Invoker pre = new AbstractInvoker() {
                     @Override
-                    protected Result doInvoke(InvokeInfo info) {
+                    protected Object doInvoke(InvokeInfo info) {
                         return filter.doFilter(next, info);
                     }
                 };

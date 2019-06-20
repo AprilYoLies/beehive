@@ -65,12 +65,11 @@ public class NettyServer extends AbstracServer implements Server {
                 .childHandler(new ChannelInitializer<NioSocketChannel>() {
                     @Override
                     protected void initChannel(NioSocketChannel ch) throws Exception {
-                        // FIXME: should we use getTimeout()?
                         // 从 url 中获取 idleTimeout 时长，如果 url 参数中没有指定，那么就直接使用三倍的 heartBeat 时长
                         ch.pipeline()//.addLast("logging",new LoggingHandler(LogLevel.INFO))//for debug
                                 .addLast("decoder", new NettyDecoderHandler(getUrl()))   // InternalDecoder
                                 .addLast("encoder", new NettyEncoderHandler(getUrl()))   // InternalEncoder
-                                // 用于检测 channel 空闲状态，条件成立时关闭对应的 channel
+                                // 用于检测 channel 空闲状态，条件成立时关闭对应的 channel，相对的客户端的 Idle 处理器则用于发送心跳消息
                                 .addLast("server-idle-handler", new IdleStateHandler(0, 0, IDLE_TIMEOUT, MILLISECONDS))
                                 .addLast("heartbeat-handler", new HeartbeatHandler())
                                 .addLast("final-handler", new ServerFinalChannelHandler(getUrl()));

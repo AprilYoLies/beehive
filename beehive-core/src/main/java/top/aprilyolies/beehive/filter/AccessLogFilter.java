@@ -1,7 +1,6 @@
 package top.aprilyolies.beehive.filter;
 
 import top.aprilyolies.beehive.common.InvokeInfo;
-import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.invoker.Invoker;
 
 /**
@@ -11,7 +10,7 @@ import top.aprilyolies.beehive.invoker.Invoker;
  */
 public class AccessLogFilter implements Filter {
     @Override
-    public Result doFilter(Invoker next, InvokeInfo invokeInfo) {
+    public Object doFilter(Invoker next, InvokeInfo invokeInfo) {
         System.out.println("AccessLogFilter do filter...");
         return next.invoke(invokeInfo);
     }

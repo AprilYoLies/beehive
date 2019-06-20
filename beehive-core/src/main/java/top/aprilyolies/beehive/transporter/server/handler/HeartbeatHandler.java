@@ -21,6 +21,7 @@ public class HeartbeatHandler extends ChannelDuplexHandler {
             Request request = (Request) msg;
             Response response = new Response(request.getId());
             response.setType(MessageType.HEARTBEAT_RESPONSE);
+            response.setStatus(Response.OK);
             ctx.writeAndFlush(response);
             if (logger.isDebugEnabled()) {
                 logger.debug("Received heartbeat request from " + ctx.channel().remoteAddress());

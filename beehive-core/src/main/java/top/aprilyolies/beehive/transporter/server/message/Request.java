@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class Request {
     private final long id;
     // 全局的 id 生成器
-    private static final AtomicLong requestId = new AtomicLong(0);
+    private static final AtomicLong requestId = new AtomicLong(1);
     // 消息类型
     private MessageType type;
     // 消息附带的内容

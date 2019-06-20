@@ -47,6 +47,7 @@ public class NettyEncoderHandler extends MessageToByteEncoder {
         } else if (msg instanceof Response) {
             responseEncode(ctx, msg, out);
         }
+        ctx.writeAndFlush(out);
     }
 
     private void requestEncode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws IOException {

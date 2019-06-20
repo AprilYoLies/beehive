@@ -11,6 +11,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.transporter.server.handler.ClientFinalChannelHandler;
 import top.aprilyolies.beehive.transporter.server.handler.NettyDecoderHandler;
 import top.aprilyolies.beehive.transporter.server.handler.NettyEncoderHandler;
 
@@ -60,22 +61,26 @@ public class NettyClient extends AbstractClient {
                 ch.pipeline()//.addLast("logging",new LoggingHandler(LogLevel.INFO))//for debug
                         .addLast("decoder", new NettyDecoderHandler(getUrl()))   // 指定 decoder -> InternalDecoder
                         .addLast("encoder", new NettyEncoderHandler(getUrl()))   // 指定 encoder -> InternalEncoder
-                        .addLast("client-idle-handler", new IdleStateHandler(HEARTBEAT_INTERVAL, 0, 0, MILLISECONDS));
-//                        .addLast("handler", nettyClientHandler);    // 最后的 handler，就是核心的逻辑处理器
+                        .addLast("client-idle-handler", new IdleStateHandler(HEARTBEAT_INTERVAL, 0, 0, MILLISECONDS))
+                        .addLast("handler", new ClientFinalChannelHandler());    // 最后的 handler，就是核心的逻辑处理器
             }
         });
     }
 
     @Override
     public void connect(InetSocketAddress address, InvokeInfo info) {
-        ChannelFuture future = bootstrap.connect(address);
-        if (future.isSuccess()) {
-            Channel channel = future.channel();
-            Channel oldChannel = this.channel;
-            if (oldChannel != null) {
-                oldChannel.close();
+        try {
+            ChannelFuture future = bootstrap.connect(address).sync();
+            if (future.isSuccess()) {
+                Channel channel = future.channel();
+                Channel oldChannel = this.channel;
+                if (oldChannel != null) {
+                    oldChannel.close();
+                }
+                this.channel = channel;
             }
-            this.channel = channel;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

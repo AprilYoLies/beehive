@@ -10,6 +10,7 @@ import top.aprilyolies.beehive.transporter.client.Client;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author EvaJohnson
@@ -49,7 +50,8 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     private List<Invoker<T>> listInvokers() {
         //noinspection unchecked
         List<String> providers = BeehiveContext.safeGet(UrlConstants.PROVIDERS, List.class);
-        Client server = BeehiveContext.safeGet(UrlConstants.CONSUMERS_TRANSPORT, Client.class);
+        Map<String, Client> clientCache = BeehiveContext.safeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
+        Client server = clientCache.get(url.getParameter(UrlConstants.SERVICE));
         assert providers != null;
         return createRemoteInvoker(providers, server);
     }

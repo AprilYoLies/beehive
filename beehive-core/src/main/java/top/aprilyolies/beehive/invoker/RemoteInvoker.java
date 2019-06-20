@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.invoker;
 
 import top.aprilyolies.beehive.common.InvokeInfo;
+import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.transporter.client.Client;
 
 import java.net.InetSocketAddress;
@@ -25,7 +26,7 @@ public class RemoteInvoker extends AbstractInvoker {
     }
 
     @Override
-    protected Object doInvoke(InvokeInfo info) {
+    protected Result doInvoke(InvokeInfo info) {
         if (port < 0) {
             throw new IllegalArgumentException("The port " + port + " is less than 0");
         }

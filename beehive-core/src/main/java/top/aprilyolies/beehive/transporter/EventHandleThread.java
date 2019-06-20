@@ -5,7 +5,6 @@ import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.RpcInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
-import top.aprilyolies.beehive.common.result.Result;
 import top.aprilyolies.beehive.invoker.Invoker;
 import top.aprilyolies.beehive.transporter.server.message.MessageType;
 import top.aprilyolies.beehive.transporter.server.message.Request;
@@ -64,7 +63,7 @@ public class EventHandleThread implements Runnable {
                     Class<?> clazz = ClassUtils.forName(url.getParameter(UrlConstants.SERVICE_REF));
                     Object target = clazz.newInstance();
                     // 进行真正的 invoke 操作
-                    Result result = invoker.invoke(info.createInvokeInfo(target));
+                    Object result = invoker.invoke(info.createInvokeInfo(target));
                     // 将 invoke 的结果填充到 response 中
                     response.setData(result);
                     // 将响应结果写回
