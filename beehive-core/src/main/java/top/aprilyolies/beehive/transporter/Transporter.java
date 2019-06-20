@@ -2,6 +2,7 @@ package top.aprilyolies.beehive.transporter;
 
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.extension.annotation.SPI;
+import top.aprilyolies.beehive.transporter.client.Client;
 import top.aprilyolies.beehive.transporter.server.Server;
 
 /**
@@ -29,5 +30,5 @@ public interface Transporter {
      * @param url
      * @return
      */
-    Server connect(URL url);
+    Client connect(URL url);
 }

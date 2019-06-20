@@ -1,7 +1,9 @@
 package top.aprilyolies.beehive.protocol;
 
+import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.transporter.client.Client;
 import top.aprilyolies.beehive.transporter.server.Server;
 
 import java.net.InetAddress;
@@ -17,10 +19,10 @@ public class BeehiveProtocol extends AbstractProtocol {
     @Override
     public void publish(URL url) {
         String serverKey = url.getParameter(UrlConstants.SERVICE);
-        Server server = transporterCache.get(serverKey);
+        Server server = serverCache.get(serverKey);
         if (server == null) {
             synchronized (this) {
-                transporterCache.computeIfAbsent(serverKey, k -> doPublish(url));
+                serverCache.computeIfAbsent(serverKey, k -> doPublish(url));
             }
         }
     }
@@ -28,15 +30,16 @@ public class BeehiveProtocol extends AbstractProtocol {
     @Override
     public void subscribe(URL url) {
         String serverKey = url.getParameter(UrlConstants.SERVICE);
-        Server client = transporterCache.get(serverKey);
+        Client client = clientCache.get(serverKey);
         if (client == null) {
             synchronized (this) {
-                transporterCache.computeIfAbsent(serverKey, k -> doSubscribe(url));
+                clientCache.computeIfAbsent(serverKey, k -> doSubscribe(url));
+                BeehiveContext.safePut(UrlConstants.CONSUMERS_TRANSPORT, serverCache);
             }
         }
     }
 
-    private Server doSubscribe(URL url) {
+    private Client doSubscribe(URL url) {
         prepareServiceUrl(url);
         return transporterSelector.connect(url);
     }
@@ -53,7 +56,7 @@ public class BeehiveProtocol extends AbstractProtocol {
      */
     private void prepareServiceUrl(URL url) {
         url.putParameterIfAbsent(UrlConstants.CODEC, UrlConstants.DEFAULT_CODEC);
-        String providerInfo = url.getParameterElseDefault(UrlConstants.PROVIDER, getServiceHost());
+        String providerInfo = getServiceHost();
         if (providerInfo.indexOf(":") > 0) {
             providerInfo = providerInfo.substring(0, providerInfo.indexOf(":"));
         }

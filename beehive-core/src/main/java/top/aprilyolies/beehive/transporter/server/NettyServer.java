@@ -13,7 +13,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import io.netty.util.concurrent.DefaultThreadFactory;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
-import top.aprilyolies.beehive.transporter.server.handler.FinalChannelHandler;
+import top.aprilyolies.beehive.transporter.server.handler.ServerFinalChannelHandler;
 import top.aprilyolies.beehive.transporter.server.handler.NettyDecoderHandler;
 import top.aprilyolies.beehive.transporter.server.handler.NettyEncoderHandler;
 import top.aprilyolies.beehive.transporter.server.handler.HeartbeatHandler;
@@ -73,7 +73,7 @@ public class NettyServer extends AbstracServer implements Server {
                                 // 用于检测 channel 空闲状态，条件成立时关闭对应的 channel
                                 .addLast("server-idle-handler", new IdleStateHandler(0, 0, IDLE_TIMEOUT, MILLISECONDS))
                                 .addLast("heartbeat-handler", new HeartbeatHandler())
-                                .addLast("final-handler", new FinalChannelHandler(getUrl()));
+                                .addLast("final-handler", new ServerFinalChannelHandler(getUrl()));
                     }
                 });
         // bind

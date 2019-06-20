@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.transporter;
 
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.transporter.client.Client;
 import top.aprilyolies.beehive.transporter.client.NettyClient;
 import top.aprilyolies.beehive.transporter.server.NettyServer;
 import top.aprilyolies.beehive.transporter.server.Server;
@@ -17,7 +18,7 @@ public class NettyTransporter extends AbstractTransporter {
     }
 
     @Override
-    public Server connect(URL url) {
+    public Client connect(URL url) {
         return new NettyClient(url);
     }
 }

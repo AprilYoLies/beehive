@@ -4,6 +4,7 @@ import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
 import top.aprilyolies.beehive.extension.annotation.Selector;
+import top.aprilyolies.beehive.transporter.client.Client;
 import top.aprilyolies.beehive.transporter.server.Server;
 import top.aprilyolies.beehive.utils.StringUtils;
 
@@ -26,7 +27,7 @@ public class TransporterSelector extends AbstractTransporter {
     }
 
     @Override
-    public Server connect(URL url) {
+    public Client connect(URL url) {
         if (!StringUtils.isEmpty(url.getParameter(UrlConstants.TRANSPORTER)))
             defaultExtensionName = url.getParameter(UrlConstants.TRANSPORTER);
         return extensionLoader.getExtension(defaultExtensionName).connect(url);

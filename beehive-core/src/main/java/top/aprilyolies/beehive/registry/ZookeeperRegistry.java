@@ -5,19 +5,13 @@ import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.zookeeper.CreateMode;
 import top.aprilyolies.beehive.common.BeehiveContext;
-import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
-import top.aprilyolies.beehive.common.result.Result;
-import top.aprilyolies.beehive.filter.AccessLogFilter;
-import top.aprilyolies.beehive.filter.Filter;
-import top.aprilyolies.beehive.filter.MonitorFilter;
 import top.aprilyolies.beehive.invoker.AbstractInvoker;
 import top.aprilyolies.beehive.invoker.Invoker;
 import top.aprilyolies.beehive.invoker.ProxyWrapperInvoker;
 import top.aprilyolies.beehive.proxy.ProxyFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static top.aprilyolies.beehive.common.UrlConstants.*;
@@ -75,25 +69,26 @@ public class ZookeeperRegistry extends AbstractRegistry {
     @Override
     protected void createInvoker(URL url) {
         ProxyFactory proxyFactory = proxyFactorySelector.createProxyFactory(url);
-        Invoker<?> invoker = proxyFactory.createProxy(url);
-        Invoker<?> chain;
         if (url.isProvider()) {
-            chain = buildInvokerChain(invoker);
+            Invoker<?> invoker = proxyFactory.createProxy(url);
+            Invoker<?> chain;
+            chain = AbstractInvoker.buildInvokerChain(invoker);
             BeehiveContext.safePut(url.getParameter(SERVICE), chain);
         } else {
             String providerPath = getProviderPath(url);
             try {
                 List<String> providerUrls = zkClient.getChildren().forPath(providerPath);
                 BeehiveContext.safePut(PROVIDERS, providerUrls);
+                Invoker<?> invoker = proxyFactory.createProxy(url);
+                if (invoker instanceof ProxyWrapperInvoker) {
+                    ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;
+                    BeehiveContext.safePut(url.getParameter(SERVICE), proxyWrapperInvoker.getProxy());
+                }
+
             } catch (Exception e) {
                 logger.error("Can't get provider information at " + providerPath);
                 throw new RuntimeException(e.getMessage(), e);
             }
-            if (invoker instanceof ProxyWrapperInvoker) {
-                ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;
-                BeehiveContext.safePut(url.getParameter(SERVICE), proxyWrapperInvoker.getProxy());
-            }
-
         }
 
     }
@@ -115,34 +110,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
                 append(PATH_SEPARATOR).
                 append(category);
         return sb.toString();
-    }
-
-    /**
-     * 通过 filter 构建 invoker 链，最后一个 invoker 就是我们创建的 ProxyWrapperInvoker，它封装了我们真正的调用逻辑
-     *
-     * @param invoker 原始的 invoker
-     * @return 通过 filter 构建出来的 invoker 链
-     */
-    private Invoker buildInvokerChain(Invoker<?> invoker) {
-        // TODO 这里的 filter 获取应该通过 ExtensionLoader
-        List<Filter> filters = new ArrayList<>();
-        filters.add(new AccessLogFilter());
-        filters.add(new MonitorFilter());
-        Invoker ptr = invoker;
-        if (filters.size() > 0) {
-            for (Filter filter : filters) {
-                final Invoker next = ptr;
-                Invoker pre = new AbstractInvoker() {
-                    @Override
-                    protected Result doInvoke(InvokeInfo info) {
-                        return filter.doFilter(next, info);
-                    }
-                };
-                ptr = pre;
-            }
-        }
-        //noinspection unchecked
-        return ptr;
     }
 
     @Override

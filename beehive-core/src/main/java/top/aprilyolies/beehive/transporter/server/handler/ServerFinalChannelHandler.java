@@ -15,9 +15,9 @@ import java.util.concurrent.*;
  * @Date 2019-06-17
  * @Email g863821569@gmail.com
  */
-public class FinalChannelHandler extends ChannelDuplexHandler {
+public class ServerFinalChannelHandler extends ChannelDuplexHandler {
     private static final Logger logger = Logger.getLogger(ChannelDuplexHandler.class);
-    // 默认的 FinalChannelHandler 的线程池线程名
+    // 默认的 ServerFinalChannelHandler 的线程池线程名
     private static final String DEFAULT_THREAD_NAME = "final-channel-handler-thread";
     // 共享的 executor
     private static final ExecutorService SHARED_EXECUTOR = Executors.newCachedThreadPool(new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true));
@@ -27,7 +27,7 @@ public class FinalChannelHandler extends ChannelDuplexHandler {
             new LinkedBlockingQueue<>(20), new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
             new ThreadPoolExecutor.DiscardPolicy());
 
-    public FinalChannelHandler(URL url) {
+    public ServerFinalChannelHandler(URL url) {
         this.url = url;
     }
 

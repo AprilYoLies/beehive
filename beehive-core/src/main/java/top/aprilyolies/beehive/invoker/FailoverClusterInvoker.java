@@ -1,9 +1,14 @@
 package top.aprilyolies.beehive.invoker;
 
 import top.aprilyolies.beehive.cluster.loadbalance.LoadBalance;
+import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.transporter.client.Client;
 
+import java.net.URLDecoder;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -22,8 +27,9 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     protected Object doInvoke(InvokeInfo info) {
         List<Invoker<T>> invokers = listInvokers();
         LoadBalance loadBalance = createLoadBalance(url);
-
-        return selectInvoker(loadBalance, invokers);
+        Invoker<T> invoker = selectInvoker(loadBalance, invokers);
+        Invoker chain = buildInvokerChain(invoker);
+        return chain.invoke(info);
     }
 
     private Invoker<T> selectInvoker(LoadBalance loadBalance, List<Invoker<T>> invokers) {
@@ -41,6 +47,23 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     }
 
     private List<Invoker<T>> listInvokers() {
-        return null;
+        //noinspection unchecked
+        List<String> providers = BeehiveContext.safeGet(UrlConstants.PROVIDERS, List.class);
+        Client server = BeehiveContext.safeGet(UrlConstants.CONSUMERS_TRANSPORT, Client.class);
+        assert providers != null;
+        return createRemoteInvoker(providers, server);
+    }
+
+    private List<Invoker<T>> createRemoteInvoker(List<String> providers, Client client) {
+        List<Invoker<T>> invokers = new ArrayList<>(providers.size());
+        for (String provider : providers) {
+            String s = URLDecoder.decode(provider);
+            URL url = URL.buildFromAddress(s);
+            String host = url.getHost();
+            int port = url.getPort();
+            RemoteInvoker invoker = new RemoteInvoker(host, port, client);
+            invokers.add(invoker);
+        }
+        return invokers;
     }
 }

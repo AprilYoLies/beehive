@@ -43,7 +43,9 @@ public class BeehiveContext {
     }
 
     public static void safePut(String key, Object value) {
-        safeProperties.get().putIfAbsent(key, value);
+        if (safeGet(key) == null) {
+            safeProperties.get().putIfAbsent(key, value);
+        }
     }
 
     public static Object unsafeGet(String key) {

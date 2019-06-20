@@ -24,8 +24,8 @@ public abstract class AbstractRegistry implements Registry {
             throw new IllegalArgumentException("Can't publish a service for null url");
         try {
             doPublish(url);
-            createInvoker(url);
             openServer(url);
+            createInvoker(url);
         } catch (Exception e) {
             logger.error("publish service failed", e.getCause());
         }
