@@ -24,6 +24,7 @@ public class ConsumerTest {
         Object obj = consumer.getObject();
         DemoService demoService = (DemoService) obj;
         String res = demoService.say("hello");
+        System.out.println(res);
         new Scanner(System.in).nextLine();
     }
 }

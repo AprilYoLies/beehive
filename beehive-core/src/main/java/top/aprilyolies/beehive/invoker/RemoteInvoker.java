@@ -49,7 +49,10 @@ public class RemoteInvoker extends AbstractInvoker {
         // 存根请求结果
         BeehiveContext.unsafePut(sid, new RpcResult());
         // 异步获取相应结果
-        return BeehiveContext.unsafeRemove(sid, RpcResult.class).get();
+        Object res = BeehiveContext.unsafeGet(sid, RpcResult.class).get();
+        // 移除缓存
+        BeehiveContext.unsafeRemove(sid);
+        return res;
     }
 
     // 打开到服务端的连接，这里默认公用同一个 client

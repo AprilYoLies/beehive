@@ -76,8 +76,8 @@ public class RpcResult implements Result {
             try {
                 lock.lock();
                 this.msg = data;
+                finishCondition.signal();
                 finished = true;
-                finishCondition.notify();
             } finally {
                 lock.unlock();
             }

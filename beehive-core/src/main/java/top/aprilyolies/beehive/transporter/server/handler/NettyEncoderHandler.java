@@ -47,6 +47,7 @@ public class NettyEncoderHandler extends MessageToByteEncoder {
         } else if (msg instanceof Response) {
             responseEncode(ctx, msg, out);
         }
+        out.retain();
         ctx.writeAndFlush(out);
     }
 

@@ -64,14 +64,27 @@ public class EventHandleThread implements Runnable {
         } else if (msg instanceof Response) {
             Response response = (Response) msg;
             byte status = response.getStatus();
+            // 只对相应状态为 ok 的 response 进行处理
             if (Response.OK == status) {
                 Object data = response.getData();
-                long id = response.getId();
-                String sid = String.valueOf(id);
-                RpcResult result = BeehiveContext.unsafeGet(sid, RpcResult.class);
+                RpcResult result = getRpcResult(response);
+                // 完成相应结果的填充
                 result.fillData(data);
             }
         }
+    }
+
+    /**
+     * 根据 response id 从 beehive context 中获取到 RpcResult
+     *
+     * @param response
+     * @return
+     */
+    private RpcResult getRpcResult(Response response) {
+        // 根据 response id 从 beehive context 中获取到 RpcResult
+        long id = response.getId();
+        String sid = String.valueOf(id);
+        return BeehiveContext.unsafeGet(sid, RpcResult.class);
     }
 
     /**

@@ -67,4 +67,8 @@ public class BeehiveContext {
         T val = (T) unsafeProperties.remove(key);
         return val;
     }
+
+    public static void unsafeRemove(String key) {
+        unsafeProperties.remove(key);
+    }
 }
