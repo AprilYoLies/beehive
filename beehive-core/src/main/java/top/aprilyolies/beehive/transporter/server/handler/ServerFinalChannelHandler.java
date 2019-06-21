@@ -1,34 +1,29 @@
 package top.aprilyolies.beehive.transporter.server.handler;
 
-import io.netty.channel.ChannelDuplexHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.timeout.IdleStateEvent;
-import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.transporter.BeehiveThreadFactory;
 import top.aprilyolies.beehive.transporter.EventHandleThread;
 
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @Author EvaJohnson
  * @Date 2019-06-17
  * @Email g863821569@gmail.com
  */
-public class ServerFinalChannelHandler extends ChannelDuplexHandler {
-    private static final Logger logger = Logger.getLogger(ChannelDuplexHandler.class);
-    // 默认的 ServerFinalChannelHandler 的线程池线程名
-    private static final String DEFAULT_THREAD_NAME = "final-channel-handler-thread";
-    // 共享的 executor
-    private static final ExecutorService SHARED_EXECUTOR = Executors.newCachedThreadPool(new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true));
-    private final URL url;
+public class ServerFinalChannelHandler extends AbstractFinalChannelHandler {
     // TODO 这里是属于每个实例的 executor，构建方式属于硬编码，应该修改为根据 url 参数信息来构建对应的 Executor
     private final ExecutorService executor = new ThreadPoolExecutor(20, 20, 0, TimeUnit.MILLISECONDS,
             new LinkedBlockingQueue<>(20), new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
             new ThreadPoolExecutor.DiscardPolicy());
 
     public ServerFinalChannelHandler(URL url) {
-        this.url = url;
+        super(url);
     }
 
 
@@ -47,7 +42,7 @@ public class ServerFinalChannelHandler extends ChannelDuplexHandler {
         if (executor == null || executor.isShutdown()) {
             executor = SHARED_EXECUTOR;
         }
-        EventHandleThread eventHandleThread = new EventHandleThread(ctx, url, msg);
+        EventHandleThread eventHandleThread = new EventHandleThread(ctx, getUrl(), msg);
         executor.submit(eventHandleThread);
     }
 }

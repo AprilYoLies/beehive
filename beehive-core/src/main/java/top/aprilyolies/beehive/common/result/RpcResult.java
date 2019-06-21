@@ -16,9 +16,9 @@ public class RpcResult implements Result {
     // rpc 的
     private Object msg;
     // 可重入锁
-    ReentrantLock lock = new ReentrantLock();
+    private ReentrantLock lock = new ReentrantLock();
     // 结果完成的条件
-    Condition finishCondition = lock.newCondition();
+    private Condition finishCondition = lock.newCondition();
     // 获取结果的超时时间
     private int timeout = 3000;
     // 结果完成标志
@@ -39,11 +39,18 @@ public class RpcResult implements Result {
         return get(this.timeout);
     }
 
+    /**
+     * 带延时的获取相应的结果
+     *
+     * @param timeout 延时时长
+     * @return 相应的结果
+     */
     public Object get(int timeout) {
         if (finished) {
             return this.msg;
         } else {
             try {
+                lock.lock();
                 finishCondition.await(timeout, TimeUnit.MILLISECONDS);
                 if (!finished) {
                     throw new RuntimeException("Get result was timeout");
@@ -53,6 +60,26 @@ public class RpcResult implements Result {
             } catch (InterruptedException e) {
                 logger.error("Get result was interrupted");
                 throw new RuntimeException("Get result was interrupted");
+            } finally {
+                lock.unlock();
+            }
+        }
+    }
+
+    /**
+     * 填充响应的结果，同时唤醒等待响应结果的线程
+     *
+     * @param data
+     */
+    public void fillData(Object data) {
+        if (!finished) {
+            try {
+                lock.lock();
+                this.msg = data;
+                finished = true;
+                finishCondition.notify();
+            } finally {
+                lock.unlock();
             }
         }
     }

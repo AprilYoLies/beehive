@@ -8,7 +8,6 @@ package top.aprilyolies.beehive.provider.service;
 public class DemoServiceImpl implements DemoService {
     @Override
     public String say(String msg) {
-        System.out.println("hello " + msg);
-        return msg;
+        return msg + " world";
     }
 }
