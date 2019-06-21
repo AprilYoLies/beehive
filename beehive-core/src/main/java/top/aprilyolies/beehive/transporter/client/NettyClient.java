@@ -12,6 +12,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.transporter.server.handler.ClientFinalChannelHandler;
+import top.aprilyolies.beehive.transporter.server.handler.HeartbeatHandler;
 import top.aprilyolies.beehive.transporter.server.handler.NettyDecoderHandler;
 import top.aprilyolies.beehive.transporter.server.handler.NettyEncoderHandler;
 
@@ -61,7 +62,9 @@ public class NettyClient extends AbstractClient {
                 ch.pipeline()//.addLast("logging",new LoggingHandler(LogLevel.INFO))//for debug
                         .addLast("decoder", new NettyDecoderHandler(getUrl()))   // 指定 decoder -> InternalDecoder
                         .addLast("encoder", new NettyEncoderHandler(getUrl()))   // 指定 encoder -> InternalEncoder
+                        // 该处理器用于向服务器发送心跳消息
                         .addLast("client-idle-handler", new IdleStateHandler(HEARTBEAT_INTERVAL, 0, 0, MILLISECONDS))
+                        .addLast("heartbeat-handler", new HeartbeatHandler())   // 该处理器主要是对心跳消息进行处理
                         .addLast("handler", new ClientFinalChannelHandler());    // 最后的 handler，就是核心的逻辑处理器
             }
         });

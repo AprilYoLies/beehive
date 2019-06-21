@@ -151,6 +151,7 @@ public class NettyEncoderHandler extends MessageToByteEncoder {
     }
 
     private void encodeEventResponse(Object msg) throws IOException {
-        serializer.writeObject(msg);
+        Response response = (Response) msg;
+        serializer.writeObject(response.getData());
     }
 }
