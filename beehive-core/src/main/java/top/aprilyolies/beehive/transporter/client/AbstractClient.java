@@ -15,6 +15,8 @@ public abstract class AbstractClient implements Client {
     private final String codec;
     // 服务发布的 url
     private final URL url;
+    // 连接状态
+    protected volatile boolean connected;
 
     public String getCodec() {
         return codec;

@@ -62,4 +62,9 @@ public class BeehiveContext {
     }
 
 
+    @SuppressWarnings("unchecked")
+    public static <T> T unsafeRemove(String key, Class<T> type) {
+        T val = (T) unsafeProperties.remove(key);
+        return val;
+    }
 }

@@ -9,7 +9,6 @@ import io.netty.channel.ChannelOption;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleStateHandler;
-import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.transporter.server.handler.ClientFinalChannelHandler;
 import top.aprilyolies.beehive.transporter.server.handler.HeartbeatHandler;
@@ -71,19 +70,36 @@ public class NettyClient extends AbstractClient {
     }
 
     @Override
-    public void connect(InetSocketAddress address, InvokeInfo info) {
+    public Channel connect(InetSocketAddress address) {
         try {
-            ChannelFuture future = bootstrap.connect(address).sync();
-            if (future.isSuccess()) {
-                Channel channel = future.channel();
-                Channel oldChannel = this.channel;
-                if (oldChannel != null) {
-                    oldChannel.close();
+            if (!connected) {
+                synchronized (NettyClient.class) {
+                    if (!connected) {
+                        ChannelFuture future = bootstrap.connect(address).sync();
+                        if (future.isSuccess()) {
+                            Channel channel = future.channel();
+                            Channel oldChannel = this.channel;
+                            if (oldChannel != null) {
+                                oldChannel.close();
+                            }
+                            this.channel = channel;
+                        }
+                        connected = true;
+                        return this.channel;
+                    }
                 }
-                this.channel = channel;
             }
+            if (this.channel == null) {
+                throw new IllegalStateException("Client's status was connected, but the channel was null");
+            }
+            return this.channel;
         } catch (Exception e) {
+            connected = false;
+            if (channel != null) {
+                channel.close();
+            }
             e.printStackTrace();
+            return null;
         }
     }
 }

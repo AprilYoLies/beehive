@@ -23,7 +23,7 @@ public class ConsumerTest {
         consumer.setService(DemoService.class.getName());
         Object obj = consumer.getObject();
         DemoService demoService = (DemoService) obj;
-        demoService.say("hello");
+        String res = demoService.say("hello");
         new Scanner(System.in).nextLine();
     }
 }
