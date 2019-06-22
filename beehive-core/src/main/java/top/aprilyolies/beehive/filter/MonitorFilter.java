@@ -11,7 +11,7 @@ import top.aprilyolies.beehive.invoker.Invoker;
 public class MonitorFilter implements Filter {
     @Override
     public Object doFilter(Invoker next, InvokeInfo invokeInfo) {
-        System.out.println("MonitorFilter do filter...");
+//        System.out.println("MonitorFilter do filter...");
         return next.invoke(invokeInfo);
     }
 }

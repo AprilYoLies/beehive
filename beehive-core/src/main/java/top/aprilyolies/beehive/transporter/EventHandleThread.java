@@ -68,8 +68,10 @@ public class EventHandleThread implements Runnable {
             if (Response.OK == status) {
                 Object data = response.getData();
                 RpcResult result = getRpcResult(response);
-                // 完成相应结果的填充
-                result.fillData(data);
+                if (result != null) {
+                    // 完成相应结果的填充
+                    result.fillData(data);
+                }
             }
         }
     }

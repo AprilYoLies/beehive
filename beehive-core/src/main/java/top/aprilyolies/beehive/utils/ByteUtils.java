@@ -45,8 +45,8 @@ public class ByteUtils {
      * @return 新得到的字节数组
      */
     public static byte[] copyOf(byte[] src, int len) {
-        byte[] des = new byte[Math.min(src.length, len)];
-        System.arraycopy(src, 0, des, 0, src.length);
+        byte[] des = new byte[len];
+        System.arraycopy(src, 0, des, 0, Math.min(src.length, len));
         return des;
     }
 

@@ -5,8 +5,6 @@ import top.aprilyolies.beehive.provider.ServiceConsumer;
 import top.aprilyolies.beehive.provider.service.DemoService;
 import top.aprilyolies.beehive.spring.RegistryConfigBean;
 
-import java.util.Scanner;
-
 /**
  * @Author EvaJohnson
  * @Date 2019-06-12
@@ -23,8 +21,9 @@ public class ConsumerTest {
         consumer.setService(DemoService.class.getName());
         Object obj = consumer.getObject();
         DemoService demoService = (DemoService) obj;
-        String res = demoService.say("hello");
-        System.out.println(res);
-        new Scanner(System.in).nextLine();
+        for (int i = 1; i <= 10000; i++) {
+            String res = demoService.say("hello - " + i);
+            System.out.println(res);
+        }
     }
 }

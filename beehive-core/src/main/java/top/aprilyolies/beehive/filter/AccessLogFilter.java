@@ -11,7 +11,7 @@ import top.aprilyolies.beehive.invoker.Invoker;
 public class AccessLogFilter implements Filter {
     @Override
     public Object doFilter(Invoker next, InvokeInfo invokeInfo) {
-        System.out.println("AccessLogFilter do filter...");
+//        System.out.println("AccessLogFilter do filter...");
         return next.invoke(invokeInfo);
     }
 }
