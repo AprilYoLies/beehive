@@ -8,33 +8,51 @@ import java.util.Arrays;
  * @Email g863821569@gmail.com
  */
 public class ByteUtils {
-    public static void fillShort(short source, byte[] target, int offset) {
+    /**
+     * 将一个短整型数据的四个字节填充到 target 数组的 offset 处
+     *
+     * @param src    长整型数据
+     * @param offset 偏移量
+     */
+    public static void fillShort(short src, byte[] target, int offset) {
         if (offset + 1 >= target.length)
-            throw new IllegalArgumentException("Cant't fill source " + source + " to target " + Arrays.toString(target) + ", there is no enough space to do this");
-        target[offset] = (byte) source;
-        target[offset + 1] = (byte) (source >>> 8);
+            throw new IllegalArgumentException("Cant't fill source " + src + " to target " + Arrays.toString(target) + ", there is no enough space to do this");
+        target[offset] = (byte) src;
+        target[offset + 1] = (byte) (src >>> 8);
     }
 
-    public static void fillLong(long source, byte[] target, int offset) {
+    /**
+     * 将一个长整型数据的四个字节填充到 target 数组的 offset 处
+     *
+     * @param src    长整型数据
+     * @param offset 偏移量
+     */
+    public static void fillLong(long src, byte[] target, int offset) {
         if (offset + 7 >= target.length)
-            throw new IllegalArgumentException("Cant't fill source " + source + " to target " + Arrays.toString(target) + ", there is no enough space to do this");
-        target[offset + 7] = (byte) (source >>> 56);
-        target[offset + 6] = (byte) (source >>> 48);
-        target[offset + 5] = (byte) (source >>> 40);
-        target[offset + 4] = (byte) (source >>> 32);
-        target[offset + 3] = (byte) (source >>> 24);
-        target[offset + 2] = (byte) (source >>> 16);
-        target[offset + 1] = (byte) (source >>> 8);
-        target[offset] = (byte) (source);
+            throw new IllegalArgumentException("Cant't fill source " + src + " to target " + Arrays.toString(target) + ", there is no enough space to do this");
+        target[offset + 7] = (byte) (src >>> 56);
+        target[offset + 6] = (byte) (src >>> 48);
+        target[offset + 5] = (byte) (src >>> 40);
+        target[offset + 4] = (byte) (src >>> 32);
+        target[offset + 3] = (byte) (src >>> 24);
+        target[offset + 2] = (byte) (src >>> 16);
+        target[offset + 1] = (byte) (src >>> 8);
+        target[offset] = (byte) (src);
     }
 
-    public static void fillInt(int source, byte[] target, int offset) {
+    /**
+     * 将一个整型数据的四个字节填充到 target 数组的 offset 处
+     *
+     * @param src    整型数据
+     * @param offset 偏移量
+     */
+    public static void fillInt(int src, byte[] target, int offset) {
         if (offset + 3 >= target.length)
-            throw new IllegalArgumentException("Cant't fill source " + source + " to target " + Arrays.toString(target) + ", there is no enough space to do this");
-        target[offset + 3] = (byte) (source >>> 24);
-        target[offset + 2] = (byte) (source >>> 16);
-        target[offset + 1] = (byte) (source >>> 8);
-        target[offset] = (byte) (source);
+            throw new IllegalArgumentException("Cant't fill source " + src + " to target " + Arrays.toString(target) + ", there is no enough space to do this");
+        target[offset + 3] = (byte) (src >>> 24);
+        target[offset + 2] = (byte) (src >>> 16);
+        target[offset + 1] = (byte) (src >>> 8);
+        target[offset] = (byte) (src);
     }
 
     /**
