@@ -5,7 +5,7 @@ package top.aprilyolies.beehive.spring;
  * @Date 2019-06-12
  * @Email g863821569@gmail.com
  */
-public class ServiceConfigBean extends AbstractConfig {
+public abstract class ServiceConfigBean extends AbstractConfig {
     // 服务使用的协议，默认为 beehive
     private String protocol;
     // 待发布服务的接口全限定名

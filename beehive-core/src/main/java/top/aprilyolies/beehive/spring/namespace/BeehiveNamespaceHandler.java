@@ -10,8 +10,11 @@ import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 public class BeehiveNamespaceHandler extends NamespaceHandlerSupport {
     @Override
     public void init() {
+        // beehive:registry 标签解析器
         registerBeanDefinitionParser("registry", new RegistryBeanDefinitionParser());
+        // beehive:service 标签解析器
         registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
-//        registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
+        // beehive:reference 标签解析器
+        registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
     }
 }

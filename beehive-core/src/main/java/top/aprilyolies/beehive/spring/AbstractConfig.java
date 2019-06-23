@@ -1,7 +1,9 @@
 package top.aprilyolies.beehive.spring;
 
 import org.apache.log4j.Logger;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
@@ -20,7 +22,7 @@ import java.util.Map;
  * @Date 2019-06-18
  * @Email g863821569@gmail.com
  */
-public class AbstractConfig {
+public abstract class AbstractConfig implements InitializingBean, ApplicationContextAware {
     protected Logger logger = Logger.getLogger(ServiceProvider.class);
 
     // 此 protocol 实例会根据 URL 参数的协议来进行分发

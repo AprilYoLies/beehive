@@ -7,6 +7,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
+import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.spring.RegistryConfigBean;
@@ -39,6 +40,7 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
+        BeehiveContext.unsafePut(UrlConstants.PROVIDER_MODEL, this);
         exportService();
     }
 
@@ -115,6 +117,10 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
 
     @Override
     public void afterPropertiesSet() throws Exception {
+        checkRegistry();
+    }
+
+    private void checkRegistry() {
         RegistryConfigBean registry = getRegistry();
         if (registry == null) {
             if (applicationContext != null) {

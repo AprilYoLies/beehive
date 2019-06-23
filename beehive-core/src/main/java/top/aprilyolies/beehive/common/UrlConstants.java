@@ -52,4 +52,6 @@ public class UrlConstants {
     public static final String LOAD_BALANCE = "load_balance";
     // 保存在 beehive-context 中的 transport 客户端
     public static final String CONSUMERS_TRANSPORT = "consumer_transporter";
+    // 保存在 beehive-context 中的 provider 模型
+    public static final String PROVIDER_MODEL = "provider_model";
 }

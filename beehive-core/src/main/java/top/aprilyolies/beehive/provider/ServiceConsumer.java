@@ -1,17 +1,23 @@
 package top.aprilyolies.beehive.provider;
 
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.context.ApplicationContext;
 import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.spring.ReferenceConfigBean;
+import top.aprilyolies.beehive.spring.RegistryConfigBean;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author EvaJohnson
@@ -101,5 +107,32 @@ public class ServiceConsumer extends ReferenceConfigBean implements FactoryBean 
     @Override
     public boolean isSingleton() {
         return true;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        checkRegistry();
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    private void checkRegistry() {
+        RegistryConfigBean registry = getRegistry();
+        if (registry == null) {
+            if (applicationContext != null) {
+                Map<String, RegistryConfigBean> registryMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext,
+                        RegistryConfigBean.class, false, false);
+                if (registryMap.size() > 0) {
+                    Collection<RegistryConfigBean> registries = registryMap.values();
+                    for (RegistryConfigBean reg : registries) {
+                        setRegistry(reg);
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

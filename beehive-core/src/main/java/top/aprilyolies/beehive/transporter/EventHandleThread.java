@@ -7,10 +7,10 @@ import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.common.result.RpcResult;
 import top.aprilyolies.beehive.invoker.Invoker;
+import top.aprilyolies.beehive.spring.ServiceConfigBean;
 import top.aprilyolies.beehive.transporter.server.message.MessageType;
 import top.aprilyolies.beehive.transporter.server.message.Request;
 import top.aprilyolies.beehive.transporter.server.message.Response;
-import top.aprilyolies.beehive.utils.ClassUtils;
 
 /**
  * @Author EvaJohnson
@@ -102,8 +102,8 @@ public class EventHandleThread implements Runnable {
         // 尝试从 BeehiveContext 中获取 invoker 实例
         Invoker invoker = BeehiveContext.unsafeGet(info.getServiceName(), Invoker.class);
         // 根据 url 信息获取 invoke target 实例
-        Class<?> clazz = ClassUtils.forName(url.getParameter(UrlConstants.SERVICE_REF));
-        Object target = clazz.newInstance();
+        ServiceConfigBean serviceConfigBean = BeehiveContext.unsafeGet(UrlConstants.PROVIDER_MODEL, ServiceConfigBean.class);
+        Object target = serviceConfigBean.getRef();
         // 进行真正的 invoke 操作
         return invoker.invoke(info.createInvokeInfo(target));
     }
