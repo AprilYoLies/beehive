@@ -21,9 +21,11 @@ public class ConsumerTest {
         consumer.setService(DemoService.class.getName());
         Object obj = consumer.getObject();
         DemoService demoService = (DemoService) obj;
+        long start = System.currentTimeMillis();
         for (int i = 1; i <= 10000; i++) {
             String res = demoService.say("hello - " + i);
             System.out.println(res);
         }
+        System.out.println(System.currentTimeMillis() - start);
     }
 }
