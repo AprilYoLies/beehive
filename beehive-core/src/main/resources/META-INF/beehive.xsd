@@ -12,12 +12,12 @@
     </xsd:annotation>
 
     <xsd:complexType name="serviceType">
-        <xsd:attribute name="id" type="xsd:ID">
+        <xsd:attribute name="id" type="xsd:ID" use="required">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The unique identifier for a bean. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="name" type="xsd:string" use="required">
+        <xsd:attribute name="name" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The service bean name. ]]></xsd:documentation>
             </xsd:annotation>
@@ -40,12 +40,12 @@
     </xsd:complexType>
 
     <xsd:complexType name="referenceType">
-        <xsd:attribute name="id" type="xsd:ID">
+        <xsd:attribute name="id" type="xsd:ID" use="required">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The unique identifier for a bean. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="name" type="xsd:string" use="required">
+        <xsd:attribute name="name" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The reference bean name. ]]></xsd:documentation>
             </xsd:annotation>
@@ -63,12 +63,12 @@
     </xsd:complexType>
 
     <xsd:complexType name="registryType">
-        <xsd:attribute name="id" type="xsd:ID">
+        <xsd:attribute name="id" type="xsd:ID" use="required">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The unique identifier for a bean. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="address" type="xsd:string" use="required">
+        <xsd:attribute name="address" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation>
                     <![CDATA[ The registry center address, for example "protocol://host1:port1,protocol://host2:port2". ]]></xsd:documentation>

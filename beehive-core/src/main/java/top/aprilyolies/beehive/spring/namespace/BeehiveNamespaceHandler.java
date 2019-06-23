@@ -11,5 +11,7 @@ public class BeehiveNamespaceHandler extends NamespaceHandlerSupport {
     @Override
     public void init() {
         registerBeanDefinitionParser("registry", new RegistryBeanDefinitionParser());
+        registerBeanDefinitionParser("service", new ServiceBeanDefinitionParser());
+        registerBeanDefinitionParser("reference", new ReferenceBeanDefinitionParser());
     }
 }
