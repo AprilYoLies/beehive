@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.spring;
 
 import org.apache.log4j.Logger;
+import org.springframework.context.ApplicationContext;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
@@ -24,6 +25,8 @@ public class AbstractConfig {
 
     // 此 protocol 实例会根据 URL 参数的协议来进行分发
     protected Protocol protocolSelector = ExtensionLoader.getExtensionLoader(Protocol.class).getExtensionSelectorInstance();
+    // Spring 的上下文环境
+    protected ApplicationContext applicationContext;
 
     /**
      * 从 ServiceConfigBean 实例中获取 address 信息，然后将其转换为 URL

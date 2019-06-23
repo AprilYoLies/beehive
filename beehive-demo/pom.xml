@@ -12,7 +12,6 @@
         <module>consumer</module>
         <module>common</module>
         <module>publisher</module>
-        <module>provider</module>
     </modules>
 
     <dependencies>

@@ -11,9 +11,9 @@ public class ServiceConfigBean extends AbstractConfig {
     // 待发布服务的接口全限定名
     private String service;
     // 服务的实现类
-    private String ref;
+    private Object ref;
     // 服务 id
-    private Integer id;
+    private String id;
     // 服务的名字
     private String name;
     // 注册配置 bean
@@ -43,19 +43,19 @@ public class ServiceConfigBean extends AbstractConfig {
         this.service = service;
     }
 
-    public String getRef() {
+    public Object getRef() {
         return ref;
     }
 
-    public void setRef(String ref) {
+    public void setRef(Object ref) {
         this.ref = ref;
     }
 
-    public Integer getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(String id) {
         this.id = id;
     }
 

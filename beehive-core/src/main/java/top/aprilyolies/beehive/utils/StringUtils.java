@@ -19,6 +19,7 @@ package top.aprilyolies.beehive.utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
+import top.aprilyolies.beehive.spring.ServiceConfigBean;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -562,4 +563,31 @@ public final class StringUtils {
         return parseKeyValuePair(qs, "\\&");
     }
 
+    /**
+     * 根据 class 获取驼峰名
+     *
+     * @param clazz
+     * @return
+     */
+    public static String getBeanName(Class<ServiceConfigBean> clazz) {
+        if (clazz == null) {
+            return "";
+        }
+        String beanName = clazz.getName();
+        return getBeanName(beanName);
+    }
+
+    /**
+     * 根据全限定名获取驼峰名
+     *
+     * @param simpleName 全限定名
+     * @return
+     */
+    public static String getBeanName(String simpleName) {
+        if (isEmpty(simpleName))
+            return "";
+        int i = simpleName.lastIndexOf(".");
+        simpleName = simpleName.substring(i + 1);
+        return simpleName.substring(0, 1).toLowerCase() + simpleName.substring(1);
+    }
 }

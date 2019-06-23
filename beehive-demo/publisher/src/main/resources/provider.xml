@@ -7,7 +7,7 @@
 
     <bean id="demoServiceImpl" class="top.aprilyolies.service.BeehiveServiceImpl"/>
 
-    <beehive:service id="demoService" service="top.DemoService"
+    <beehive:service id="demoService" service="top.aprilyolies.service.BeehiveService"
                      ref="demoServiceImpl"/>
 
     <beehive:registry id="provider-registry" address="zookeeper://127.0.0.1:2181"/>

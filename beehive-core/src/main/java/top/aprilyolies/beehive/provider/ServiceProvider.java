@@ -1,30 +1,44 @@
 package top.aprilyolies.beehive.provider;
 
-import org.springframework.context.ApplicationEvent;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactoryUtils;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.spring.RegistryConfigBean;
 import top.aprilyolies.beehive.spring.ServiceConfigBean;
 import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetAddress;
 import java.net.URLEncoder;
 import java.net.UnknownHostException;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @Author EvaJohnson
  * @Date 2019-06-12
  * @Email g863821569@gmail.com
  */
-public class ServiceProvider extends ServiceConfigBean implements ApplicationListener {
+public class ServiceProvider extends ServiceConfigBean implements ApplicationListener<ContextRefreshedEvent>,
+        InitializingBean, ApplicationContextAware {
     // 用于记录当前 bean 所代表的服务是否已经发布
     private boolean published = false;
 
     private static final Object publishMonitor = new Object();
 
     @Override
-    public void onApplicationEvent(ApplicationEvent event) {
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
+    }
+
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent event) {
         exportService();
     }
 
@@ -99,4 +113,21 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
         }
     }
 
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        RegistryConfigBean registry = getRegistry();
+        if (registry == null) {
+            if (applicationContext != null) {
+                Map<String, RegistryConfigBean> registryMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext,
+                        RegistryConfigBean.class, false, false);
+                if (registryMap.size() > 0) {
+                    Collection<RegistryConfigBean> registries = registryMap.values();
+                    for (RegistryConfigBean reg : registries) {
+                        setRegistry(reg);
+                        break;
+                    }
+                }
+            }
+        }
+    }
 }
