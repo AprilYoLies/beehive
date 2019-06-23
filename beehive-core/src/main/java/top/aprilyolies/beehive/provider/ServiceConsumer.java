@@ -117,6 +117,7 @@ public class ServiceConsumer extends ReferenceConfigBean implements FactoryBean 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+//        addApplicationListener(applicationContext,);
     }
 
     private void checkRegistry() {

@@ -40,7 +40,6 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        BeehiveContext.unsafePut(UrlConstants.PROVIDER_MODEL, this);
         exportService();
     }
 
@@ -48,6 +47,7 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
         if (!published) {
             synchronized (publishMonitor) {
                 if (!published) {
+                    BeehiveContext.unsafePut(UrlConstants.PROVIDER_MODEL, this);
                     List<URL> registryUrls = getRegistryUrl(getRegistry());
                     fillParameters(registryUrls, this);
                     checkRegistryUrls(registryUrls);

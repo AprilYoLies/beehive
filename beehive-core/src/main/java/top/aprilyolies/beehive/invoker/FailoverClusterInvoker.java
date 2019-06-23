@@ -29,8 +29,11 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         List<Invoker<T>> invokers = listInvokers();
         LoadBalance loadBalance = createLoadBalance(url);
         Invoker<T> invoker = selectInvoker(loadBalance, invokers);
-        Invoker chain = buildInvokerChain(invoker);
-        return chain.invoke(info);
+        if (invoker != null) {
+            Invoker chain = buildInvokerChain(invoker);
+            return chain.invoke(info);
+        }
+        throw new RuntimeException("Can't get invoker from provider");
     }
 
     private Invoker<T> selectInvoker(LoadBalance loadBalance, List<Invoker<T>> invokers) {

@@ -9,7 +9,7 @@ import java.io.IOException;
  * @Date 2019-06-23
  * @Email g863821569@gmail.com
  */
-public class Publisher {
+public class Provider {
     public static void main(String[] args) throws IOException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("provider.xml");
         context.start();
