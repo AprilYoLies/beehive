@@ -33,7 +33,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
             Invoker chain = buildInvokerChain(invoker);
             return chain.invoke(info);
         }
-        throw new RuntimeException("Can't get invoker from provider");
+        throw new RuntimeException("There is none of provider could be found, beehive can't build a invoker");
     }
 
     private Invoker<T> selectInvoker(LoadBalance loadBalance, List<Invoker<T>> invokers) {

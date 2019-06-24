@@ -32,7 +32,7 @@ public class NettyServer extends AbstracServer implements Server {
     // 工作线程的数量，默认为 cpu 核心数加 1
     private int WORKER_THREADS = Runtime.getRuntime().availableProcessors() + 1;
     // 心跳时间间隔
-    private int HEARTBEAT_TIMEOUT = 2000;
+    private int HEARTBEAT_TIMEOUT = 20000;
     // 空闲超时时间
     private int IDLE_TIMEOUT = HEARTBEAT_TIMEOUT * 3;
     // netty server

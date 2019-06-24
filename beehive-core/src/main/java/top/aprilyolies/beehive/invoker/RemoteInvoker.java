@@ -44,6 +44,17 @@ public class RemoteInvoker extends AbstractInvoker {
         Request request = buildRequest(info);
         // 发送消息
         ch.writeAndFlush(request);
+        // 获取异步的响应结果
+        return getResponse(request);
+    }
+
+    /**
+     * 从 BeehiveContext 中获取异步的响应结果
+     *
+     * @param request
+     * @return
+     */
+    private Object getResponse(Request request) {
         // 拿到请求的 id，用于异步获取响应内容
         String sid = String.valueOf(request.getId());
         // 存根请求结果
