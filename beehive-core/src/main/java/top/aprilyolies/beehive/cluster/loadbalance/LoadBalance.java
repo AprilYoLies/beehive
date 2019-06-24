@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * 该接口的实现类适用于进行负载均衡的，也就是能够按照一定的逻辑，从 invokers 中选择一个进行返回
  */
-@SPI
+@SPI("random")
 public interface LoadBalance {
     /**
      * 进行 invoker 的选择，从 invokers 中选择一个返回，不同的实现类，选择的逻辑不一样

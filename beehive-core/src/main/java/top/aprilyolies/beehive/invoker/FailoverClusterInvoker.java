@@ -7,7 +7,9 @@ import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.transporter.client.Client;
 
+import java.net.InetAddress;
 import java.net.URLDecoder;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,11 +66,28 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         for (String provider : providers) {
             String s = URLDecoder.decode(provider);
             URL url = URL.buildFromAddress(s);
-            String host = url.getHost();
+            String address = host2IpAddress(url.getHost());
             int port = url.getPort();
-            RemoteInvoker invoker = new RemoteInvoker(host, port, client);
+            RemoteInvoker invoker = new RemoteInvoker(address, port, client);
             invokers.add(invoker);
         }
         return invokers;
+    }
+
+    /**
+     * 将 host 转换为 ip address
+     *
+     * @param host
+     * @return
+     */
+    private String host2IpAddress(String host) {
+        try {
+            InetAddress inetAddress = InetAddress.getByName(host);
+            return inetAddress.getHostAddress();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Got an host " + host + " from registry center, but the host can't be converted " +
+                    "to ip address");
+        }
     }
 }

@@ -7,6 +7,7 @@ import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 /**
  * @Author EvaJohnson
@@ -34,6 +35,27 @@ public class CommonTest {
         new Thread(() -> {
             System.out.println(AbstractConfig.BeehiveShutdownHook.BEEHIVE_SHUTDOWN_HOOK);
         }).start();
+    }
+
+    @Test
+    public void testRandom() {
+        Random random = new Random(7440);
+        for (int i = 0; i < 100; i++) {
+            System.out.println(Math.abs(random.nextInt() % 2));
+        }
+    }
+
+    @Test
+    public void testHost2IpAddress() {
+        String host = "192.168.1.1";
+        try {
+            InetAddress inetAddress = InetAddress.getByName(host);
+            System.out.println(inetAddress.getHostAddress());
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+            throw new IllegalStateException("Got an host " + host + " from registry center, but the host can't be converted " +
+                    "to ip address");
+        }
     }
 }
 

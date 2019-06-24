@@ -120,7 +120,7 @@ public class ServiceConsumer extends ReferenceConfigBean implements FactoryBean 
         this.applicationContext = applicationContext;
         // 注册关闭监听器
         // 如果 context 是 ConfigurableApplicationContext 接口的实例
-        if (applicationContext instanceof ConfigurableApplicationContext) {
+        if (applicationContext instanceof org.springframework.context.ConfigurableApplicationContext) {
             // spring 框架的方法，向 jvm 注册一个关闭钩子函数，在 jvm 关闭时会调用这个钩子函数来关闭 applicationContext
             ((ConfigurableApplicationContext) applicationContext).registerShutdownHook();
         }

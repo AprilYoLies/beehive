@@ -18,6 +18,7 @@ public class LoadBalanceSelector extends AbstractLoadBalance {
     public LoadBalance createLoadBalance(URL url) {
         String defaultExtensionName = extensionLoader.getDefaultExtensionName();
         String extName = url.getParameterElseDefault(UrlConstants.LOAD_BALANCE, defaultExtensionName);
+        extensionLoader.getExtension(extName);
         return null;
     }
 }

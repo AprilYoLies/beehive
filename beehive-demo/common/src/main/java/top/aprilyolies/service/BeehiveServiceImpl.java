@@ -8,6 +8,6 @@ package top.aprilyolies.service;
 public class BeehiveServiceImpl implements BeehiveService {
     @Override
     public String say(String msg) {
-        return "Eva say " + msg;
+        return "Jim say " + msg;
     }
 }
