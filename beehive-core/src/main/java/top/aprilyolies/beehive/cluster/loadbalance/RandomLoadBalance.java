@@ -15,7 +15,7 @@ public class RandomLoadBalance extends AbstractLoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers) {
-        return invokers.get(random.nextInt() % invokers.size());
+        return invokers.get(Math.abs(random.nextInt() % invokers.size()));
     }
 
 }
