@@ -61,6 +61,13 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         return createRemoteInvoker(providers, server);
     }
 
+    /**
+     * 根据 providers 构建 Invoker 信息
+     *
+     * @param providers 从注册中心获取的 provider 信息
+     * @param client    数据交互的客户端
+     * @return
+     */
     private List<Invoker<T>> createRemoteInvoker(List<String> providers, Client client) {
         List<Invoker<T>> invokers = new ArrayList<>(providers.size());
         for (String provider : providers) {
@@ -68,6 +75,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
             URL url = URL.buildFromAddress(s);
             String address = host2IpAddress(url.getHost());
             int port = url.getPort();
+            // RemoteInvoker 为实际进行数据交互的 invoker
             RemoteInvoker invoker = new RemoteInvoker(address, port, client);
             invokers.add(invoker);
         }
@@ -77,7 +85,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     /**
      * 将 host 转换为 ip address
      *
-     * @param host
+     * @param host 主机名
      * @return
      */
     private String host2IpAddress(String host) {

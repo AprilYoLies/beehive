@@ -111,6 +111,15 @@ public class NettyClient extends AbstractClient {
     }
 
     @Override
+    public boolean disconnect() {
+        synchronized (NettyClient.class) {
+            channel.close();
+            connected = false;
+            return true;
+        }
+    }
+
+    @Override
     public void close() {
         if (workers != null && !workers.isShutdown()) {
             workers.shutdownGracefully();

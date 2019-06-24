@@ -21,4 +21,11 @@ public interface Client extends EndPoint {
      * @param address 远程服务的请求地址
      */
     Channel connect(InetSocketAddress address);
+
+    /**
+     * 用于关闭到服务端的连接
+     *
+     * @return
+     */
+    boolean disconnect();
 }

@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.transporter.server.handler;
 
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelPromise;
 import io.netty.handler.timeout.IdleStateEvent;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.transporter.BeehiveThreadFactory;
@@ -19,9 +20,11 @@ import java.util.concurrent.TimeUnit;
  * @Email g863821569@gmail.com
  */
 public class ClientFinalChannelHandler extends AbstractFinalChannelHandler {
+    private final int FINAL_CHANNEL_HANDLER_THREADS = 10;
     // TODO 这里是属于每个实例的 executor，构建方式属于硬编码，应该修改为根据 url 参数信息来构建对应的 Executor
-    private final ExecutorService executor = new ThreadPoolExecutor(20, 20, 0, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(20), new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
+    private final ExecutorService executor = new ThreadPoolExecutor(FINAL_CHANNEL_HANDLER_THREADS,
+            FINAL_CHANNEL_HANDLER_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(20),
+            new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
             new ThreadPoolExecutor.DiscardPolicy());
 
     public ClientFinalChannelHandler(URL url) {
@@ -46,5 +49,11 @@ public class ClientFinalChannelHandler extends AbstractFinalChannelHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         executor.submit(new EventHandleThread(ctx, getUrl(), msg));
+    }
+
+    @Override
+    public void close(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
+        executor.shutdown();
+        super.close(ctx, promise);
     }
 }

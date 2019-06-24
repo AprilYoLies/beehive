@@ -20,7 +20,7 @@ public class RpcResult implements Result {
     // 结果完成的条件
     private Condition finishCondition = lock.newCondition();
     // 获取结果的超时时间
-    private int timeout = 3000;
+    private int timeout = 5000;
     // 结果完成标志
     private volatile boolean finished = false;
 

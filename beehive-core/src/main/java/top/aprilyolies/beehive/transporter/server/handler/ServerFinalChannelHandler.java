@@ -17,9 +17,11 @@ import java.util.concurrent.TimeUnit;
  * @Email g863821569@gmail.com
  */
 public class ServerFinalChannelHandler extends AbstractFinalChannelHandler {
+    private final int FINAL_CHANNEL_HANDLER_THREADS = 10;
     // TODO 这里是属于每个实例的 executor，构建方式属于硬编码，应该修改为根据 url 参数信息来构建对应的 Executor
-    private final ExecutorService executor = new ThreadPoolExecutor(20, 20, 0, TimeUnit.MILLISECONDS,
-            new LinkedBlockingQueue<>(20), new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
+    private final ExecutorService executor = new ThreadPoolExecutor(FINAL_CHANNEL_HANDLER_THREADS,
+            FINAL_CHANNEL_HANDLER_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(20),
+            new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
             new ThreadPoolExecutor.DiscardPolicy());
 
     public ServerFinalChannelHandler(URL url) {
@@ -44,5 +46,11 @@ public class ServerFinalChannelHandler extends AbstractFinalChannelHandler {
         }
         EventHandleThread eventHandleThread = new EventHandleThread(ctx, getUrl(), msg);
         executor.submit(eventHandleThread);
+    }
+
+    @Override
+    public void channelInactive(ChannelHandlerContext ctx) throws Exception {
+        executor.shutdown();
+        super.channelInactive(ctx);
     }
 }
