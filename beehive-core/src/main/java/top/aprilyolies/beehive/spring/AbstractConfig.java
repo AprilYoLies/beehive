@@ -4,11 +4,16 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ApplicationEvent;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextClosedEvent;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
 import top.aprilyolies.beehive.protocol.Protocol;
 import top.aprilyolies.beehive.provider.ServiceProvider;
+import top.aprilyolies.beehive.registry.Registry;
+import top.aprilyolies.beehive.transporter.server.EndPoint;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.StringUtils;
 
@@ -88,4 +93,71 @@ public abstract class AbstractConfig implements InitializingBean, ApplicationCon
         registryUrl.setOriginUrl(originUrl);
         registryUrl.setProtocol(UrlConstants.REGISTRY_PROTOCOL);
     }
+
+    /**
+     * 为 application context 添加一个 listener
+     *
+     * @param listener 待添加的监听器
+     * @return
+     */
+    protected boolean addApplicationListener(ApplicationListener listener) {
+        try {
+            Method method = applicationContext.getClass().getMethod("addApplicationListener", ApplicationListener.class);
+            method.invoke(applicationContext, listener);
+            return true;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /**
+     * beehive 的关闭监听器，它会监听 context 关闭事件，同时关闭相关的组件
+     */
+    public class ShutdownHookListener implements ApplicationListener {
+        @Override
+        public void onApplicationEvent(ApplicationEvent event) {
+            // 此监听器只会监听 context 关闭事件
+            if (event instanceof ContextClosedEvent) {
+                BeehiveShutdownHook.closeAll();
+            }
+        }
+    }
+
+    /**
+     * Beehive 关闭钩子函数
+     */
+    public static class BeehiveShutdownHook {
+        private BeehiveShutdownHook() {
+        }
+
+        // 将其设置为单例
+        public static BeehiveShutdownHook BEEHIVE_SHUTDOWN_HOOK = new BeehiveShutdownHook();
+        // 用于存储 Registry
+        private static List<Registry> registries = new ArrayList<>();
+        // 用于存储 EndPoint
+        private static List<EndPoint> endPoints = new ArrayList<>();
+
+        // 添加 Registry
+        public static void addRegistry(Registry registry) {
+            registries.add(registry);
+        }
+
+        // 添加 EndPoint
+        public static void addEndPoint(EndPoint endPoint) {
+            endPoints.add(endPoint);
+        }
+
+        // 关闭注册的 Registry
+        public static void closeAll() {
+            for (Registry registry : registries) {
+                registry.close();
+            }
+            for (EndPoint endPoint : endPoints) {
+                endPoint.close();
+            }
+        }
+
+
+    }
 }
+

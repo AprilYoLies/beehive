@@ -4,6 +4,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactoryUtils;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
@@ -117,7 +118,13 @@ public class ServiceConsumer extends ReferenceConfigBean implements FactoryBean 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-//        addApplicationListener(applicationContext,);
+        // 注册关闭监听器
+        // 如果 context 是 ConfigurableApplicationContext 接口的实例
+        if (applicationContext instanceof ConfigurableApplicationContext) {
+            // spring 框架的方法，向 jvm 注册一个关闭钩子函数，在 jvm 关闭时会调用这个钩子函数来关闭 applicationContext
+            ((ConfigurableApplicationContext) applicationContext).registerShutdownHook();
+        }
+        addApplicationListener(new ShutdownHookListener());
     }
 
     private void checkRegistry() {

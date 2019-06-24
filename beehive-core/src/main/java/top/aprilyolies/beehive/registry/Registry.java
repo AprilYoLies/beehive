@@ -16,4 +16,7 @@ import top.aprilyolies.beehive.extension.annotation.SPI;
 public interface Registry {
     // 用于向注册中心进行方法的注册
     void registry(URL url);
+
+    // 用于关闭注册中心
+    void close();
 }

@@ -97,4 +97,14 @@ public class NettyServer extends AbstracServer implements Server {
             port = UrlConstants.SERVICE_PORT;
         return new InetSocketAddress(ip, Integer.parseInt(port));
     }
+
+    @Override
+    public void close() {
+        if (bossGroup != null)
+            bossGroup.shutdownGracefully();
+        if (workerGroup != null)
+            workerGroup.shutdownGracefully();
+        if (channel != null)
+            channel.close();
+    }
 }

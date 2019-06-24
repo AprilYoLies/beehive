@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.common;
 
 import org.junit.Test;
+import top.aprilyolies.beehive.spring.AbstractConfig;
 import top.aprilyolies.beehive.spring.ServiceConfigBean;
 import top.aprilyolies.beehive.utils.StringUtils;
 
@@ -26,4 +27,13 @@ public class CommonTest {
     public void testGetBeanName() {
         System.out.println(StringUtils.getBeanName(ServiceConfigBean.class));
     }
+
+    @Test
+    public void testBeehiveShutdownHook() {
+        System.out.println(AbstractConfig.BeehiveShutdownHook.BEEHIVE_SHUTDOWN_HOOK);
+        new Thread(() -> {
+            System.out.println(AbstractConfig.BeehiveShutdownHook.BEEHIVE_SHUTDOWN_HOOK);
+        }).start();
+    }
 }
+

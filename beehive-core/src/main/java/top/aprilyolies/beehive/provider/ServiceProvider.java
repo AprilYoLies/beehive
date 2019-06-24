@@ -6,6 +6,7 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.URL;
@@ -36,6 +37,14 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        // 注册关闭监听器
+        // 如果 context 是 ConfigurableApplicationContext 接口的实例
+        if (applicationContext instanceof ConfigurableApplicationContext) {
+            // spring 框架的方法，向 jvm 注册一个关闭钩子函数，在 jvm 关闭时会调用这个钩子函数来关闭 applicationContext
+            ((ConfigurableApplicationContext) applicationContext).registerShutdownHook();
+        }
+        // 注册关闭监听器
+        addApplicationListener(new ShutdownHookListener());
     }
 
     @Override

@@ -69,6 +69,12 @@ public class NettyClient extends AbstractClient {
         });
     }
 
+    /**
+     * 进行连接到服务器的操作
+     *
+     * @param address 远程服务的请求地址
+     * @return
+     */
     @Override
     public Channel connect(InetSocketAddress address) {
         try {
@@ -76,6 +82,7 @@ public class NettyClient extends AbstractClient {
                 synchronized (NettyClient.class) {
                     if (!connected) {
                         ChannelFuture future = bootstrap.connect(address).sync();
+                        // 根据情况对新的 channel 进行缓存，同时要关闭旧的 channel
                         if (future.isSuccess()) {
                             Channel channel = future.channel();
                             Channel oldChannel = this.channel;
@@ -100,6 +107,16 @@ public class NettyClient extends AbstractClient {
             }
             e.printStackTrace();
             return null;
+        }
+    }
+
+    @Override
+    public void close() {
+        if (workers != null) {
+            workers.shutdownGracefully();
+        }
+        if (channel != null) {
+            channel.close();
         }
     }
 }

@@ -3,6 +3,7 @@ package top.aprilyolies.beehive.registry;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.RetryNTimes;
+import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
 import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.URL;
@@ -198,5 +199,10 @@ public class ZookeeperRegistry extends AbstractRegistry {
                 .append(PATH_SEPARATOR)
                 .append(registorInfo);
         return sb.toString();
+    }
+
+    @Override
+    public void close() {
+        CloseableUtils.closeQuietly(zkClient);
     }
 }

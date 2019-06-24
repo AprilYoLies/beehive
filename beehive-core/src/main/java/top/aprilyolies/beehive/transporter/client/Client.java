@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.transporter.client;
 
 import io.netty.channel.Channel;
+import top.aprilyolies.beehive.transporter.server.EndPoint;
 
 import java.net.InetSocketAddress;
 
@@ -13,7 +14,7 @@ import java.net.InetSocketAddress;
 /**
  * 此接口代表 transporter 的 client
  */
-public interface Client {
+public interface Client extends EndPoint {
     /**
      * 进行真正的连接操作
      *
