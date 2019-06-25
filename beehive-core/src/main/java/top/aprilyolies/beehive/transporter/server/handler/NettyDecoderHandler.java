@@ -3,6 +3,7 @@ package top.aprilyolies.beehive.transporter.server.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
+import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.RpcInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
@@ -24,6 +25,7 @@ import static top.aprilyolies.beehive.transporter.server.handler.NettyEncoderHan
  * @Email g863821569@gmail.com
  */
 public class NettyDecoderHandler extends ByteToMessageDecoder {
+    private static final Logger logger = Logger.getLogger(NettyDecoderHandler.class);
     private SerializerFactory extensionSelector = ExtensionLoader.getExtensionLoader(SerializerFactory.class).getExtensionSelectorInstance();
     // 魔幻头，十进制为 7440
     private final short MAGIC = 0x4A28;
@@ -58,7 +60,11 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
                 in.readerIndex(readerIndex);
                 break;
             } else {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Received request message of " + result);
+                }
                 out.add(result);
+                break;
             }
         }
     }
