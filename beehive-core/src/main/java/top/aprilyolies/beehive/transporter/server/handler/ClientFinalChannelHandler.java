@@ -23,9 +23,9 @@ public class ClientFinalChannelHandler extends AbstractFinalChannelHandler {
     private final int FINAL_CHANNEL_HANDLER_THREADS = 10;
     // TODO 这里是属于每个实例的 executor，构建方式属于硬编码，应该修改为根据 url 参数信息来构建对应的 Executor
     private final ExecutorService executor = new ThreadPoolExecutor(FINAL_CHANNEL_HANDLER_THREADS,
-            FINAL_CHANNEL_HANDLER_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(20),
+            FINAL_CHANNEL_HANDLER_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
             new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
-            new ThreadPoolExecutor.DiscardPolicy());
+            new ThreadPoolExecutor.AbortPolicy());
 
     public ClientFinalChannelHandler(URL url) {
         super(url);

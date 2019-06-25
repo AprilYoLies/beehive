@@ -3,6 +3,7 @@ package top.aprilyolies.beehive.transporter.server.handler;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
+import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.RpcInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
@@ -21,6 +22,7 @@ import java.io.IOException;
  * @Email g863821569@gmail.com
  */
 public class NettyEncoderHandler extends MessageToByteEncoder {
+    private static final Logger logger = Logger.getLogger(NettyEncoderHandler.class);
     private SerializerFactory extensionSelector = ExtensionLoader.getExtensionLoader(SerializerFactory.class).getExtensionSelectorInstance();
     // 魔幻头，十进制为 7440
     private final short MAGIC = 0x4A28;
@@ -53,6 +55,9 @@ public class NettyEncoderHandler extends MessageToByteEncoder {
 
     private void requestEncode(ChannelHandlerContext ctx, Object msg, ByteBuf out) throws IOException {
         Request request = (Request) msg;
+        if (logger.isDebugEnabled()) {
+            logger.debug("Encode request message of " + request);
+        }
         // 构建请求头
         byte[] header = new byte[HEADER_LENGTH];
         // 填充魔幻数字

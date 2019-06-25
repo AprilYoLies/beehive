@@ -24,7 +24,7 @@ public class ServerFinalChannelHandler extends AbstractFinalChannelHandler {
             FINAL_CHANNEL_HANDLER_THREADS, 0, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<>(),
             new BeehiveThreadFactory(DEFAULT_THREAD_NAME, true),
             // TODO 如果修改为有界队列，那么当队列满之后，采取的拒绝执行策略应该进行指定
-            new ThreadPoolExecutor.DiscardPolicy());
+            new ThreadPoolExecutor.AbortPolicy());
 
     public ServerFinalChannelHandler(URL url) {
         super(url);

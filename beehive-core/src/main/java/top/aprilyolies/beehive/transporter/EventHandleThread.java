@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.transporter;
 
 import io.netty.channel.ChannelHandlerContext;
+import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.RpcInfo;
 import top.aprilyolies.beehive.common.URL;
@@ -18,9 +19,12 @@ import top.aprilyolies.beehive.transporter.server.message.Response;
  * @Email g863821569@gmail.com
  */
 public class EventHandleThread implements Runnable {
+    private static final Logger logger = Logger.getLogger(EventHandleThread.class);
+    // 待处理的消息
     private final Object msg;
-
+    // url 信息
     private final URL url;
+    // 处理器上下文
     private final ChannelHandlerContext ctx;
 
     public EventHandleThread(ChannelHandlerContext ctx, URL url, Object msg) {
@@ -48,6 +52,9 @@ public class EventHandleThread implements Runnable {
         // 这里是对于非事件 request 的处理方式
         if (msg instanceof Request) {
             Request request = (Request) msg;
+            if (logger.isDebugEnabled()) {
+                logger.debug("Received request message of " + request);
+            }
             if (!request.isEvent()) {
                 // 根据 request 相关的内容构建 response
                 Response response = buildResponse(request);

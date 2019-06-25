@@ -23,6 +23,10 @@ public class RemoteInvoker extends AbstractInvoker {
     private final int port;
     // 连接的客户端
     private final Client client;
+    //
+    private final int RETRY_TIMES = 3;
+
+    private int retryCount = 1;
 
     public RemoteInvoker(String host, int port, Client client) {
         this.host = host;
@@ -46,6 +50,18 @@ public class RemoteInvoker extends AbstractInvoker {
         ch.writeAndFlush(request);
         // 获取异步的响应结果
         Object result = getResponse(request);
+        while (result == null && retryCount <= RETRY_TIMES) {
+            if (logger.isDebugEnabled()) {
+                logger.debug("Got result of request " + request + " timeout, attempt to retry 3 times, this is " + retryCount++ + " time");
+            }
+            // 发送消息
+            ch.writeAndFlush(request);
+            result = getResponse(request);
+        }
+        if (result == null && logger.isDebugEnabled()) {
+            logger.error("Send request " + request + " 3 times, but the result was still null");
+        }
+        retryCount = 1;
 //        client.disconnect();
         return result;
     }
@@ -62,7 +78,12 @@ public class RemoteInvoker extends AbstractInvoker {
         // 存根请求结果
         BeehiveContext.unsafePut(sid, new RpcResult());
         // 异步获取相应结果
-        Object res = BeehiveContext.unsafeGet(sid, RpcResult.class).get();
+        Object res = null;
+        try {
+            res = BeehiveContext.unsafeGet(sid, RpcResult.class).get();
+        } catch (Throwable t) {
+            // empty
+        }
         // 移除缓存
         BeehiveContext.unsafeRemove(sid);
         return res;
