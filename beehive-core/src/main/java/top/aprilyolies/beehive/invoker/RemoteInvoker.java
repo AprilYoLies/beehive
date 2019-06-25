@@ -46,7 +46,7 @@ public class RemoteInvoker extends AbstractInvoker {
         ch.writeAndFlush(request);
         // 获取异步的响应结果
         Object result = getResponse(request);
-        client.disconnect();
+//        client.disconnect();
         return result;
     }
 
