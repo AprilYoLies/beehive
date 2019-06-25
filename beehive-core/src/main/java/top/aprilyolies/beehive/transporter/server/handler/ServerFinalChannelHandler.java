@@ -5,6 +5,7 @@ import io.netty.handler.timeout.IdleStateEvent;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.transporter.BeehiveThreadFactory;
 import top.aprilyolies.beehive.transporter.EventHandleThread;
+import top.aprilyolies.beehive.transporter.server.message.Request;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -46,8 +47,10 @@ public class ServerFinalChannelHandler extends AbstractFinalChannelHandler {
         if (executor.isShutdown()) {
             executor = SHARED_EXECUTOR;
         }
-        EventHandleThread eventHandleThread = new EventHandleThread(ctx, getUrl(), msg);
-        executor.submit(eventHandleThread);
+        if (msg instanceof Request) {
+            EventHandleThread eventHandleThread = new EventHandleThread(ctx, getUrl(), msg);
+            executor.submit(eventHandleThread);
+        }
     }
 
     @Override

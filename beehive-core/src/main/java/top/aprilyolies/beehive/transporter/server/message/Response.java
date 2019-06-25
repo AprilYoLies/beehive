@@ -62,4 +62,14 @@ public class Response {
     public boolean isEvent() {
         return type == MessageType.HEARTBEAT_RESPONSE || type == MessageType.HEARTBEAT_REQUEST;
     }
+
+    @Override
+    public String toString() {
+        return "Response{" +
+                "id=" + (id - 1) +
+                ", type=" + type +
+                ", data=" + data +
+                ", status=" + status +
+                '}';
+    }
 }

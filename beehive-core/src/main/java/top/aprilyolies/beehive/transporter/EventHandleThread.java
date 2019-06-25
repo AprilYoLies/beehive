@@ -70,6 +70,9 @@ public class EventHandleThread implements Runnable {
             }
         } else if (msg instanceof Response) {
             Response response = (Response) msg;
+            if (logger.isDebugEnabled()) {
+                logger.debug("Received response message of " + response);
+            }
             byte status = response.getStatus();
             // 只对相应状态为 ok 的 response 进行处理
             if (Response.OK == status) {

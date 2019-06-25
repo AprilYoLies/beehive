@@ -161,6 +161,7 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
                 }
             } catch (Exception e) {
                 e.printStackTrace();
+                return EMPTY_RESULT;
             }
             return req;
         }

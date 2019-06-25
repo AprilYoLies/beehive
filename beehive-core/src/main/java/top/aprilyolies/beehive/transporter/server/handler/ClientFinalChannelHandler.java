@@ -8,6 +8,7 @@ import top.aprilyolies.beehive.transporter.BeehiveThreadFactory;
 import top.aprilyolies.beehive.transporter.EventHandleThread;
 import top.aprilyolies.beehive.transporter.server.message.MessageType;
 import top.aprilyolies.beehive.transporter.server.message.Request;
+import top.aprilyolies.beehive.transporter.server.message.Response;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -48,7 +49,9 @@ public class ClientFinalChannelHandler extends AbstractFinalChannelHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        executor.submit(new EventHandleThread(ctx, getUrl(), msg));
+        if (msg instanceof Response) {
+            executor.submit(new EventHandleThread(ctx, getUrl(), msg));
+        }
     }
 
     @Override
