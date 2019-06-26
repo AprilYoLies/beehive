@@ -61,7 +61,6 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
                 break;
             } else {
                 out.add(result);
-                break;
             }
         }
     }
