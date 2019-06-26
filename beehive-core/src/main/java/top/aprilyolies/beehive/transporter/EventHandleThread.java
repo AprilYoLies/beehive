@@ -53,7 +53,7 @@ public class EventHandleThread implements Runnable {
         if (msg instanceof Request) {
             Request request = (Request) msg;
             if (logger.isDebugEnabled()) {
-//                logger.debug("Received request message of " + request);
+                logger.debug("Received request message of " + request);
             }
             if (!request.isEvent()) {
                 // 根据 request 相关的内容构建 response

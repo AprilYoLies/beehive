@@ -60,9 +60,6 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
                 in.readerIndex(readerIndex);
                 break;
             } else {
-                if (logger.isDebugEnabled()) {
-                    logger.debug("Received request message of " + result);
-                }
                 out.add(result);
                 break;
             }
