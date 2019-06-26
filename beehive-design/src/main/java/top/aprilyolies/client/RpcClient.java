@@ -20,7 +20,9 @@ import top.aprilyolies.handler.ClientChannelHandler;
 public class RpcClient {
     private static Integer DEFAULT_WORKER_THREAD = Runtime.getRuntime().availableProcessors() + 1;
 
-    private static Integer DEFAULT_SERVER_PORT = 7440;
+    private static Integer DEFAULT_SERVERA_PORT = 7440;
+
+    private static Integer DEFAULT_SERVERB_PORT = 7441;
 
     public static void main(String[] args) {
         Bootstrap client = new Bootstrap();
@@ -36,9 +38,11 @@ public class RpcClient {
         client.handler(new ClientChannelInitializer());
 
         try {
-            ChannelFuture future = client.connect("127.0.0.1", DEFAULT_SERVER_PORT).sync();
+            ChannelFuture futureB = client.connect("127.0.0.1", DEFAULT_SERVERA_PORT).sync();
+            ChannelFuture futureA = client.connect("127.0.0.1", DEFAULT_SERVERB_PORT).sync();
             System.out.println("Client finished the connect and send the message...");
-            future.channel().closeFuture().sync();
+            futureA.channel().closeFuture().sync();
+            futureB.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {

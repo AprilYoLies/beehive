@@ -17,7 +17,7 @@ import top.aprilyolies.handler.ServerChannelHandler;
  * @Date 2019-06-09
  * @Email g863821569@gmail.com
  */
-public class RpcServer {
+public class RpcServerA {
     private static Integer DEFAULT_WORKER_THREAD = Runtime.getRuntime().availableProcessors() + 1;
 
     private static Integer DEFAULT_SERVER_PORT = 7440;
