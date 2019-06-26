@@ -6,5 +6,5 @@ package top.aprilyolies.service;
  * @Email g863821569@gmail.com
  */
 public interface BeehiveService {
-    String say(String msg);
+    String say(String msg) throws Exception;
 }

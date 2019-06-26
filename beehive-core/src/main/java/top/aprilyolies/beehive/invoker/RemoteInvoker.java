@@ -62,7 +62,7 @@ public class RemoteInvoker extends AbstractInvoker {
             logger.error("Send request " + request + " 3 times, but the result was still null");
         }
         retryCount = 1;
-//        client.disconnect();
+        client.disconnect();
         return result;
     }
 

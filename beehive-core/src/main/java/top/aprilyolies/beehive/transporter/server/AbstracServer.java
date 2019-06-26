@@ -32,4 +32,5 @@ public abstract class AbstracServer implements Server {
     }
 
     protected abstract void openServer();
+
 }
