@@ -10,6 +10,8 @@ import top.aprilyolies.beehive.transporter.server.message.MessageType;
 import top.aprilyolies.beehive.transporter.server.message.Request;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @Author EvaJohnson
@@ -23,17 +25,20 @@ public class RemoteInvoker extends AbstractInvoker {
     private final int port;
     // 连接的客户端
     private final Client client;
-    //
+    // 获取结果超时，请求重发的次数
     private final int RETRY_TIMES = 3;
-
+    // 记录当前已经重试的次数
     private int retryCount = 1;
-    // 客户端通道
-    private Channel ch;
+    // 用于存储当前线程建立的 channel 信息
+    private final ThreadLocal<Map<String, Channel>> addressChannel = new AddressChannelThreadLocal();
+    //
+    private final String channelKey;
 
     public RemoteInvoker(String host, int port, Client client) {
         this.host = host;
         this.port = port;
         this.client = client;
+        this.channelKey = host + ":" + port;
     }
 
     @Override
@@ -44,9 +49,16 @@ public class RemoteInvoker extends AbstractInvoker {
         if (client == null) {
             throw new IllegalStateException("None of client could be use, the client was null");
         }
-        if (this.ch == null || (!ch.isOpen()) || (!ch.isActive())) {
+        // 获取当前线程的 channelMap
+        Map<String, Channel> channelMap = addressChannel.get();
+        Channel ch = channelMap.get(channelKey);
+        if (ch == null || !ch.isOpen() || !ch.isActive()) {
+            System.out.println(Thread.currentThread().getName());
             // 连接服务器
             ch = connectServer();
+            System.out.println(ch);
+            // 进行缓存
+            channelMap.putIfAbsent(channelKey, ch);
         }
         // 构建 request 消息
         Request request = buildRequest(info);
@@ -111,5 +123,15 @@ public class RemoteInvoker extends AbstractInvoker {
         request.setType(MessageType.REQUEST);
         request.setData(rpcInfo);
         return request;
+    }
+
+    /**
+     * 线程本地变量，用于承载 address 到 channel 的映射
+     */
+    private class AddressChannelThreadLocal extends ThreadLocal<Map<String, Channel>> {
+        @Override
+        protected Map<String, Channel> initialValue() {
+            return new HashMap<>();
+        }
     }
 }

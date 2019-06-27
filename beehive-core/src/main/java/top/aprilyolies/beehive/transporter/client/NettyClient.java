@@ -18,6 +18,7 @@ import top.aprilyolies.beehive.transporter.server.handler.NettyEncoderHandler;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -40,6 +41,8 @@ public class NettyClient extends AbstractClient {
     private final int HEARTBEAT_INTERVAL = 20000;
     // 用于缓存已经连接的地址和 channel
     private Map<String, Channel> addressChannel = new HashMap<>();
+    // 用于记录进行连接过的线程
+    private Set<Thread> threads = new HashSet<>();
 
 
     public NettyClient(URL url) {
@@ -83,9 +86,9 @@ public class NettyClient extends AbstractClient {
     public Channel connect(InetSocketAddress address) {
         String adddressKey = address.toString();
         try {
-            if (!connected || !isAddressAdded(adddressKey)) {
+            if (!connected || !isAddressAdded(adddressKey) || !isThreadAdded()) {
                 synchronized (NettyClient.class) {
-                    if (!connected || !isAddressAdded(adddressKey)) {
+                    if (!connected || !isAddressAdded(adddressKey) || !isThreadAdded()) {
                         ChannelFuture future = bootstrap.connect(address).sync();
                         // 根据情况对新的 channel 进行缓存，同时要关闭旧的 channel
                         Channel channel = future.channel();
@@ -96,6 +99,7 @@ public class NettyClient extends AbstractClient {
                             }
                         }
                         connected = true;
+                        threads.add(Thread.currentThread());
                         addressChannel.putIfAbsent(adddressKey, channel);
                         return channel;
                     }
@@ -115,6 +119,16 @@ public class NettyClient extends AbstractClient {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 判断缓存中是否有当前线程
+     *
+     * @return
+     */
+    private boolean isThreadAdded() {
+        Set<Thread> threads = this.threads;
+        return threads.contains(Thread.currentThread());
     }
 
     /**

@@ -79,7 +79,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
             String providerPath = getProviderPath(url);
             try {
                 List<String> providerUrls = zkClient.getChildren().forPath(providerPath);
-                BeehiveContext.safePut(PROVIDERS, providerUrls);
+                BeehiveContext.unsafePut(PROVIDERS, providerUrls);
                 Invoker<?> invoker = proxyFactory.createProxy(url);
                 if (invoker instanceof ProxyWrapperInvoker) {
                     ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;

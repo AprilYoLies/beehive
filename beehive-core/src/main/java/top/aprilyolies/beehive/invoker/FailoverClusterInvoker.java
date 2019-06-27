@@ -57,8 +57,8 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
 
     private List<Invoker<T>> listInvokers() {
         //noinspection unchecked
-        List<String> providers = BeehiveContext.safeGet(UrlConstants.PROVIDERS, List.class);
-        @SuppressWarnings("unchecked") Map<String, Client> clientCache = BeehiveContext.safeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
+        List<String> providers = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, List.class);
+        @SuppressWarnings("unchecked") Map<String, Client> clientCache = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
         Client server = clientCache.get(url.getParameter(UrlConstants.SERVICE));
         assert providers != null;
         return createRemoteInvoker(providers, server);
