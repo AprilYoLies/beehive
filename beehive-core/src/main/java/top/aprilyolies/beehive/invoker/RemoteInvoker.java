@@ -53,10 +53,11 @@ public class RemoteInvoker extends AbstractInvoker {
         Map<String, Channel> channelMap = addressChannel.get();
         Channel ch = channelMap.get(channelKey);
         if (ch == null || !ch.isOpen() || !ch.isActive()) {
-            System.out.println(Thread.currentThread().getName());
+            if (logger.isDebugEnabled()) {
+                logger.debug("Thread of " + Thread.currentThread().getName() + " don't hold the channel to service provider: " + host + ":" + port);
+            }
             // 连接服务器
             ch = connectServer();
-            System.out.println(ch);
             // 进行缓存
             channelMap.putIfAbsent(channelKey, ch);
         }

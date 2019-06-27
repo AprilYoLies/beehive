@@ -94,9 +94,6 @@ public class NettyClient extends AbstractClient {
                         Channel channel = future.channel();
                         if (future.isSuccess()) {
                             Channel oldChannel = addressChannel.get(adddressKey);
-                            if (oldChannel != null) {
-                                oldChannel.close();
-                            }
                         }
                         connected = true;
                         threads.add(Thread.currentThread());

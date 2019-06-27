@@ -16,20 +16,19 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class MultiThreadConsumer {
     // 拟测试的线程数
-    private static int THREADS = 9;
+    private static int THREADS = 5;
 
     public static void main(String[] args) throws Exception {
         // 计数栅栏
         CountDownLatch latch = new CountDownLatch(THREADS);
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("consumer.xml");
         context.start();
-//        BeehiveService demoService = context.getBean("demoService", BeehiveService.class);
         ExecutorService executor = Executors.newCachedThreadPool(new DemoThreadFactory());
         // 多个线程进行访问
         for (int i = 0; i < THREADS; i++) {
             executor.submit(() -> {
                 try {
-                    for (int i1 = 0; i1 < 2; i1++) {
+                    for (int i1 = 0; i1 < 20000; i1++) {
                         BeehiveService service = context.getBean("demoService", BeehiveService.class);
                         String hello = service.say(Thread.currentThread().getName() + " - " + i1);
 //                        System.out.println("result: " + hello);
@@ -41,11 +40,9 @@ public class MultiThreadConsumer {
                 }
             });
         }
-//        for (int i = 0; i < 2000; i++) {
-//            String hello = demoService.say("world - " + i);
-//            System.out.println("result: " + hello);
-//        }
+        long start = System.currentTimeMillis();
         latch.await();
+        System.out.println(System.currentTimeMillis() - start);
     }
 
     private static class DemoThreadFactory implements ThreadFactory {
