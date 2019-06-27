@@ -11,9 +11,6 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import top.aprilyolies.codec.MessageDecoder;
 import top.aprilyolies.codec.MessageEncoder;
 import top.aprilyolies.handler.ClientChannelHandler;
-import top.aprilyolies.pojo.Message;
-
-import java.net.InetSocketAddress;
 
 /**
  * @Author EvaJohnson
@@ -24,8 +21,6 @@ public class RpcClient {
     private static Integer DEFAULT_WORKER_THREAD = Runtime.getRuntime().availableProcessors() + 1;
 
     private static Integer DEFAULT_SERVERA_PORT = 7440;
-
-    private static Integer DEFAULT_SERVERB_PORT = 7441;
 
     public static void main(String[] args) {
         Bootstrap client = new Bootstrap();
@@ -41,20 +36,9 @@ public class RpcClient {
         client.handler(new ClientChannelInitializer());
 
         try {
-            ChannelFuture futureB = client.connect("127.0.0.1", DEFAULT_SERVERA_PORT).sync();
-            InetSocketAddress providerB = new InetSocketAddress("192.168.95.201", DEFAULT_SERVERB_PORT);
-            ChannelFuture futureA = client.connect(providerB).sync();
-            Channel channelA = futureA.channel();
-            Channel channelB = futureB.channel();
-            for (int i = 0; i < 100; i++) {
-                channelA.writeAndFlush(new Message("channelA message"));
-                channelB.writeAndFlush(new Message("channelB message"));
-                System.out.println(channelA.isActive() + " " + channelA.isOpen());
-                System.out.println(channelB.isActive() + " " + channelB.isOpen());
-            }
+            ChannelFuture future = client.connect("127.0.0.1", DEFAULT_SERVERA_PORT).sync();
             System.out.println("Client finished the connect and send the message...");
-            futureA.channel().closeFuture().sync();
-            futureB.channel().closeFuture().sync();
+            future.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             e.printStackTrace();
         } finally {
