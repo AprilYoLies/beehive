@@ -21,6 +21,7 @@ import java.util.Map;
  */
 public class FailoverClusterInvoker<T> extends AbstractInvoker {
     private final URL url;
+    private List<Invoker<T>> invokers;
 
     public FailoverClusterInvoker(URL url) {
         this.url = url;
@@ -28,7 +29,9 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
 
     @Override
     protected Object doInvoke(InvokeInfo info) {
-        List<Invoker<T>> invokers = listInvokers();
+        if (this.invokers == null) {
+            invokers = listInvokers();
+        }
         LoadBalance loadBalance = createLoadBalance(url);
         Invoker<T> invoker = selectInvoker(loadBalance, invokers);
         if (invoker != null) {

@@ -27,6 +27,8 @@ public class RemoteInvoker extends AbstractInvoker {
     private final int RETRY_TIMES = 3;
 
     private int retryCount = 1;
+    // 客户端通道
+    private Channel ch;
 
     public RemoteInvoker(String host, int port, Client client) {
         this.host = host;
@@ -42,8 +44,10 @@ public class RemoteInvoker extends AbstractInvoker {
         if (client == null) {
             throw new IllegalStateException("None of client could be use, the client was null");
         }
-        // 连接服务器
-        Channel ch = connectServer();
+        if (this.ch == null || (!ch.isOpen()) || (!ch.isActive())) {
+            // 连接服务器
+            ch = connectServer();
+        }
         // 构建 request 消息
         Request request = buildRequest(info);
         // 发送消息
@@ -62,7 +66,7 @@ public class RemoteInvoker extends AbstractInvoker {
             logger.error("Send request " + request + " 3 times, but the result was still null");
         }
         retryCount = 1;
-        client.disconnect();
+//        client.disconnect();
         return result;
     }
 

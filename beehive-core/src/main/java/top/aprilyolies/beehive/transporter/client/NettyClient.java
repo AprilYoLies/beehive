@@ -17,6 +17,9 @@ import top.aprilyolies.beehive.transporter.server.handler.NettyDecoderHandler;
 import top.aprilyolies.beehive.transporter.server.handler.NettyEncoderHandler;
 
 import java.net.InetSocketAddress;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -35,8 +38,9 @@ public class NettyClient extends AbstractClient {
     private final int DEFAULT_CONNECT_TIMEOUT = 3000;
     // 心跳时间间隔
     private final int HEARTBEAT_INTERVAL = 20000;
-    // NioSocketChannel
-    private Channel channel;
+    // 用于缓存已经连接的地址和 channel
+    private Map<String, Channel> addressChannel = new HashMap<>();
+
 
     public NettyClient(URL url) {
         super(url);
@@ -77,31 +81,34 @@ public class NettyClient extends AbstractClient {
      */
     @Override
     public Channel connect(InetSocketAddress address) {
+        String adddressKey = address.toString();
         try {
-            if (!connected) {
+            if (!connected || !isAddressAdded(adddressKey)) {
                 synchronized (NettyClient.class) {
-                    if (!connected) {
+                    if (!connected || !isAddressAdded(adddressKey)) {
                         ChannelFuture future = bootstrap.connect(address).sync();
                         // 根据情况对新的 channel 进行缓存，同时要关闭旧的 channel
+                        Channel channel = future.channel();
                         if (future.isSuccess()) {
-                            Channel channel = future.channel();
-                            Channel oldChannel = this.channel;
+                            Channel oldChannel = addressChannel.get(adddressKey);
                             if (oldChannel != null) {
                                 oldChannel.close();
                             }
-                            this.channel = channel;
                         }
                         connected = true;
-                        return this.channel;
+                        addressChannel.putIfAbsent(adddressKey, channel);
+                        return channel;
                     }
                 }
             }
-            if (this.channel == null) {
+            Channel channel = addressChannel.get(adddressKey);
+            if (channel == null) {
                 throw new IllegalStateException("Client's status was connected, but the channel was null");
             }
-            return this.channel;
+            return channel;
         } catch (Exception e) {
             connected = false;
+            Channel channel = addressChannel.get(adddressKey);
             if (channel != null) {
                 channel.close();
             }
@@ -110,10 +117,25 @@ public class NettyClient extends AbstractClient {
         }
     }
 
+    /**
+     * 判断当前 address 是否已经连接过
+     *
+     * @param adddressKey 服务器地址构建的 key 信息
+     * @return
+     */
+    private boolean isAddressAdded(String adddressKey) {
+        Map<String, Channel> addressChannel = this.addressChannel;
+        Set<String> addresses = addressChannel.keySet();
+        return addresses.contains(adddressKey);
+    }
+
     @Override
     public boolean disconnect() {
         synchronized (NettyClient.class) {
-            channel.close();
+            for (Channel channel : addressChannel.values()) {
+                if (channel != null)
+                    channel.close();
+            }
             connected = false;
             return true;
         }
@@ -124,8 +146,9 @@ public class NettyClient extends AbstractClient {
         if (workers != null && !workers.isShutdown()) {
             workers.shutdownGracefully();
         }
-        if (channel != null) {
-            channel.close();
+        for (Channel channel : addressChannel.values()) {
+            if (channel != null)
+                channel.close();
         }
     }
 }

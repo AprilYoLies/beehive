@@ -56,6 +56,9 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
         if (!published) {
             synchronized (publishMonitor) {
                 if (!published) {
+                    if (logger.isDebugEnabled()) {
+                        logger.debug("Export service via thread " + Thread.currentThread().getName());
+                    }
                     BeehiveContext.unsafePut(UrlConstants.PROVIDER_MODEL, this);
                     List<URL> registryUrls = getRegistryUrl(getRegistry());
                     fillParameters(registryUrls, this);

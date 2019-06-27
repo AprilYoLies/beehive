@@ -36,9 +36,9 @@ public class RpcServerB {
                 .childOption(ChannelOption.ALLOCATOR, PooledByteBufAllocator.DEFAULT)
                 .childHandler(new ServerChannelInitializer());
 
-        ChannelFuture channelFuture = server.bind("127.0.0.1", DEFAULT_SERVER_PORT);
+        ChannelFuture channelFuture = server.bind("192.168.95.201", DEFAULT_SERVER_PORT);
 
-        System.out.println("Server started on 127.0.0.1:" + DEFAULT_SERVER_PORT);
+        System.out.println("Server started on 192.168.95.201:" + DEFAULT_SERVER_PORT);
 
         channelFuture.syncUninterruptibly();
     }

@@ -13,7 +13,7 @@ public class Provider {
     public static void main(String[] args) throws IOException {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("provider.xml");
         context.start();
-        System.out.println("Provider started..");
+        System.out.println("Provider started on thread " + Thread.currentThread().getName() + "..");
         System.in.read();
     }
 }

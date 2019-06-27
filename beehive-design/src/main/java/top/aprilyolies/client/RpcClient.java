@@ -11,6 +11,9 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import top.aprilyolies.codec.MessageDecoder;
 import top.aprilyolies.codec.MessageEncoder;
 import top.aprilyolies.handler.ClientChannelHandler;
+import top.aprilyolies.pojo.Message;
+
+import java.net.InetSocketAddress;
 
 /**
  * @Author EvaJohnson
@@ -39,7 +42,16 @@ public class RpcClient {
 
         try {
             ChannelFuture futureB = client.connect("127.0.0.1", DEFAULT_SERVERA_PORT).sync();
-            ChannelFuture futureA = client.connect("127.0.0.1", DEFAULT_SERVERB_PORT).sync();
+            InetSocketAddress providerB = new InetSocketAddress("192.168.95.201", DEFAULT_SERVERB_PORT);
+            ChannelFuture futureA = client.connect(providerB).sync();
+            Channel channelA = futureA.channel();
+            Channel channelB = futureB.channel();
+            for (int i = 0; i < 100; i++) {
+                channelA.writeAndFlush(new Message("channelA message"));
+                channelB.writeAndFlush(new Message("channelB message"));
+                System.out.println(channelA.isActive() + " " + channelA.isOpen());
+                System.out.println(channelB.isActive() + " " + channelB.isOpen());
+            }
             System.out.println("Client finished the connect and send the message...");
             futureA.channel().closeFuture().sync();
             futureB.channel().closeFuture().sync();

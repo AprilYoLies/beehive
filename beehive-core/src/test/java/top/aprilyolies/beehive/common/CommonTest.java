@@ -8,6 +8,8 @@ import top.aprilyolies.beehive.utils.StringUtils;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Random;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.SynchronousQueue;
 
 /**
  * @Author EvaJohnson
@@ -56,6 +58,26 @@ public class CommonTest {
             throw new IllegalStateException("Got an host " + host + " from registry center, but the host can't be converted " +
                     "to ip address");
         }
+    }
+
+    @Test
+    public void testSynchronizedQueue() throws InterruptedException {
+        BlockingQueue<Integer> queue = new SynchronousQueue<>();
+        new Thread(() -> {
+            for (int i = 0; i < 3; i++) {
+                try {
+                    System.out.println(queue.take());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+        Thread.sleep(20);
+        System.out.println(queue.offer(1) + " ");
+        Thread.sleep(20);
+        System.out.println(queue.offer(2) + " ");
+        Thread.sleep(20);
+        System.out.println(queue.offer(3) + " ");
     }
 }
 
