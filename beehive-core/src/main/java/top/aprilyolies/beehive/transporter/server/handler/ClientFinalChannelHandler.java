@@ -59,4 +59,12 @@ public class ClientFinalChannelHandler extends AbstractFinalChannelHandler {
         executor.shutdown();
         super.close(ctx, promise);
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        if (logger.isDebugEnabled()) {
+            logger.error(cause.getMessage());
+        }
+        ctx.channel().close();
+    }
 }

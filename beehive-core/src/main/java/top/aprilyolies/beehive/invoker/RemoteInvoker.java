@@ -52,7 +52,7 @@ public class RemoteInvoker extends AbstractInvoker {
         // 获取当前线程的 channelMap
         Map<String, Channel> channelMap = addressChannel.get();
         Channel ch = channelMap.get(channelKey);
-        if (ch == null) {
+        if (ch == null || !ch.isOpen() || !ch.isActive()) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Thread of " + Thread.currentThread().getName() + " don't hold the channel to service provider: " + host + ":" + port);
             }
@@ -68,9 +68,7 @@ public class RemoteInvoker extends AbstractInvoker {
         // 获取异步的响应结果
         Object result = getResponse(request);
         while (result == null && retryCount <= RETRY_TIMES) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Got result of request " + request + " timeout, attempt to retry 3 times, this is " + retryCount++ + " time");
-            }
+            logger.info("Got result of request " + request + " timeout, attempt to retry 3 times, this is " + retryCount++ + " time");
             // 发送消息
             ch.writeAndFlush(request);
             result = getResponse(request);

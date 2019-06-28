@@ -159,7 +159,7 @@ public class NettyClient extends AbstractClient {
             workers.shutdownGracefully();
         }
         for (Channel channel : addressChannel.values()) {
-            if (channel != null)
+            if (channel != null && channel.isActive() && channel.isOpen())
                 channel.close();
         }
     }

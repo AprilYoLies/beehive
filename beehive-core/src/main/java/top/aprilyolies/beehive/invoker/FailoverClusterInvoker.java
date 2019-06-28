@@ -49,7 +49,10 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         Invoker<T> invoker = selectInvoker(loadBalance, invokers);
         if (invoker != null) {
             Invoker chain = buildInvokerChain(invoker);
-            return chain.invoke(info);
+            Object result = chain.invoke(info);
+            if (result == null) {
+                return doInvoke(info);
+            } else return result;
         } else {
             return doInvoke(info);
         }
