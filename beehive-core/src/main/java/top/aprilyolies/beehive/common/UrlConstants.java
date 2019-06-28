@@ -30,8 +30,6 @@ public class UrlConstants {
     public static final String PROVIDERS = "providers";
     // 表示分类的 consumer 类型
     public static final String CONSUMERS = "consumers";
-    // 表示分类的 provider 类型
-    public static final String SERVICE_REF = "ref";
     // 代理工厂
     public static final String PROXY_FACTORY = "proxy_factory";
     // 服务发布使用的协议，这个参数将会决定服务调用的性能

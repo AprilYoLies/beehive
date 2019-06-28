@@ -17,7 +17,7 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MultiThreadConsumer {
     // FIXME 当这里的线程较多时，比如 10，RemoteInvoker 中的 thread local 逻辑有错误
     // 拟测试的线程数
-    private static int THREADS = 10;
+    private static int THREADS = 5;
 
     public static void main(String[] args) throws Exception {
         // 计数栅栏

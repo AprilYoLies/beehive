@@ -4,7 +4,6 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.TreeCache;
-import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.curator.test.TestingServer;
@@ -43,27 +42,24 @@ public class TreeCacheExample {
     }
 
     private static void addListener(final TreeCache cache) {
-        TreeCacheListener listener = new TreeCacheListener() {
-            @Override
-            public void childEvent(CuratorFramework client, TreeCacheEvent event) throws Exception {
-                switch (event.getType()) {
-                    case NODE_ADDED: {
-                        System.out.println("TreeNode added: " + ZKPaths.getNodeFromPath(event.getData().getPath()) + ", value: "
-                                + new String(event.getData().getData()));
-                        break;
-                    }
-                    case NODE_UPDATED: {
-                        System.out.println("TreeNode changed: " + ZKPaths.getNodeFromPath(event.getData().getPath()) + ", value: "
-                                + new String(event.getData().getData()));
-                        break;
-                    }
-                    case NODE_REMOVED: {
-                        System.out.println("TreeNode removed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
-                        break;
-                    }
-                    default:
-                        System.out.println("Other event: " + event.getType().name());
+        TreeCacheListener listener = (client, event) -> {
+            switch (event.getType()) {
+                case NODE_ADDED: {
+                    System.out.println("TreeNode added: " + ZKPaths.getNodeFromPath(event.getData().getPath()) + ", value: "
+                            + new String(event.getData().getData()));
+                    break;
                 }
+                case NODE_UPDATED: {
+                    System.out.println("TreeNode changed: " + ZKPaths.getNodeFromPath(event.getData().getPath()) + ", value: "
+                            + new String(event.getData().getData()));
+                    break;
+                }
+                case NODE_REMOVED: {
+                    System.out.println("TreeNode removed: " + ZKPaths.getNodeFromPath(event.getData().getPath()));
+                    break;
+                }
+                default:
+                    System.out.println("Other event: " + event.getType().name());
             }
         };
         cache.getListenable().addListener(listener);

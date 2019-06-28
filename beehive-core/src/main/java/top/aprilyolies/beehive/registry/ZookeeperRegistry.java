@@ -2,6 +2,10 @@ package top.aprilyolies.beehive.registry;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.ChildData;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import org.apache.curator.retry.RetryNTimes;
 import org.apache.curator.utils.CloseableUtils;
 import org.apache.zookeeper.CreateMode;
@@ -13,6 +17,7 @@ import top.aprilyolies.beehive.invoker.Invoker;
 import top.aprilyolies.beehive.invoker.ProxyWrapperInvoker;
 import top.aprilyolies.beehive.proxy.ProxyFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static top.aprilyolies.beehive.common.UrlConstants.*;
@@ -79,7 +84,8 @@ public class ZookeeperRegistry extends AbstractRegistry {
             String providerPath = getProviderPath(url);
             try {
                 List<String> providerUrls = zkClient.getChildren().forPath(providerPath);
-                BeehiveContext.unsafePut(PROVIDERS, providerUrls);
+                addProviderRefreshListener(providerPath);
+//                BeehiveContext.unsafePut(PROVIDERS, providerUrls);
                 Invoker<?> invoker = proxyFactory.createProxy(url);
                 if (invoker instanceof ProxyWrapperInvoker) {
                     ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;
@@ -92,6 +98,22 @@ public class ZookeeperRegistry extends AbstractRegistry {
             }
         }
 
+    }
+
+    /**
+     * 为 consumer 添加一个监听器，用于监测 provider 更新消息
+     *
+     * @param providerPath
+     */
+    private void addProviderRefreshListener(String providerPath) {
+        try {
+            PathChildrenCache pathCache = new PathChildrenCache(zkClient, providerPath, true);
+            pathCache.start();
+            pathCache.getListenable().addListener(new ProviderRefreshListener(pathCache));
+        } catch (Exception e) {
+            logger.error("Add provider refresh listener failed, the target path was " + providerPath + ", the curator client was " + zkClient);
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -204,5 +226,35 @@ public class ZookeeperRegistry extends AbstractRegistry {
     @Override
     public void close() {
         CloseableUtils.closeQuietly(zkClient);
+    }
+
+    /**
+     * 该 listener 用于刷新 provider 信息
+     */
+    private class ProviderRefreshListener implements PathChildrenCacheListener {
+        private final PathChildrenCache pathCache;
+
+        public ProviderRefreshListener(PathChildrenCache pathCache) {
+            this.pathCache = pathCache;
+        }
+
+        @Override
+        public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+            PathChildrenCacheEvent.Type eventType = event.getType();
+            // 如果 child 信息发生变化，进行更新
+            switch (eventType) {
+                case CHILD_ADDED:
+                case CHILD_REMOVED:
+                case CHILD_UPDATED: {
+                    List<ChildData> currentData = pathCache.getCurrentData();
+                    List<String> providerUrls = new ArrayList<>(currentData.size());
+                    for (ChildData data : currentData) {
+                        providerUrls.add(data.getPath());
+                    }
+                    BeehiveContext.unsafePut(PROVIDERS, providerUrls);
+                    break;
+                }
+            }
+        }
     }
 }
