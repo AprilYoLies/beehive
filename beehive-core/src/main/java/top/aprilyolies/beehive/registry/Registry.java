@@ -19,4 +19,7 @@ public interface Registry {
 
     // 用于关闭注册中心
     void close();
+
+    // 用于获取注册中心
+    Object getClient();
 }

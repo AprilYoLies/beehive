@@ -37,6 +37,12 @@ public class ZookeeperRegistry extends AbstractRegistry {
     private CuratorFramework zkClient;
 
     private URL url;
+    // 注册路径
+    private String registryPath;
+
+    public String getRegistryPath() {
+        return registryPath;
+    }
 
     public ZookeeperRegistry(URL url) {
         this.url = url;
@@ -82,10 +88,11 @@ public class ZookeeperRegistry extends AbstractRegistry {
             BeehiveContext.unsafePut(url.getParameter(SERVICE), chain);
         } else {
             String providerPath = getProviderPath(url);
+            this.registryPath = providerPath;
             try {
                 List<String> providerUrls = zkClient.getChildren().forPath(providerPath);
                 addProviderRefreshListener(providerPath);
-//                BeehiveContext.unsafePut(PROVIDERS, providerUrls);
+                BeehiveContext.unsafePut(PROVIDERS, providerUrls);
                 Invoker<?> invoker = proxyFactory.createProxy(url);
                 if (invoker instanceof ProxyWrapperInvoker) {
                     ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;
@@ -228,6 +235,11 @@ public class ZookeeperRegistry extends AbstractRegistry {
         CloseableUtils.closeQuietly(zkClient);
     }
 
+    @Override
+    public CuratorFramework getClient() {
+        return zkClient;
+    }
+
     /**
      * 该 listener 用于刷新 provider 信息
      */
@@ -251,9 +263,10 @@ public class ZookeeperRegistry extends AbstractRegistry {
                     for (ChildData data : currentData) {
                         providerUrls.add(data.getPath());
                     }
+                    // 这里是保存到 concurrent hash map 中，能够保证可见性
                     BeehiveContext.unsafePut(PROVIDERS, providerUrls);
-                    break;
                 }
+
             }
         }
     }

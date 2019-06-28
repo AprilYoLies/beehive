@@ -15,12 +15,21 @@ public class RandomLoadBalance extends AbstractLoadBalance {
 
     @Override
     public <T> Invoker<T> select(List<Invoker<T>> invokers) {
-        int idx = Math.abs(random.nextInt() % invokers.size());
-        if (logger.isDebugEnabled()) {
-            logger.debug("There are " + invokers.size() + " invokers, RandomLoadBalance choose the invoker with" +
-                    "index of " + idx);
+        try {
+            if (invokers == null || invokers.size() == 0) {
+                return null;
+            }
+            int idx = Math.abs(random.nextInt() % invokers.size());
+            if (logger.isDebugEnabled()) {
+                logger.debug("There are " + invokers.size() + " invokers, RandomLoadBalance choose the invoker with" +
+                        "index of " + idx);
+            }
+            return invokers.get(idx);
+        } catch (Exception e) {
+            logger.error("Got invoker failed, this may caused by some new provider was added, and the beehive" +
+                    " was refresh the invokers list");
+            return null;
         }
-        return invokers.get(idx);
     }
 
 }

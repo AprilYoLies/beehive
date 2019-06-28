@@ -58,7 +58,7 @@ public class BeehiveContext {
     }
 
     public static void unsafePut(String key, Object value) {
-        unsafeProperties.putIfAbsent(key, value);
+        unsafeProperties.put(key, value);
     }
 
 

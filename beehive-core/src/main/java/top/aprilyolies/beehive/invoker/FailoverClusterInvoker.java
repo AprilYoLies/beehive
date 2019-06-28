@@ -1,10 +1,16 @@
 package top.aprilyolies.beehive.invoker;
 
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.PathChildrenCache;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
+import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
 import top.aprilyolies.beehive.cluster.loadbalance.LoadBalance;
 import top.aprilyolies.beehive.common.BeehiveContext;
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.registry.Registry;
+import top.aprilyolies.beehive.registry.ZookeeperRegistry;
 import top.aprilyolies.beehive.transporter.client.Client;
 
 import java.net.InetAddress;
@@ -21,7 +27,10 @@ import java.util.Map;
  */
 public class FailoverClusterInvoker<T> extends AbstractInvoker {
     private final URL url;
-    private List<Invoker<T>> invokers;
+    // 缓存的 invokers 信息
+    private volatile List<Invoker<T>> invokers;
+    // 缓存注册中心信息
+    private static Registry regsitry;
 
     public FailoverClusterInvoker(URL url) {
         this.url = url;
@@ -32,13 +41,39 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         if (this.invokers == null) {
             invokers = listInvokers();
         }
+        if (regsitry == null) {
+            regsitry = BeehiveContext.unsafeGet(UrlConstants.REGISTRIES, Registry.class);
+            addInvokersRefreshListener(regsitry);
+        }
         LoadBalance loadBalance = createLoadBalance(url);
         Invoker<T> invoker = selectInvoker(loadBalance, invokers);
         if (invoker != null) {
             Invoker chain = buildInvokerChain(invoker);
             return chain.invoke(info);
+        } else {
+            return doInvoke(info);
         }
-        throw new RuntimeException("There is none of provider could be found, beehive can't build a invoker");
+    }
+
+    /**
+     * 添加 invokers 刷新监听器
+     *
+     * @param regsitry
+     */
+    private void addInvokersRefreshListener(Registry regsitry) {
+        try {
+            if (regsitry instanceof ZookeeperRegistry) {
+                ZookeeperRegistry zkRegistry = (ZookeeperRegistry) regsitry;
+                CuratorFramework client = zkRegistry.getClient();
+                String registryPath = zkRegistry.getRegistryPath();
+                PathChildrenCache pathCache = new PathChildrenCache(client, registryPath, true);
+                pathCache.start();
+                pathCache.getListenable().addListener(new InvokersRefreshListener());
+            }
+        } catch (Exception e) {
+            logger.error("Can't add invokers refresh listener");
+            e.printStackTrace();
+        }
     }
 
     private Invoker<T> selectInvoker(LoadBalance loadBalance, List<Invoker<T>> invokers) {
@@ -99,6 +134,23 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
             e.printStackTrace();
             throw new IllegalStateException("Got an host " + host + " from registry center, but the host can't be converted " +
                     "to ip address");
+        }
+    }
+
+    /**
+     * invokers 刷新监听器
+     */
+    private class InvokersRefreshListener implements PathChildrenCacheListener {
+        @Override
+        public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
+            PathChildrenCacheEvent.Type type = event.getType();
+            switch (type) {
+                case CHILD_ADDED:
+                case CHILD_REMOVED:
+                case CHILD_UPDATED: {
+                    FailoverClusterInvoker.this.invokers = null;
+                }
+            }
         }
     }
 }
