@@ -14,9 +14,9 @@ public class Consumer {
         context.start();
         BeehiveService demoService = context.getBean("demoService", BeehiveService.class);
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 50000; i++) {
             String hello = demoService.say("world - " + i);
-            System.out.println("result: " + hello);
+//            System.out.println("result: " + hello);
         }
         System.out.println(System.currentTimeMillis() - start);
     }

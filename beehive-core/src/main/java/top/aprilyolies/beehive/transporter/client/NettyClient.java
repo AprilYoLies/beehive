@@ -93,12 +93,11 @@ public class NettyClient extends AbstractClient {
                         // 根据情况对新的 channel 进行缓存，同时要关闭旧的 channel
                         Channel channel = future.channel();
                         if (future.isSuccess()) {
-                            Channel oldChannel = addressChannel.get(adddressKey);
+                            connected = true;
+                            threads.add(Thread.currentThread());
+                            addressChannel.putIfAbsent(adddressKey, channel);
+                            return channel;
                         }
-                        connected = true;
-                        threads.add(Thread.currentThread());
-                        addressChannel.putIfAbsent(adddressKey, channel);
-                        return channel;
                     }
                 }
             }

@@ -59,7 +59,7 @@ public class RemoteInvoker extends AbstractInvoker {
             // 连接服务器
             ch = connectServer();
             // 进行缓存
-            channelMap.putIfAbsent(channelKey, ch);
+            channelMap.put(channelKey, ch);
         }
         // 构建 request 消息
         Request request = buildRequest(info);

@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Email g863821569@gmail.com
  */
 public class MultiThreadConsumer {
+    // FIXME 当这里的线程较多时，比如 10，RemoteInvoker 中的 thread local 逻辑有错误
     // 拟测试的线程数
     private static int THREADS = 5;
 
@@ -28,7 +29,7 @@ public class MultiThreadConsumer {
         for (int i = 0; i < THREADS; i++) {
             executor.submit(() -> {
                 try {
-                    for (int i1 = 0; i1 < 20000; i1++) {
+                    for (int i1 = 0; i1 < 10000; i1++) {
                         BeehiveService service = context.getBean("demoService", BeehiveService.class);
                         String hello = service.say(Thread.currentThread().getName() + " - " + i1);
 //                        System.out.println("result: " + hello);
