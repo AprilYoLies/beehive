@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Date 2019-06-28
  * @Email g863821569@gmail.com
  */
-public class DemoThreadLocal implements ThreadFactory {
+public class DemoThreadFactory implements ThreadFactory {
     AtomicLong id = new AtomicLong(1);
 
     @Override

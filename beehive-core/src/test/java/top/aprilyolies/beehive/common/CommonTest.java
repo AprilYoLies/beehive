@@ -86,21 +86,26 @@ public class CommonTest {
 
     @Test
     public void testThreadLocal() {
-        ExecutorService executor = Executors.newCachedThreadPool(new DemoThreadLocal());
+        ExecutorService executor = Executors.newCachedThreadPool(new DemoThreadFactory());
         String token = "token";
         AddressChannelThreadLocal threadLocal = new AddressChannelThreadLocal();
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < 100; i++) {
             Runnable runnable = () -> {
                 Map<String, String> strMap = threadLocal.get();
                 for (int j = 0; j < 100; j++) {
                     String val = strMap.get(token);
                     if (val == null) {
                         strMap.putIfAbsent(token, "val");
-                        System.out.println("count");
+                        System.out.println("count - " + j);
                     }
                 }
             };
             executor.submit(runnable);
+        }
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
     }
 

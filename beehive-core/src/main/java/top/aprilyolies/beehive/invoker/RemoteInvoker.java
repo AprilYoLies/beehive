@@ -52,7 +52,7 @@ public class RemoteInvoker extends AbstractInvoker {
         // 获取当前线程的 channelMap
         Map<String, Channel> channelMap = addressChannel.get();
         Channel ch = channelMap.get(channelKey);
-        if (ch == null || !ch.isOpen() || !ch.isActive()) {
+        if (ch == null) {
             if (logger.isDebugEnabled()) {
                 logger.debug("Thread of " + Thread.currentThread().getName() + " don't hold the channel to service provider: " + host + ":" + port);
             }

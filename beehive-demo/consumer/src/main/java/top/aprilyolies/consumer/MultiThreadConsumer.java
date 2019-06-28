@@ -17,22 +17,22 @@ import java.util.concurrent.atomic.AtomicLong;
 public class MultiThreadConsumer {
     // FIXME 当这里的线程较多时，比如 10，RemoteInvoker 中的 thread local 逻辑有错误
     // 拟测试的线程数
-    private static int THREADS = 5;
+    private static int THREADS = 10;
 
     public static void main(String[] args) throws Exception {
         // 计数栅栏
         CountDownLatch latch = new CountDownLatch(THREADS);
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("consumer.xml");
         context.start();
-        ExecutorService executor = Executors.newCachedThreadPool(new DemoThreadFactory());
+        ExecutorService executor = Executors.newFixedThreadPool(THREADS, new DemoThreadFactory());
         // 多个线程进行访问
         for (int i = 0; i < THREADS; i++) {
             executor.submit(() -> {
                 try {
-                    for (int i1 = 0; i1 < 200000; i1++) {
+                    for (int i1 = 0; i1 < 100; i1++) {
                         BeehiveService service = context.getBean("demoService", BeehiveService.class);
                         String hello = service.say(Thread.currentThread().getName() + " - " + i1);
-//                        System.out.println("result: " + hello);
+                        System.out.println("result: " + hello);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

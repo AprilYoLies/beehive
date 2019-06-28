@@ -84,31 +84,31 @@ public class NettyClient extends AbstractClient {
      */
     @Override
     public Channel connect(InetSocketAddress address) {
-        String adddressKey = address.toString();
+        String channelKey = createChannelKey(address);
         try {
-            if (!connected || !isAddressAdded(adddressKey) || !isThreadAdded()) {
+            if (!connected || !isAddressAdded(channelKey)) {
                 synchronized (NettyClient.class) {
-                    if (!connected || !isAddressAdded(adddressKey) || !isThreadAdded()) {
+                    if (!connected || !isAddressAdded(channelKey)) {
                         ChannelFuture future = bootstrap.connect(address).sync();
                         // 根据情况对新的 channel 进行缓存，同时要关闭旧的 channel
                         Channel channel = future.channel();
                         if (future.isSuccess()) {
                             connected = true;
                             threads.add(Thread.currentThread());
-                            addressChannel.putIfAbsent(adddressKey, channel);
+                            addressChannel.putIfAbsent(channelKey, channel);
                             return channel;
                         }
                     }
                 }
             }
-            Channel channel = addressChannel.get(adddressKey);
+            Channel channel = addressChannel.get(channelKey);
             if (channel == null) {
                 throw new IllegalStateException("Client's status was connected, but the channel was null");
             }
             return channel;
         } catch (Exception e) {
             connected = false;
-            Channel channel = addressChannel.get(adddressKey);
+            Channel channel = addressChannel.get(channelKey);
             if (channel != null) {
                 channel.close();
             }
@@ -118,13 +118,15 @@ public class NettyClient extends AbstractClient {
     }
 
     /**
-     * 判断缓存中是否有当前线程
+     * 根据 address 和当前线程构建 channel key
      *
-     * @return
+     * @param address 服务器地址
+     * @return 构建的 channel key
      */
-    private boolean isThreadAdded() {
-        Set<Thread> threads = this.threads;
-        return threads.contains(Thread.currentThread());
+    private String createChannelKey(InetSocketAddress address) {
+        String addressKey = address.toString();
+        String threadKey = Thread.currentThread().getName();
+        return addressKey + threadKey;
     }
 
     /**
