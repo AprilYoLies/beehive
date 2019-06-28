@@ -7,8 +7,12 @@ import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.SynchronousQueue;
 
 /**
@@ -78,6 +82,36 @@ public class CommonTest {
         System.out.println(queue.offer(2) + " ");
         Thread.sleep(20);
         System.out.println(queue.offer(3) + " ");
+    }
+
+    @Test
+    public void testThreadLocal() {
+        ExecutorService executor = Executors.newCachedThreadPool(new DemoThreadLocal());
+        String token = "token";
+        AddressChannelThreadLocal threadLocal = new AddressChannelThreadLocal();
+        for (int i = 0; i < 20; i++) {
+            Runnable runnable = () -> {
+                Map<String, String> strMap = threadLocal.get();
+                for (int j = 0; j < 100; j++) {
+                    String val = strMap.get(token);
+                    if (val == null) {
+                        strMap.putIfAbsent(token, "val");
+                        System.out.println("count");
+                    }
+                }
+            };
+            executor.submit(runnable);
+        }
+    }
+
+    /**
+     * 线程本地变量，用于承载 address 到 channel 的映射
+     */
+    private class AddressChannelThreadLocal extends ThreadLocal<Map<String, String>> {
+        @Override
+        protected Map<String, String> initialValue() {
+            return new HashMap<>();
+        }
     }
 }
 
