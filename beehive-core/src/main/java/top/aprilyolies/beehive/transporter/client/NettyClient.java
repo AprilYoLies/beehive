@@ -86,9 +86,10 @@ public class NettyClient extends AbstractClient {
     public Channel connect(InetSocketAddress address) {
         String channelKey = createChannelKey(address);
         try {
-            if (!connected || !isAddressAdded(channelKey)) {
+            if (!connected || !isAddressAdded(channelKey) || !checkOk(addressChannel.get(channelKey))) {
                 synchronized (NettyClient.class) {
-                    if (!connected || !isAddressAdded(channelKey)) {
+                    if (!connected || !isAddressAdded(channelKey) || !checkOk(addressChannel.get(channelKey))) {
+                        addressChannel.remove(channelKey);
                         ChannelFuture future = bootstrap.connect(address).sync();
                         // 根据情况对新的 channel 进行缓存，同时要关闭旧的 channel
                         Channel channel = future.channel();
@@ -115,6 +116,19 @@ public class NettyClient extends AbstractClient {
             e.printStackTrace();
             return null;
         }
+    }
+
+    /**
+     * 用于检查 channel 是否是可用状态
+     *
+     * @param channel
+     * @return
+     */
+    private boolean checkOk(Channel channel) {
+        if (channel == null) {
+            return false;
+        }
+        return channel.isOpen() && channel.isActive();
     }
 
     /**
