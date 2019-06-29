@@ -59,10 +59,15 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
                     if (logger.isDebugEnabled()) {
                         logger.debug("Export service via thread " + Thread.currentThread().getName());
                     }
+                    // 将当前实例以 provider_model 的形式保存到 BeehiveContext 中
                     BeehiveContext.unsafePut(UrlConstants.PROVIDER_MODEL, this);
+                    // 根据 registry 属性构建 registry urls
                     List<URL> registryUrls = getRegistryUrl(getRegistry());
+                    // 将当前实例中的属性填充到 url 的参数中
                     fillParameters(registryUrls, this);
+                    // 检查 registry url 是否包含必要的属性
                     checkRegistryUrls(registryUrls);
+                    // 进行真正的服务注册
                     registryService(registryUrls);
                 }
                 published = true;
@@ -127,11 +132,19 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
         }
     }
 
+    /**
+     * 用于为当前 bean 填充一些必要属性
+     *
+     * @throws Exception
+     */
     @Override
     public void afterPropertiesSet() throws Exception {
         checkRegistry();
     }
 
+    /**
+     * 检查当前 bean 的 registry 属性是否为空，否则从 spring 容器中获取对应的值进行填充
+     */
     private void checkRegistry() {
         RegistryConfigBean registry = getRegistry();
         if (registry == null) {
@@ -139,6 +152,7 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
                 Map<String, RegistryConfigBean> registryMap = BeanFactoryUtils.beansOfTypeIncludingAncestors(applicationContext,
                         RegistryConfigBean.class, false, false);
                 if (registryMap.size() > 0) {
+                    // 如果 spring 容器中有多个 registry bean，那么优先获取第一个
                     Collection<RegistryConfigBean> registries = registryMap.values();
                     for (RegistryConfigBean reg : registries) {
                         setRegistry(reg);
