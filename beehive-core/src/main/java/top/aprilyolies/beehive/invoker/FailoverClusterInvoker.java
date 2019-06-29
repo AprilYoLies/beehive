@@ -32,6 +32,10 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     // 缓存注册中心信息
     private static Registry regsitry;
 
+    private final int MAX_REINVOKE_TIMES = 10;
+
+    private int reinvokeCount = 0;
+
     public FailoverClusterInvoker(URL url) {
         this.url = url;
     }
@@ -48,13 +52,18 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         LoadBalance loadBalance = createLoadBalance(url);
         Invoker<T> invoker = selectInvoker(loadBalance, invokers);
         if (invoker != null) {
+            reinvokeCount = 0;
             Invoker chain = buildInvokerChain(invoker);
             Object result = chain.invoke(info);
             if (result == null) {
                 return doInvoke(info);
             } else return result;
         } else {
-            return doInvoke(info);
+            if (reinvokeCount++ < MAX_REINVOKE_TIMES) {
+                return doInvoke(info);
+            } else {
+                throw new IllegalStateException("There is none of invoker could be used");
+            }
         }
     }
 
