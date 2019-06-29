@@ -27,18 +27,25 @@ public class RemoteInvoker extends AbstractInvoker {
     private final Client client;
     // 获取结果超时，请求重发的次数
     private final int RETRY_TIMES = 3;
+    // 缓存原 provider 的信息
+    private final String provider;
     // 记录当前已经重试的次数
     private int retryCount = 1;
     // 用于存储当前线程建立的 channel 信息
     private final ThreadLocal<Map<String, Channel>> addressChannel = new AddressChannelThreadLocal();
-    //
+    // 客户端 channel 缓存的 key 信息
     private final String channelKey;
 
-    public RemoteInvoker(String host, int port, Client client) {
+    public String getProvider() {
+        return provider;
+    }
+
+    public RemoteInvoker(String host, int port, Client client, String provider) {
         this.host = host;
         this.port = port;
         this.client = client;
         this.channelKey = host + ":" + port;
+        this.provider = provider;
     }
 
     @Override

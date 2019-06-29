@@ -31,10 +31,14 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     private volatile List<Invoker<T>> invokers;
     // 缓存注册中心信息
     private static Registry regsitry;
-
+    // 最大重复 invoke 次数
     private final int MAX_REINVOKE_TIMES = 10;
-
+    // 记录当前重复 invoke 的此处
     private int reinvokeCount = 0;
+    // 更新 invokers 的标志，在有服务上线或者下线后，此标志会设置为 true
+    private volatile boolean needUpdateInvokers = false;
+    // 用于缓存当前的 providers，invokers 将会根据此 providers 来构建
+    private List<String> providers;
 
     public FailoverClusterInvoker(URL url) {
         this.url = url;
@@ -44,6 +48,10 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     protected Object doInvoke(InvokeInfo info) {
         if (this.invokers == null) {
             invokers = listInvokers();
+        }
+        if (needUpdateInvokers) {
+            needUpdateInvokers = false;
+            updateInvokers();
         }
         if (regsitry == null) {
             regsitry = BeehiveContext.unsafeGet(UrlConstants.REGISTRIES, Registry.class);
@@ -65,6 +73,58 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                 throw new IllegalStateException("There is none of invoker could be used");
             }
         }
+    }
+
+    /**
+     * 更新 invokers 信息
+     */
+    @SuppressWarnings("unchecked")
+    private void updateInvokers() {
+        List<Invoker<T>> oldInvokers = this.invokers;
+        List<Invoker<T>> newInvokers = new ArrayList<>();
+        List<String> oldProviders = this.providers;
+        @SuppressWarnings("unchecked") List<String> newProviders = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, List.class);
+        List<String> toRemove = new ArrayList<>();
+        List<String> toAdd = new ArrayList<>();
+        // 获取将要被移除的 provider 集合
+        for (String oldProvider : oldProviders) {
+            if (!newProviders.contains(oldProvider)) {
+                toRemove.add(oldProvider);
+            }
+        }
+        // 获取将要被添加的 provider 集合
+        for (String newProvider : newProviders) {
+            if (!oldProviders.contains(newProvider)) {
+                toAdd.add(newProvider);
+            }
+        }
+        for (Invoker<T> oldInvoker : oldInvokers) {
+            if (oldInvoker instanceof RemoteInvoker) {
+                RemoteInvoker remoteInvoker = (RemoteInvoker) oldInvoker;
+                String provider = remoteInvoker.getProvider();
+                if (!toRemove.contains(provider)) {
+                    newInvokers.add(remoteInvoker);
+                }
+            }
+        }
+        oldInvokers.clear();
+        List<Invoker<T>> invokers = buildInvokers(toAdd);
+        newInvokers.addAll(invokers);
+        this.providers = newProviders;
+        this.invokers = newInvokers;
+    }
+
+    /**
+     * 根据指定的 providers 构建 invokers
+     *
+     * @param providers
+     * @return
+     */
+    private List<Invoker<T>> buildInvokers(List<String> providers) {
+        @SuppressWarnings("unchecked") Map<String, Client> clientCache = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
+        Client server = clientCache.get(url.getParameter(UrlConstants.SERVICE));
+        assert providers != null;
+        return createRemoteInvoker(providers, server);
     }
 
     /**
@@ -105,6 +165,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     private List<Invoker<T>> listInvokers() {
         //noinspection unchecked
         List<String> providers = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, List.class);
+        this.providers = providers;
         @SuppressWarnings("unchecked") Map<String, Client> clientCache = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
         Client server = clientCache.get(url.getParameter(UrlConstants.SERVICE));
         assert providers != null;
@@ -126,7 +187,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
             String address = host2IpAddress(url.getHost());
             int port = url.getPort();
             // RemoteInvoker 为实际进行数据交互的 invoker
-            RemoteInvoker invoker = new RemoteInvoker(address, port, client);
+            RemoteInvoker invoker = new RemoteInvoker(address, port, client, provider);
             invokers.add(invoker);
         }
         return invokers;
@@ -160,7 +221,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                 case CHILD_ADDED:
                 case CHILD_REMOVED:
                 case CHILD_UPDATED: {
-                    FailoverClusterInvoker.this.invokers = null;
+                    FailoverClusterInvoker.this.needUpdateInvokers = true;
                 }
             }
         }
