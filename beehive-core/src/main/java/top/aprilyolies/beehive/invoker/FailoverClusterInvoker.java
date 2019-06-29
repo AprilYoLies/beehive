@@ -39,6 +39,8 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     private volatile boolean needUpdateInvokers = false;
     // 用于缓存当前的 providers，invokers 将会根据此 providers 来构建
     private List<String> providers;
+    // 保存到当前线程中的 load balance
+    private final ThreadLocal<LoadBalance> loadBalanceThreadLocal = new LoadBalanceThreadLocal();
 
     public FailoverClusterInvoker(URL url) {
         this.url = url;
@@ -57,7 +59,11 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
             regsitry = BeehiveContext.unsafeGet(UrlConstants.REGISTRIES, Registry.class);
             addInvokersRefreshListener(regsitry);
         }
-        LoadBalance loadBalance = createLoadBalance(url);
+        LoadBalance loadBalance = loadBalanceThreadLocal.get();
+        if (loadBalance == null) {
+            loadBalance = createLoadBalance(url);
+            loadBalanceThreadLocal.set(loadBalance);
+        }
         Invoker<T> invoker = selectInvoker(loadBalance, invokers);
         if (invoker != null) {
             reinvokeCount = 0;
@@ -98,6 +104,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                 toAdd.add(newProvider);
             }
         }
+        // 将旧的 invokers 中没有被移除的 invoker 添加到新 invokers 中
         for (Invoker<T> oldInvoker : oldInvokers) {
             if (oldInvoker instanceof RemoteInvoker) {
                 RemoteInvoker remoteInvoker = (RemoteInvoker) oldInvoker;
@@ -110,6 +117,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         oldInvokers.clear();
         List<Invoker<T>> invokers = buildInvokers(toAdd);
         newInvokers.addAll(invokers);
+        // 重新缓存 providers 和 invokers 信息
         this.providers = newProviders;
         this.invokers = newInvokers;
     }
@@ -225,5 +233,9 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                 }
             }
         }
+    }
+
+    private class LoadBalanceThreadLocal extends ThreadLocal<LoadBalance> {
+        // empty
     }
 }

@@ -31,9 +31,9 @@ public class UrlConstants {
     // 表示分类的 consumer 类型
     public static final String CONSUMERS = "consumers";
     // 代理工厂
-    public static final String PROXY_FACTORY = "proxy_factory";
+    public static final String PROXY_FACTORY = "proxyFactory";
     // 服务发布使用的协议，这个参数将会决定服务调用的性能
-    public static final String SERVICE_PROTOCOL = "service_protocol";
+    public static final String SERVICE_PROTOCOL = "serviceProtocol";
     // 默认的服务发布协议，该协议会使用 netty 作为底层通信
     public static final String DEFAULT_SERVICE_PROTOCOL = "beehive";
     // 默认的服务发布协议，该协议会使用 netty 作为底层通信
@@ -47,11 +47,11 @@ public class UrlConstants {
     // 表示 beehive 所模拟的集群，如容灾型或者是快速失败型
     public static final String CLUSTER = "cluster";
     // beehive 负载均衡参数
-    public static final String LOAD_BALANCE = "load_balance";
+    public static final String LOAD_BALANCE = "loadBalance";
     // 保存在 beehive-context 中的 transport 客户端
-    public static final String CONSUMERS_TRANSPORT = "consumer_transporter";
+    public static final String CONSUMERS_TRANSPORT = "consumerTransporter";
     // 保存在 beehive-context 中的 provider 模型
-    public static final String PROVIDER_MODEL = "provider_model";
+    public static final String PROVIDER_MODEL = "providerModel";
     // 保存在 beehive-context 中的 registry 实例
     public static final String REGISTRIES = "registries";
 }

@@ -29,10 +29,10 @@ public class MultiThreadConsumer {
         for (int i = 0; i < THREADS; i++) {
             executor.submit(() -> {
                 try {
-                    for (int i1 = 0; i1 < 200000; i1++) {
+                    for (int i1 = 0; i1 < 1000; i1++) {
                         BeehiveService service = context.getBean("demoService", BeehiveService.class);
                         String hello = service.say(Thread.currentThread().getName() + " - " + i1);
-                        System.out.println("result: " + hello);
+//                        System.out.println("result: " + hello);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

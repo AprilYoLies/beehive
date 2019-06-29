@@ -7,5 +7,5 @@
 
     <beehive:registry id="registry" address="zookeeper://192.168.95.1:2181"/>
 
-    <beehive:reference id="demoService" service="top.aprilyolies.service.BeehiveService"/>
+    <beehive:reference id="demoService" service="top.aprilyolies.service.BeehiveService" load-balance="poll"/>
 </beans>

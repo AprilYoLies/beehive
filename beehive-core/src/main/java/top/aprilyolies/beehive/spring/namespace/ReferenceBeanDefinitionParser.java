@@ -54,6 +54,11 @@ public class ReferenceBeanDefinitionParser extends AbstractBeanDefinitionParser 
         if (StringUtils.isEmpty(protocol)) {
             protocol = "beehive";
         }
+        // 负载均衡参数
+        String loadBalance = element.getAttribute("load-balance");
+        if (!StringUtils.isEmpty(loadBalance)) {
+            beanDefinition.getPropertyValues().addPropertyValue("loadBalance", loadBalance);
+        }
         beanDefinition.getPropertyValues().addPropertyValue("protocol", protocol);
         return beanDefinition;
     }

@@ -16,6 +16,16 @@ public abstract class ReferenceConfigBean extends AbstractConfig {
     private String name;
     // 注册配置 bean
     private RegistryConfigBean registry;
+    // 负载均衡策略
+    private String loadBalance;
+
+    public String getLoadBalance() {
+        return loadBalance;
+    }
+
+    public void setLoadBalance(String loadBalance) {
+        this.loadBalance = loadBalance;
+    }
 
     public RegistryConfigBean getRegistry() {
         return registry;
