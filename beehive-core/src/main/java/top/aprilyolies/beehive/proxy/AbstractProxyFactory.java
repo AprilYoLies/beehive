@@ -36,7 +36,7 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
             }
             return createInvoker(clazz, target, url);
         } catch (Exception e) {
-            throw new IllegalStateException("Can't create invoker");
+            throw new IllegalStateException("Can't create invoker", e.getCause());
         }
     }
 

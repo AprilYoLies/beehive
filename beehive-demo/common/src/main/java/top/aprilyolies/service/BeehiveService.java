@@ -7,4 +7,6 @@ package top.aprilyolies.service;
  */
 public interface BeehiveService {
     String say(String msg) throws Exception;
+
+    String see(String msg) throws Exception;
 }

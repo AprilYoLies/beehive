@@ -12,4 +12,9 @@ public class BeehiveServiceImpl implements BeehiveService {
     public String say(String msg) throws Exception {
         return "Jim say " + msg + " from " + InetAddress.getLocalHost().getHostAddress();
     }
+
+    @Override
+    public String see(String msg) throws Exception {
+        return "Jim see " + msg + " from " + InetAddress.getLocalHost().getHostAddress();
+    }
 }
