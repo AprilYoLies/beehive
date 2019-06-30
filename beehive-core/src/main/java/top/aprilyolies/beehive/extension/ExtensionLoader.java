@@ -2,6 +2,7 @@ package top.aprilyolies.beehive.extension;
 
 import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.compiler.Compiler;
+import top.aprilyolies.beehive.extension.annotation.Prototype;
 import top.aprilyolies.beehive.extension.annotation.SPI;
 import top.aprilyolies.beehive.extension.annotation.Selector;
 import top.aprilyolies.beehive.injector.PropertyInjector;
@@ -310,9 +311,12 @@ public class ExtensionLoader<T> {
                         loadExtensionClasses();
                     Map<String, Class<T>> cache = this.extensionClassCache;
                     try {
-                        instance = cache.get(extensionName).newInstance();
+                        Class<T> clazz = cache.get(extensionName);
+                        instance = clazz.newInstance();
                         injectProperty(instance);
-                        extensionInstanceCache.putIfAbsent(extensionName, instance);
+                        if (!isPrototypeAnnotated(clazz)) {
+                            extensionInstanceCache.putIfAbsent(extensionName, instance);
+                        }
                     } catch (Exception e) {
                         throw new IllegalStateException("Can't get extension instance for extensionName " + extensionName, e.getCause());
                     }
@@ -323,7 +327,9 @@ public class ExtensionLoader<T> {
         if (instance == null) {
             try {
                 instance = extensionClassCache.get(extensionName).newInstance();
-                extensionInstanceCache.putIfAbsent(extensionName, instance);
+                if (!isPrototypeAnnotated(extensionClassCache.get(extensionName))) {
+                    extensionInstanceCache.putIfAbsent(extensionName, instance);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
                 if (logger.isDebugEnabled())
@@ -331,6 +337,16 @@ public class ExtensionLoader<T> {
             }
         }
         return instance;
+    }
+
+    /**
+     * 判断 clazz 是否有 Prototype 注解
+     *
+     * @param clazz
+     * @return
+     */
+    private boolean isPrototypeAnnotated(Class<T> clazz) {
+        return clazz.isAnnotationPresent(Prototype.class);
     }
 
     public Set<String> getSupportedExtensions() {

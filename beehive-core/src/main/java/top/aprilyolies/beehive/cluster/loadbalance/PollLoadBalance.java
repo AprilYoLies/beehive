@@ -1,5 +1,6 @@
 package top.aprilyolies.beehive.cluster.loadbalance;
 
+import top.aprilyolies.beehive.extension.annotation.Prototype;
 import top.aprilyolies.beehive.invoker.Invoker;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
  * @Date 2019-06-29
  * @Email g863821569@gmail.com
  */
+@Prototype
 public class PollLoadBalance extends AbstractLoadBalance {
     private int idx = 0;
 

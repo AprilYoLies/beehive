@@ -66,4 +66,12 @@ public class ExtensionTest {
     public void test() {
         RegistryFactory registry = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtensionSelectorInstance();
     }
+
+    @Test
+    public void testPrototypeExtension() {
+        for (int i = 0; i < 10; i++) {
+            TestExtension extension = (TestExtension) extensionLoader.getExtension("test");
+            System.out.println(extension);
+        }
+    }
 }

@@ -7,6 +7,7 @@ import top.aprilyolies.beehive.common.URL;
  * @Date 2019-06-11
  * @Email g863821569@gmail.com
  */
+//@Prototype
 public class TestExtensionImpl implements TestExtension {
     TestExtension testExtension;
 

@@ -1,6 +1,8 @@
 package top.aprilyolies.beehive.common;
 
 import org.junit.Test;
+import top.aprilyolies.beehive.extension.annotation.Prototype;
+import top.aprilyolies.beehive.extension.testextension.TestExtensionImpl;
 import top.aprilyolies.beehive.spring.AbstractConfig;
 import top.aprilyolies.beehive.spring.ServiceConfigBean;
 import top.aprilyolies.beehive.utils.StringUtils;
@@ -117,6 +119,12 @@ public class CommonTest {
         protected Map<String, String> initialValue() {
             return new HashMap<>();
         }
+    }
+
+    @Test
+    public void testPrototypeAnnotated() {
+        Class<TestExtensionImpl> clazz = TestExtensionImpl.class;
+        System.out.println(clazz.isAnnotationPresent(Prototype.class));
     }
 }
 
