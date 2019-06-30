@@ -18,7 +18,8 @@ public class ProxyFactorySelector implements ProxyFactory {
 
     @Override
     public <T> Invoker<T> createProxy(URL url) {
-        throw new UnsupportedOperationException("This is proxy factory seletor, please call top.aprilyolies.beehive.proxy.ProxyFactorySelector.getProxyFactory");
+        throw new UnsupportedOperationException("This is proxy factory selector, please call" +
+                "top.aprilyolies.beehive.proxy.ProxyFactorySelector.createProxyFactory");
     }
 
     @Override
