@@ -38,7 +38,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     // 更新 invokers 的标志，在有服务上线或者下线后，此标志会设置为 true
     private volatile boolean needUpdateInvokers = false;
     // 用于缓存当前的 providers，invokers 将会根据此 providers 来构建
-    private List<String> providers;
+    private volatile List<String> providers;
     // 保存到当前线程中的 load balance
     private final ThreadLocal<LoadBalance> loadBalanceThreadLocal = new LoadBalanceThreadLocal();
 
@@ -53,7 +53,6 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                 invokers = listInvokers();
             }
             if (needUpdateInvokers) {
-                needUpdateInvokers = false;
                 updateInvokers();
             }
             if (regsitry == null) {
@@ -98,7 +97,8 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
      * 更新 invokers 信息
      */
     @SuppressWarnings("unchecked")
-    private void updateInvokers() {
+    private synchronized void updateInvokers() {
+        if (!needUpdateInvokers) return;
         List<Invoker<T>> oldInvokers = this.invokers;
         List<Invoker<T>> newInvokers = new ArrayList<>();
         List<String> oldProviders = this.providers;
@@ -133,6 +133,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         // 重新缓存 providers 和 invokers 信息
         this.providers = newProviders;
         this.invokers = newInvokers;
+        needUpdateInvokers = false;
     }
 
     /**

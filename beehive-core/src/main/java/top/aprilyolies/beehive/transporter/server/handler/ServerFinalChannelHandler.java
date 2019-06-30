@@ -58,4 +58,12 @@ public class ServerFinalChannelHandler extends AbstractFinalChannelHandler {
         executor.shutdown();
         super.channelInactive(ctx);
     }
+
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+        ctx.channel().close();
+        executor.shutdown();
+        logger.info("Caught unknown exception, this may caused by the client close the connection, the server has " +
+                "close the channel and the executor");
+    }
 }
