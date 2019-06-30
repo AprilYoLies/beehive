@@ -32,9 +32,9 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     // 缓存注册中心信息
     private static Registry regsitry;
     // 最大重复 invoke 次数
-    private final int MAX_REINVOKE_TIMES = 10;
-    // 记录当前重复 invoke 的此处
-    private int reinvokeCount = 0;
+    private final int MAX_REINVOKE_TIMES = 5;
+    // 记录当前重复 invoke 的次数
+    private final ThreadLocal<Integer> retryCountThreadLocal = new RetryCountThreadLocal();
     // 更新 invokers 的标志，在有服务上线或者下线后，此标志会设置为 true
     private volatile boolean needUpdateInvokers = false;
     // 用于缓存当前的 providers，invokers 将会根据此 providers 来构建
@@ -48,36 +48,49 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
 
     @Override
     protected Object doInvoke(InvokeInfo info) {
-        if (this.invokers == null) {
-            invokers = listInvokers();
-        }
-        if (needUpdateInvokers) {
-            needUpdateInvokers = false;
-            updateInvokers();
-        }
-        if (regsitry == null) {
-            regsitry = BeehiveContext.unsafeGet(UrlConstants.REGISTRIES, Registry.class);
-            addInvokersRefreshListener(regsitry);
-        }
-        LoadBalance loadBalance = loadBalanceThreadLocal.get();
-        if (loadBalance == null) {
-            loadBalance = createLoadBalance(url);
-            loadBalanceThreadLocal.set(loadBalance);
-        }
-        Invoker<T> invoker = selectInvoker(loadBalance, invokers);
-        if (invoker != null) {
-            reinvokeCount = 0;
-            Invoker chain = buildInvokerChain(invoker);
-            Object result = chain.invoke(info);
-            if (result == null) {
-                return doInvoke(info);
-            } else return result;
-        } else {
-            if (reinvokeCount++ < MAX_REINVOKE_TIMES) {
-                return doInvoke(info);
-            } else {
-                throw new IllegalStateException("There is none of invoker could be used");
+        try {
+            if (this.invokers == null) {
+                invokers = listInvokers();
             }
+            if (needUpdateInvokers) {
+                needUpdateInvokers = false;
+                updateInvokers();
+            }
+            if (regsitry == null) {
+                regsitry = BeehiveContext.unsafeGet(UrlConstants.REGISTRIES, Registry.class);
+                addInvokersRefreshListener(regsitry);
+            }
+            int reInvokeCount = retryCountThreadLocal.get();
+            LoadBalance loadBalance = loadBalanceThreadLocal.get();
+            if (loadBalance == null) {
+                loadBalance = createLoadBalance(url);
+                loadBalanceThreadLocal.set(loadBalance);
+            }
+            // 选择合适的 invoker
+            Invoker<T> invoker = selectInvoker(loadBalance, invokers);
+            if (invoker != null) {
+                Invoker chain = buildInvokerChain(invoker);
+                Object result = chain.invoke(info);
+                if (result == null) {
+                    // 返回结果为空进行重试
+                    if (reInvokeCount++ < MAX_REINVOKE_TIMES) {
+                        retryCountThreadLocal.set(reInvokeCount);
+                        return doInvoke(info);
+                    } else {
+                        // 重试达到上限，直接返回 null 结果
+                        throw new IllegalStateException("Do invoke " + MAX_REINVOKE_TIMES + " times, but the result was still null");
+                    }
+                } else return result;
+            } else {
+                if (reInvokeCount++ < MAX_REINVOKE_TIMES) {
+                    retryCountThreadLocal.set(reInvokeCount);
+                    return doInvoke(info);
+                } else {
+                    throw new IllegalStateException("There is none of invoker could be used");
+                }
+            }
+        } finally {
+            retryCountThreadLocal.set(0);
         }
     }
 
@@ -235,7 +248,20 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         }
     }
 
+    /**
+     * 保存到当前线程的 load balance
+     */
     private class LoadBalanceThreadLocal extends ThreadLocal<LoadBalance> {
         // empty
+    }
+
+    /**
+     * 保存到当前线程的 retry count
+     */
+    private class RetryCountThreadLocal extends ThreadLocal<Integer> {
+        @Override
+        protected Integer initialValue() {
+            return 0;
+        }
     }
 }

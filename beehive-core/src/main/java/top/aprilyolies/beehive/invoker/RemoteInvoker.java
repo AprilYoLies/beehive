@@ -50,42 +50,45 @@ public class RemoteInvoker extends AbstractInvoker {
 
     @Override
     protected Object doInvoke(InvokeInfo info) {
-        if (port < 0) {
-            throw new IllegalArgumentException("The port " + port + " is less than 0");
-        }
-        if (client == null) {
-            throw new IllegalStateException("None of client could be use, the client was null");
-        }
-        // 获取当前线程的 channelMap
-        Map<String, Channel> channelMap = addressChannel.get();
-        Channel ch = channelMap.get(channelKey);
-        if (ch == null || !ch.isOpen() || !ch.isActive()) {
-            if (logger.isDebugEnabled()) {
-                logger.debug("Thread of " + Thread.currentThread().getName() + " don't hold the channel to service provider: " + host + ":" + port);
+        try {
+            if (port < 0) {
+                throw new IllegalArgumentException("The port " + port + " is less than 0");
             }
-            // 连接服务器
-            ch = connectServer();
-            // 进行缓存
-            channelMap.put(channelKey, ch);
-        }
-        // 构建 request 消息
-        Request request = buildRequest(info);
-        // 发送消息
-        ch.writeAndFlush(request);
-        // 获取异步的响应结果
-        Object result = getResponse(request);
-        while (result == null && retryCount <= RETRY_TIMES) {
-            logger.info("Got result of request " + request + " timeout, attempt to retry 3 times, this is " + retryCount++ + " time");
+            if (client == null) {
+                throw new IllegalStateException("None of client could be use, the client was null");
+            }
+            // 获取当前线程的 channelMap
+            Map<String, Channel> channelMap = addressChannel.get();
+            Channel ch = channelMap.get(channelKey);
+            if (ch == null || !ch.isOpen() || !ch.isActive()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Thread of " + Thread.currentThread().getName() + " don't hold the channel to service provider: " + host + ":" + port);
+                }
+                // 连接服务器
+                ch = connectServer();
+                // 进行缓存
+                channelMap.put(channelKey, ch);
+            }
+            // 构建 request 消息
+            Request request = buildRequest(info);
             // 发送消息
             ch.writeAndFlush(request);
-            result = getResponse(request);
-        }
-        if (result == null && logger.isDebugEnabled()) {
-            logger.error("Send request " + request + " 3 times, but the result was still null");
-        }
-        retryCount = 1;
+            // 获取异步的响应结果
+            Object result = getResponse(request);
+            while (result == null && retryCount <= RETRY_TIMES) {
+                logger.info("Got result of request " + request + " timeout, attempt to retry 3 times, this is " + retryCount++ + " time");
+                // 发送消息
+                ch.writeAndFlush(request);
+                result = getResponse(request);
+            }
+            if (result == null && logger.isDebugEnabled()) {
+                logger.info("Send request " + request + " 3 times, but the result was still null");
+            }
 //        client.disconnect();
-        return result;
+            return result;
+        } finally {
+            retryCount = 1;
+        }
     }
 
     /**
