@@ -3,8 +3,9 @@ package top.aprilyolies.beehive.invoker;
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.proxy.support.ConsumerProxy;
-import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 import top.aprilyolies.beehive.proxy.support.Proxy;
+
+import java.lang.reflect.Method;
 
 /**
  * @Author EvaJohnson
@@ -43,13 +44,20 @@ public class ProxyWrapperInvoker<T> extends AbstractInvoker<T> {
         Object[] pvs = info.getPvs();
         Object target = info.getTarget();
         if (url.isProvider()) {
-            ProviderProxy providerProxy = (ProviderProxy) proxy;
             try {
-                return providerProxy.invokeMethod(target, methodName, pts, pvs);
+                Method method = proxy.getClass().getMethod(methodName, pts);
+                return method.invoke(proxy, pvs);
             } catch (Exception e) {
                 e.printStackTrace();
                 return null;
             }
+//            ProviderProxy providerProxy = (ProviderProxy) proxy;
+//            try {
+//                return providerProxy.invokeMethod(target, methodName, pts, pvs);
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return null;
+//            }
         } else {
             ConsumerProxy consumerProxy = (ConsumerProxy) proxy;
             return consumerProxy.newInstance();

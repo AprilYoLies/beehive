@@ -1,8 +1,12 @@
 package top.aprilyolies.beehive.proxy.support;
 
+import top.aprilyolies.beehive.common.BeehiveContext;
+import top.aprilyolies.beehive.common.UrlConstants;
+import top.aprilyolies.beehive.spring.ServiceConfigBean;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.ReflectUtils;
 
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -185,6 +189,38 @@ public abstract class ProviderProxy implements Proxy {
             throw new RuntimeException("Unknown primitive type: " + cl.getName());
         }
         return "(" + ReflectUtils.getName(cl) + ")" + name;
+    }
+
+    /**
+     * 创建 jdk 代理类
+     *
+     * @param classes
+     * @return
+     */
+    public static Proxy getJdkProxy(Class<?>... classes) {
+        ClassLoader classLoader = classes[0].getClassLoader();
+        // 根据 url 信息获取 invoke target 实例
+        ServiceConfigBean serviceConfigBean = BeehiveContext.unsafeGet(UrlConstants.PROVIDER_MODEL, ServiceConfigBean.class);
+        Object target = serviceConfigBean.getRef();
+        ProviderInvocationHandler handler = new ProviderInvocationHandler(target);
+        return (Proxy) java.lang.reflect.Proxy.newProxyInstance(classLoader, classes, handler);
+    }
+
+    /**
+     * provider 的 jdk invocation handler
+     */
+    private static class ProviderInvocationHandler implements InvocationHandler {
+
+        private final Object target;
+
+        public ProviderInvocationHandler(Object target) {
+            this.target = target;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return method.invoke(target, args);
+        }
     }
 
     /**

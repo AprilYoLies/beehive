@@ -13,7 +13,7 @@ import top.aprilyolies.beehive.invoker.Invoker;
 /**
  * 该接口的实现类需要根据 URL 的 ref 参数来构建代理类，返回结果通过 Invoker 实现类进行封装
  */
-@SPI("javassist")
+@SPI("jdk")
 public interface ProxyFactory {
     /**
      * 该方法主要是获取 url 的 ref 参数，构建代理类，然后将其封装成为 Invoker 返回
