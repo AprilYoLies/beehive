@@ -55,11 +55,12 @@ public class ReferenceBeanDefinitionParser extends AbstractBeanDefinitionParser 
             protocol = "beehive";
         }
         // 负载均衡参数
-        String loadBalance = element.getAttribute("load-balance");
-        if (!StringUtils.isEmpty(loadBalance)) {
-            beanDefinition.getPropertyValues().addPropertyValue("loadBalance", loadBalance);
-        }
+        parseAttribute(element, beanDefinition, "load-balance", "random");
+        // 解析 proxy 参数
+        // 解析 proxy 属性
+        parseAttribute(element, beanDefinition, "proxy-factory", "javassist");
         beanDefinition.getPropertyValues().addPropertyValue("protocol", protocol);
         return beanDefinition;
     }
+
 }

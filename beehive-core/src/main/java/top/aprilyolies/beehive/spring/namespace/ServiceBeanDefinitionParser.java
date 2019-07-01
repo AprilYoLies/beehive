@@ -51,11 +51,10 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
             // 进行注册信息，这一步一定不能落下
             parserContext.getRegistry().registerBeanDefinition(id, beanDefinition);
         }
-        String protocol = element.getAttribute("protocol");
-        if (StringUtils.isEmpty(protocol)) {
-            protocol = "beehive";
-        }
-        beanDefinition.getPropertyValues().addPropertyValue("protocol", protocol);
+        // 解析 protocol 属性
+        parseAttribute(element, beanDefinition, "protocol", "beehive");
+        // 解析 proxy 属性
+        parseAttribute(element, beanDefinition, "proxy-factory", "javassist");
         String ref = element.getAttribute("ref");
         // 如果 setter 方法对应的属性为 ref，并且 spring 容器中已经注册过这个 ref 所引用的 bean 的 beanDefinition
         if (parserContext.getRegistry().containsBeanDefinition(ref)) {

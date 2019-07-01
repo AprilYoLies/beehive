@@ -8,7 +8,7 @@
     <bean id="demoServiceImpl" class="top.aprilyolies.service.BeehiveServiceImpl"/>
 
     <beehive:service id="demoService" service="top.aprilyolies.service.BeehiveService"
-                     ref="demoServiceImpl"/>
+                     ref="demoServiceImpl" proxy-factory="jdk"/>
 
     <beehive:registry id="registry" address="zookeeper://192.168.95.1:2181"/>
 </beans>

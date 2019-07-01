@@ -195,6 +195,9 @@ public abstract class ProviderProxy implements Proxy {
      * @return
      */
     public static Proxy getJdkProxy(Object target, Class<?>... classes) {
+        if (classes.length < 1) {
+            throw new IllegalStateException("Can't create jdk proxy for none of interface has specified");
+        }
         ClassLoader classLoader = classes[0].getClassLoader();
         ProviderInvocationHandler handler = new ProviderInvocationHandler(target);
         return (Proxy) java.lang.reflect.Proxy.newProxyInstance(classLoader, classes, handler);

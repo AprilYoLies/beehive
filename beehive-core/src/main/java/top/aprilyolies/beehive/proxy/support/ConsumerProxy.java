@@ -231,6 +231,9 @@ public abstract class ConsumerProxy implements Proxy {
      * @return
      */
     public static Proxy getJdkProxy(InvocationHandler handler, Class<?>... classes) {
+        if (classes.length < 1) {
+            throw new IllegalStateException("Can't create jdk proxy for none of interface has specified");
+        }
         ClassLoader classLoader = classes[0].getClassLoader();
         ConsumerInvocationHandler consumerHandler = new ConsumerInvocationHandler(handler);
         return (Proxy) java.lang.reflect.Proxy.newProxyInstance(classLoader, classes, consumerHandler);

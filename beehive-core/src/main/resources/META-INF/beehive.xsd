@@ -37,6 +37,11 @@
                 <xsd:documentation><![CDATA[ The service implementation. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="proxy-factory" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ The proxy model, default use javassist. ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="referenceType">
@@ -63,6 +68,11 @@
         <xsd:attribute name="load-balance" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The load balance strategy, default is random. ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="proxy-factory" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ The proxy model, default use javassist. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>

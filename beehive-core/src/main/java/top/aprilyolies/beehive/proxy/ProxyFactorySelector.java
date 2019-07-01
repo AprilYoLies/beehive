@@ -1,5 +1,6 @@
 package top.aprilyolies.beehive.proxy;
 
+import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.URL;
 import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.extension.ExtensionLoader;
@@ -16,6 +17,8 @@ import top.aprilyolies.beehive.utils.StringUtils;
 public class ProxyFactorySelector implements ProxyFactory {
     private final ExtensionLoader extensionLoader = ExtensionLoader.getExtensionLoader(ProxyFactory.class);
 
+    protected Logger logger = Logger.getLogger(ProxyFactorySelector.class);
+
     @Override
     public <T> Invoker<T> createProxy(URL url) {
         throw new UnsupportedOperationException("This is proxy factory selector, please call" +
@@ -28,6 +31,7 @@ public class ProxyFactorySelector implements ProxyFactory {
         if (url != null && !StringUtils.isEmpty(url.getParameter(UrlConstants.PROXY_FACTORY))) {
             extName = url.getParameter(UrlConstants.PROXY_FACTORY);
         }
+        logger.info("Beehive use " + extName + " to create the proxy instance");
         return (ProxyFactory) extensionLoader.getExtension(extName);
     }
 

@@ -18,6 +18,16 @@ public abstract class ServiceConfigBean extends AbstractConfig {
     private String name;
     // 注册配置 bean
     private RegistryConfigBean registry;
+    // 代理创建方式
+    private String proxyFactory;
+
+    public String getProxyFactory() {
+        return proxyFactory;
+    }
+
+    public void setProxyFactory(String proxyFactory) {
+        this.proxyFactory = proxyFactory;
+    }
 
     public RegistryConfigBean getRegistry() {
         return registry;

@@ -18,6 +18,16 @@ public abstract class ReferenceConfigBean extends AbstractConfig {
     private RegistryConfigBean registry;
     // 负载均衡策略
     private String loadBalance;
+    // 代理创建方式
+    private String proxyFactory;
+
+    public String getProxyFactory() {
+        return proxyFactory;
+    }
+
+    public void setProxyFactory(String proxyFactory) {
+        this.proxyFactory = proxyFactory;
+    }
 
     public String getLoadBalance() {
         return loadBalance;
