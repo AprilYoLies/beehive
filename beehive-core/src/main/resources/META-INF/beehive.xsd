@@ -42,6 +42,11 @@
                 <xsd:documentation><![CDATA[ The proxy model, default use javassist. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="serializer" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ The serializer model, default use fastjson. ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="referenceType">
@@ -73,6 +78,11 @@
         <xsd:attribute name="proxy-factory" type="xsd:string">
             <xsd:annotation>
                 <xsd:documentation><![CDATA[ The proxy model, default use javassist. ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="serializer" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ The serializer model, default use fastjson. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:complexType>

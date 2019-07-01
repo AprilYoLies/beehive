@@ -56,9 +56,10 @@ public class ReferenceBeanDefinitionParser extends AbstractBeanDefinitionParser 
         }
         // 负载均衡参数
         parseAttribute(element, beanDefinition, "load-balance", "random");
-        // 解析 proxy 参数
         // 解析 proxy 属性
         parseAttribute(element, beanDefinition, "proxy-factory", "javassist");
+        // 解析 serializer 属性
+        parseAttribute(element, beanDefinition, "serializer", "fastjson");
         beanDefinition.getPropertyValues().addPropertyValue("protocol", protocol);
         return beanDefinition;
     }

@@ -55,6 +55,8 @@ public class ServiceBeanDefinitionParser extends AbstractBeanDefinitionParser {
         parseAttribute(element, beanDefinition, "protocol", "beehive");
         // 解析 proxy 属性
         parseAttribute(element, beanDefinition, "proxy-factory", "javassist");
+        // 解析 serializer 属性
+        parseAttribute(element, beanDefinition, "serializer", "fastjson");
         String ref = element.getAttribute("ref");
         // 如果 setter 方法对应的属性为 ref，并且 spring 容器中已经注册过这个 ref 所引用的 bean 的 beanDefinition
         if (parserContext.getRegistry().containsBeanDefinition(ref)) {

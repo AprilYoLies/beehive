@@ -20,6 +20,16 @@ public abstract class ServiceConfigBean extends AbstractConfig {
     private RegistryConfigBean registry;
     // 代理创建方式
     private String proxyFactory;
+    // 序列化方式
+    private String serializer;
+
+    public String getSerializer() {
+        return serializer;
+    }
+
+    public void setSerializer(String serializer) {
+        this.serializer = serializer;
+    }
 
     public String getProxyFactory() {
         return proxyFactory;
