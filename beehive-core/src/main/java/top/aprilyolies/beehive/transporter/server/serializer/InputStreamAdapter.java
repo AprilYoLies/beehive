@@ -1,4 +1,4 @@
-package top.aprilyolies.beehive.transporter.server.serializer.hessian;
+package top.aprilyolies.beehive.transporter.server.serializer;
 
 import io.netty.buffer.ByteBuf;
 

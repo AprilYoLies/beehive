@@ -1,2 +1,3 @@
 hessian=top.aprilyolies.beehive.transporter.server.serializer.factory.HessianFactory
 selector=top.aprilyolies.beehive.transporter.server.serializer.factory.HessianFactorySelector
+fastjson=top.aprilyolies.beehive.transporter.server.serializer.factory.FastJsonFactory

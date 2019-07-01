@@ -15,7 +15,7 @@ import top.aprilyolies.beehive.transporter.server.serializer.OutputSerializer;
 /**
  * 此接口的实现类代表着序列化器工厂
  */
-@SPI("hessian")
+@SPI("fastjson")
 public interface SerializerFactory {
     /**
      * 获取对应的序列化工厂

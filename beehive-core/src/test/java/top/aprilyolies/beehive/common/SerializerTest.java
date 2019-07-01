@@ -1,5 +1,7 @@
 package top.aprilyolies.beehive.common;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import org.junit.Before;
@@ -49,5 +51,15 @@ public class SerializerTest {
         serializer.flushBuffer();
         Class cls = deserializer.readObject(Class.class);
         System.out.println(cls.getName());
+    }
+
+    @Test
+    public void testFastJson() {
+        String str = "content";
+        byte[] bytes = JSON.toJSONBytes(str, SerializerFeature.EMPTY);
+        Object parse = JSON.parse(bytes);
+        Object object = JSON.parseObject(bytes, String.class);
+        System.out.println(parse);
+        System.out.println(object);
     }
 }
