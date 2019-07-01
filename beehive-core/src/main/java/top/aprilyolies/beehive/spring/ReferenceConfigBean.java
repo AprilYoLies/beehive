@@ -22,6 +22,16 @@ public abstract class ReferenceConfigBean extends AbstractConfig {
     private String proxyFactory;
     // 序列化方式
     private String serializer;
+    // 从 RpcResult 中获取 rpc 结果的最长等待时间
+    private String readTimeout;
+
+    public String getReadTimeout() {
+        return readTimeout;
+    }
+
+    public void setReadTimeout(String readTimeout) {
+        this.readTimeout = readTimeout;
+    }
 
     public String getSerializer() {
         return serializer;

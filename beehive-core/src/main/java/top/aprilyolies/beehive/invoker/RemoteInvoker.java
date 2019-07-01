@@ -1,13 +1,12 @@
 package top.aprilyolies.beehive.invoker;
 
 import io.netty.channel.Channel;
-import top.aprilyolies.beehive.common.BeehiveContext;
-import top.aprilyolies.beehive.common.InvokeInfo;
-import top.aprilyolies.beehive.common.RpcInfo;
+import top.aprilyolies.beehive.common.*;
 import top.aprilyolies.beehive.common.result.RpcResult;
 import top.aprilyolies.beehive.transporter.client.Client;
 import top.aprilyolies.beehive.transporter.server.message.MessageType;
 import top.aprilyolies.beehive.transporter.server.message.Request;
+import top.aprilyolies.beehive.utils.StringUtils;
 
 import java.net.InetSocketAddress;
 import java.util.HashMap;
@@ -29,6 +28,8 @@ public class RemoteInvoker extends AbstractInvoker {
     private final int RETRY_TIMES = 3;
     // 缓存原 provider 的信息
     private final String provider;
+    // URL 信息
+    private final URL url;
     // 记录当前已经重试的次数
     private int retryCount = 1;
     // 用于存储当前线程建立的 channel 信息
@@ -40,12 +41,13 @@ public class RemoteInvoker extends AbstractInvoker {
         return provider;
     }
 
-    public RemoteInvoker(String host, int port, Client client, String provider) {
+    public RemoteInvoker(String host, int port, Client client, String provider, URL url) {
         this.host = host;
         this.port = port;
         this.client = client;
         this.channelKey = host + ":" + port;
         this.provider = provider;
+        this.url = url;
     }
 
     @Override
@@ -105,7 +107,18 @@ public class RemoteInvoker extends AbstractInvoker {
         // 异步获取相应结果
         Object res = null;
         try {
-            res = BeehiveContext.unsafeGet(sid, RpcResult.class).get();
+            String timeout = this.url.getParameter(UrlConstants.READ_TIMEOUT);
+            if (StringUtils.isEmpty(timeout)) {
+                res = BeehiveContext.unsafeGet(sid, RpcResult.class).get();
+            } else {
+                try {
+                    int time = Integer.parseInt(timeout);
+                    res = BeehiveContext.unsafeGet(sid, RpcResult.class).get(time);
+                } catch (NumberFormatException e) {
+                    logger.warn("The timeout parameter " + timeout + " is wrong, use the default timeout 2000ms");
+                    res = BeehiveContext.unsafeGet(sid, RpcResult.class).get();
+                }
+            }
         } catch (Throwable t) {
             // empty
         }

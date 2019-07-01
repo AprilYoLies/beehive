@@ -209,7 +209,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
             String address = host2IpAddress(url.getHost());
             int port = url.getPort();
             // RemoteInvoker 为实际进行数据交互的 invoker
-            RemoteInvoker invoker = new RemoteInvoker(address, port, client, provider);
+            RemoteInvoker invoker = new RemoteInvoker(address, port, client, provider, this.url);
             invokers.add(invoker);
         }
         return invokers;

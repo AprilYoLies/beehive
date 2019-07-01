@@ -54,4 +54,6 @@ public class UrlConstants {
     public static final String PROVIDER_MODEL = "providerModel";
     // 保存在 beehive-context 中的 registry 实例
     public static final String REGISTRIES = "registries";
+    // 代表从 RpcResult 中获取 rpc 结果的超时时间
+    public static final String READ_TIMEOUT = "readTimeout";
 }
