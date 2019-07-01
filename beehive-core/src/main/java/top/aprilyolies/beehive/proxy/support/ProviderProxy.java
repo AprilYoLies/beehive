@@ -1,8 +1,5 @@
 package top.aprilyolies.beehive.proxy.support;
 
-import top.aprilyolies.beehive.common.BeehiveContext;
-import top.aprilyolies.beehive.common.UrlConstants;
-import top.aprilyolies.beehive.spring.ServiceConfigBean;
 import top.aprilyolies.beehive.utils.ClassUtils;
 import top.aprilyolies.beehive.utils.ReflectUtils;
 
@@ -197,11 +194,8 @@ public abstract class ProviderProxy implements Proxy {
      * @param classes
      * @return
      */
-    public static Proxy getJdkProxy(Class<?>... classes) {
+    public static Proxy getJdkProxy(Object target, Class<?>... classes) {
         ClassLoader classLoader = classes[0].getClassLoader();
-        // 根据 url 信息获取 invoke target 实例
-        ServiceConfigBean serviceConfigBean = BeehiveContext.unsafeGet(UrlConstants.PROVIDER_MODEL, ServiceConfigBean.class);
-        Object target = serviceConfigBean.getRef();
         ProviderInvocationHandler handler = new ProviderInvocationHandler(target);
         return (Proxy) java.lang.reflect.Proxy.newProxyInstance(classLoader, classes, handler);
     }

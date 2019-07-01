@@ -224,6 +224,36 @@ public abstract class ConsumerProxy implements Proxy {
     }
 
     /**
+     * 创建 jdk 动态代理的 consumer
+     *
+     * @param handler
+     * @param classes
+     * @return
+     */
+    public static Proxy getJdkProxy(InvocationHandler handler, Class<?>... classes) {
+        ClassLoader classLoader = classes[0].getClassLoader();
+        ConsumerInvocationHandler consumerHandler = new ConsumerInvocationHandler(handler);
+        return (Proxy) java.lang.reflect.Proxy.newProxyInstance(classLoader, classes, consumerHandler);
+    }
+
+    /**
+     * consumer 的 invocation handler 用于触发 invoker invocation handler
+     */
+    private static class ConsumerInvocationHandler implements InvocationHandler {
+
+        private final InvocationHandler handler;
+
+        ConsumerInvocationHandler(InvocationHandler handler) {
+            this.handler = handler;
+        }
+
+        @Override
+        public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+            return handler.invoke(this, method, args);
+        }
+    }
+
+    /**
      * get instance with default handler.
      *
      * @return instance.
