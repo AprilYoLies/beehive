@@ -24,6 +24,16 @@ public abstract class ReferenceConfigBean extends AbstractConfig {
     private String serializer;
     // 从 RpcResult 中获取 rpc 结果的最长等待时间
     private String readTimeout;
+    // 从 RpcResult 中获取 rpc 结果超时后重试的次数
+    private String retryTimes;
+
+    public String getRetryTimes() {
+        return retryTimes;
+    }
+
+    public void setRetryTimes(String retryTimes) {
+        this.retryTimes = retryTimes;
+    }
 
     public String getReadTimeout() {
         return readTimeout;

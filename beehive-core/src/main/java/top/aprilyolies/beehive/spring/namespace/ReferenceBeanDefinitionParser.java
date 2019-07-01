@@ -60,6 +60,8 @@ public class ReferenceBeanDefinitionParser extends AbstractBeanDefinitionParser 
         parseAttribute(element, beanDefinition, "proxy-factory", "javassist");
         // 解析 serializer 属性
         parseAttribute(element, beanDefinition, "serializer", "fastjson");
+        // 解析 retry-times 属性
+        parseAttribute(element, beanDefinition, "retry-times", "3");
         // 解析 read-timeout 属性
         parseAttribute(element, beanDefinition, "read-timeout", "2000");
         beanDefinition.getPropertyValues().addPropertyValue("protocol", protocol);

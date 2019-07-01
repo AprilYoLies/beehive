@@ -64,7 +64,8 @@ public class RemoteInvoker extends AbstractInvoker {
             Channel ch = channelMap.get(channelKey);
             if (ch == null || !ch.isOpen() || !ch.isActive()) {
                 if (logger.isDebugEnabled()) {
-                    logger.debug("Thread of " + Thread.currentThread().getName() + " don't hold the channel to service provider: " + host + ":" + port);
+                    logger.debug("Thread of " + Thread.currentThread().getName() + " don't hold the channel to service " +
+                            "provider: " + host + ":" + port);
                 }
                 // 连接服务器
                 ch = connectServer();
@@ -77,7 +78,17 @@ public class RemoteInvoker extends AbstractInvoker {
             ch.writeAndFlush(request);
             // 获取异步的响应结果
             Object result = getResponse(request);
-            while (result == null && retryCount <= RETRY_TIMES) {
+            String retryTimes = this.url.getParameter(UrlConstants.RETRY_TIMES);
+            int times = RETRY_TIMES;
+            if (!StringUtils.isEmpty(retryTimes)) {
+                try {
+                    times = Integer.parseInt(retryTimes);
+                } catch (NumberFormatException e) {
+                    logger.warn("The retry times parameter " + retryTimes + " is wrong, use the default retry times " + RETRY_TIMES);
+                    times = RETRY_TIMES;
+                }
+            }
+            while (result == null && retryCount <= times) {
                 logger.info("Got result of request " + request + " timeout, attempt to retry 3 times, this is " + retryCount++ + " time");
                 // 发送消息
                 ch.writeAndFlush(request);

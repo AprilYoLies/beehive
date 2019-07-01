@@ -91,6 +91,12 @@
                     <![CDATA[ The max time to read rpc result from RpcResult, default is 2000ms. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="retry-times" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>
+                    <![CDATA[ The max time to read rpc result from RpcResult, default is 2000ms. ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="registryType">

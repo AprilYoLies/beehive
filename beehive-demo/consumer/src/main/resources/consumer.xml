@@ -8,5 +8,5 @@
     <beehive:registry id="registry" address="zookeeper://192.168.95.1:2181"/>
 
     <beehive:reference id="demoService" service="top.aprilyolies.service.BeehiveService" load-balance="poll"
-                       serializer="hessian" read-timeout="1000"/>
+                       serializer="hessian" read-timeout="1000" retry-times="2"/>
 </beans>

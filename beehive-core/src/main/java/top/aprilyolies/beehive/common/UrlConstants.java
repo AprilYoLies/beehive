@@ -56,4 +56,6 @@ public class UrlConstants {
     public static final String REGISTRIES = "registries";
     // 代表从 RpcResult 中获取 rpc 结果的超时时间
     public static final String READ_TIMEOUT = "readTimeout";
+    // 表示从 RpcResult 中获取 rpc 结果超时后，重试的次数
+    public static final String RETRY_TIMES = "retryTimes";
 }
