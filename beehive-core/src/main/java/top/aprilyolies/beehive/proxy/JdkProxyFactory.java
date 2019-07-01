@@ -30,11 +30,6 @@ public class JdkProxyFactory extends AbstractProxyFactory {
         }
     }
 
-    @Override
-    public ProxyFactory createProxyFactory(URL url) {
-        throw new UnsupportedOperationException("Only ProxyFactorySelector could call this method");
-    }
-
     private Invoker getInvoker(URL url) {
         Cluster selector = ExtensionLoader.getExtensionLoader(Cluster.class).getExtensionSelectorInstance();
         return selector.join(url);

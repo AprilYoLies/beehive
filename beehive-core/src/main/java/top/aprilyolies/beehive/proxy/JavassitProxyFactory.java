@@ -16,11 +16,6 @@ import top.aprilyolies.beehive.proxy.support.Proxy;
 public class JavassitProxyFactory extends AbstractProxyFactory {
 
     @Override
-    public ProxyFactory createProxyFactory(URL url) {
-        throw new UnsupportedOperationException("Only ProxyFactorySelector could call this method");
-    }
-
-    @Override
     protected Proxy createProxy(Class<?> clazz, URL url) {
         if (url.isProvider())
             return ProviderProxy.getProxy(clazz);

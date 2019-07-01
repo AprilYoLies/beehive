@@ -47,4 +47,9 @@ public abstract class AbstractProxyFactory implements ProxyFactory {
     }
 
     protected abstract Proxy createProxy(Class<?> clazz, URL url);
+
+    @Override
+    public ProxyFactory createProxyFactory(URL url) {
+        throw new UnsupportedOperationException("Only ProxyFactorySelector could call this method");
+    }
 }
