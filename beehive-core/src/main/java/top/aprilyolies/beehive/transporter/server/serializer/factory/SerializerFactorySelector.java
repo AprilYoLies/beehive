@@ -15,10 +15,10 @@ import top.aprilyolies.beehive.transporter.server.serializer.OutputSerializer;
  * @Email g863821569@gmail.com
  */
 @Selector
-public class HessianFactorySelector implements SerializerFactory {
+public class SerializerFactorySelector implements SerializerFactory {
     private ExtensionLoader extensionLoader = ExtensionLoader.getExtensionLoader(SerializerFactory.class);
 
-    private static final Logger logger = Logger.getLogger(HessianFactorySelector.class);
+    private static final Logger logger = Logger.getLogger(SerializerFactorySelector.class);
 
     private SerializerFactory serializerFactory;
 
@@ -27,7 +27,7 @@ public class HessianFactorySelector implements SerializerFactory {
     @Override
     public OutputSerializer serializer(URL url, ByteBuf buf) {
         if (this.serializerFactory == null) {
-            synchronized (HessianFactorySelector.class) {
+            synchronized (SerializerFactorySelector.class) {
                 if (this.serializerFactory == null) {
                     serializerFactory = getSerializerFactory(url, true);
                 }
@@ -39,7 +39,7 @@ public class HessianFactorySelector implements SerializerFactory {
     @Override
     public InputSerializer deserializer(URL url, ByteBuf buf) {
         if (this.deserializerFactory == null) {
-            synchronized (HessianFactorySelector.class) {
+            synchronized (SerializerFactorySelector.class) {
                 if (this.deserializerFactory == null) {
                     deserializerFactory = getSerializerFactory(url, false);
                 }
