@@ -6,8 +6,7 @@ import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.transporter.client.Client;
 import top.aprilyolies.beehive.transporter.server.Server;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.net.URLDecoder;
 
 /**
  * @Author EvaJohnson
@@ -55,27 +54,18 @@ public class BeehiveProtocol extends AbstractProtocol {
      * @param url
      */
     private void prepareServiceUrl(URL url) {
-        url.putParameterIfAbsent(UrlConstants.CODEC, UrlConstants.DEFAULT_CODEC);
-        String providerInfo = getServiceHost();
-        if (providerInfo.indexOf(":") > 0) {
-            providerInfo = providerInfo.substring(0, providerInfo.indexOf(":"));
+        String serviceInfo;
+        if (url.isProvider())
+            serviceInfo = url.getParameter(UrlConstants.PROVIDER);
+        else
+            serviceInfo = url.getParameter(UrlConstants.CONSUMER);
+        URL providerUrl = URL.buildFromAddress(URLDecoder.decode(serviceInfo));
+        int port = providerUrl.getPort();
+        if (port < 0) {
+            port = 7440;
         }
-        String host = providerInfo;
-        url.setHost(host);
-        url.setPort(Integer.parseInt(UrlConstants.SERVICE_PORT));
+        url.setPort(port);
+        url.setHost(providerUrl.getHost());
     }
 
-    /**
-     * 获取服务主机 ip
-     *
-     * @return
-     */
-    private String getServiceHost() {
-        try {
-            return InetAddress.getLocalHost().getCanonicalHostName();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-            throw new IllegalStateException("Can't get service host");
-        }
-    }
 }

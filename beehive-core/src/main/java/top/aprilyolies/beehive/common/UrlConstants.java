@@ -38,10 +38,6 @@ public class UrlConstants {
     public static final String DEFAULT_SERVICE_PROTOCOL = "beehive";
     // 默认的服务发布协议，该协议会使用 netty 作为底层通信
     public static final String TRANSPORTER = "transporter";
-    // 通信的编解码器
-    public static final String CODEC = "codec";
-    // 通默认的编解码器
-    public static final String DEFAULT_CODEC = "hessian";
     // beehive 底层的序列化器
     public static final String SERIALIZER = "serializer";
     // 表示 beehive 所模拟的集群，如容灾型或者是快速失败型
@@ -58,4 +54,6 @@ public class UrlConstants {
     public static final String READ_TIMEOUT = "readTimeout";
     // 表示从 RpcResult 中获取 rpc 结果超时后，重试的次数
     public static final String RETRY_TIMES = "retryTimes";
+    // 服务启动的端口，默认为 7440
+    public static final String SERVER_PORT = "serverPort";
 }

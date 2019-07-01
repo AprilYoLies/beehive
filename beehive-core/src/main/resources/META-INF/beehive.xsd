@@ -47,6 +47,11 @@
                 <xsd:documentation><![CDATA[ The serializer model, default use fastjson. ]]></xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
+        <xsd:attribute name="server-port" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation><![CDATA[ The server's working port, default use 7440. ]]></xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
     </xsd:complexType>
 
     <xsd:complexType name="referenceType">

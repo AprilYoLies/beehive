@@ -113,7 +113,26 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
         try {
             String protocol = getProtocol();
             String ipAddress = InetAddress.getLocalHost().getCanonicalHostName();
-            return URLEncoder.encode(protocol + "://" + ipAddress + ":" + UrlConstants.SERVICE_PORT + "/" + registryUrl.getParameter(UrlConstants.SERVICE));
+            String strPort = registryUrl.getParameter(UrlConstants.SERVER_PORT);
+            if (!StringUtils.isEmpty(strPort)) {
+                try {
+                    Integer.parseInt(strPort);
+                } catch (NumberFormatException e) {
+                    logger.warn("Specified server-port was wrong, use the default server working port " + UrlConstants.SERVICE_PORT);
+                    strPort = UrlConstants.SERVICE_PORT;
+                }
+            } else {
+                strPort = UrlConstants.SERVICE_PORT;
+            }
+            // 优先使用 -D 参数指定的 port
+            String port = System.getProperty("port");
+            try {
+                Integer.parseInt(port);
+                strPort = port;
+            } catch (NumberFormatException e) {
+                logger.warn("Parameter specified by -D was wrong, ignore this parameter");
+            }
+            return URLEncoder.encode(protocol + "://" + ipAddress + ":" + strPort + "/" + registryUrl.getParameter(UrlConstants.SERVICE));
         } catch (UnknownHostException e) {
             throw new RuntimeException("Can't get provider ip address", e);
         }

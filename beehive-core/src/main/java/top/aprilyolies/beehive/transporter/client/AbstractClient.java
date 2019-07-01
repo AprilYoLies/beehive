@@ -2,7 +2,6 @@ package top.aprilyolies.beehive.transporter.client;
 
 import org.apache.log4j.Logger;
 import top.aprilyolies.beehive.common.URL;
-import top.aprilyolies.beehive.common.UrlConstants;
 
 /**
  * @Author EvaJohnson
@@ -11,23 +10,17 @@ import top.aprilyolies.beehive.common.UrlConstants;
  */
 public abstract class AbstractClient implements Client {
     protected final Logger logger = Logger.getLogger(getClass());
-    // 底层通信的编解码器
-    private final String codec;
     // 服务发布的 url
     private final URL url;
     // 连接状态
     protected volatile boolean connected;
 
-    public String getCodec() {
-        return codec;
-    }
 
     public URL getUrl() {
         return url;
     }
 
     public AbstractClient(URL url) {
-        this.codec = url.getParameter(UrlConstants.CODEC);
         this.url = url;
         openClient();
     }

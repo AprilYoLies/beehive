@@ -22,6 +22,16 @@ public abstract class ServiceConfigBean extends AbstractConfig {
     private String proxyFactory;
     // 序列化方式
     private String serializer;
+    // Server 启动的端口，默认使用 7440
+    private String serverPort;
+
+    public String getServerPort() {
+        return serverPort;
+    }
+
+    public void setServerPort(String serverPort) {
+        this.serverPort = serverPort;
+    }
 
     public String getSerializer() {
         return serializer;
