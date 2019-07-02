@@ -30,8 +30,6 @@ public class RemoteInvoker extends AbstractInvoker {
     private final String provider;
     // URL 信息
     private final URL url;
-    // 记录当前已经重试的次数
-    private int retryCount = 1;
     // 用于存储当前线程建立的 channel 信息
     private final ThreadLocal<Map<String, Channel>> addressChannel = new AddressChannelThreadLocal();
     // 客户端 channel 缓存的 key 信息
@@ -93,6 +91,7 @@ public class RemoteInvoker extends AbstractInvoker {
                     times = RETRY_TIMES;
                 }
             }
+            int retryCount = 1;
             while (result == null && retryCount <= times) {
                 logger.info("Got result of request " + request + " timeout, attempt to retry 3 times, this is " + retryCount++ + " time");
                 // 发送消息
@@ -106,8 +105,6 @@ public class RemoteInvoker extends AbstractInvoker {
             return result;
         } catch (Exception e) {
             return null;
-        } finally {
-            retryCount = 1;
         }
     }
 

@@ -17,6 +17,7 @@ public class UserConsumer {
         for (int i = 0; i < 50000; i++) {
             String result = userService.findUserById(i);
             System.out.println("result: " + result);
+            Thread.sleep(500);
         }
         System.out.println(System.currentTimeMillis() - start);
     }

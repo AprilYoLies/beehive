@@ -17,6 +17,7 @@ public class Consumer {
         for (int i = 0; i < 50000; i++) {
             String hello = demoService.say("world - " + i);
             System.out.println("result: " + hello);
+            Thread.sleep(500);
         }
         System.out.println(System.currentTimeMillis() - start);
     }

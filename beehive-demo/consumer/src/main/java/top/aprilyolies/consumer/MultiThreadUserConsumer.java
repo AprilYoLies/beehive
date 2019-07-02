@@ -1,7 +1,7 @@
 package top.aprilyolies.consumer;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-import top.aprilyolies.service.BeehiveService;
+import top.aprilyolies.service.UserService;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * @Date 2019-06-23
  * @Email g863821569@gmail.com
  */
-public class MultiThreadConsumer {
+public class MultiThreadUserConsumer {
     // FIXED 当这里的线程较多时，比如 10，RemoteInvoker 中的 thread local 逻辑有错误
     // 拟测试的线程数
     private static int THREADS = 5;
@@ -30,9 +30,9 @@ public class MultiThreadConsumer {
             executor.submit(() -> {
                 try {
                     for (int j = 0; j < 200000; j++) {
-                        BeehiveService service = context.getBean("demoService", BeehiveService.class);
-                        String hello = service.say(Thread.currentThread().getName() + " - " + j);
-                        System.out.println("result: " + hello);
+                        UserService service = context.getBean("userService", UserService.class);
+                        String result = service.findUserById(j);
+                        System.out.println("result: " + result);
                         Thread.sleep(500);
                     }
                 } catch (Exception e) {
