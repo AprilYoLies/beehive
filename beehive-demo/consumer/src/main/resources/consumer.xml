@@ -9,4 +9,7 @@
 
     <beehive:reference id="demoService" service="top.aprilyolies.service.BeehiveService" load-balance="poll"
                        serializer="hessian" read-timeout="1000" retry-times="2"/>
+
+    <beehive:reference id="userService" service="top.aprilyolies.service.UserService" load-balance="poll"
+                       serializer="fastjson" read-timeout="1000" retry-times="2"/>
 </beans>

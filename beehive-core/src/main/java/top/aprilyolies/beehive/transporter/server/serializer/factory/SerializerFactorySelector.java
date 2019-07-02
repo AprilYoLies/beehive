@@ -9,6 +9,9 @@ import top.aprilyolies.beehive.extension.annotation.Selector;
 import top.aprilyolies.beehive.transporter.server.serializer.InputSerializer;
 import top.aprilyolies.beehive.transporter.server.serializer.OutputSerializer;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @Author EvaJohnson
  * @Date 2019-06-16
@@ -20,40 +23,47 @@ public class SerializerFactorySelector implements SerializerFactory {
 
     private static final Logger logger = Logger.getLogger(SerializerFactorySelector.class);
 
-    private SerializerFactory serializerFactory;
-
-    private SerializerFactory deserializerFactory;
+    private Map<String, SerializerFactory> serializerFactories = new HashMap<>();
 
     @Override
     public OutputSerializer serializer(URL url, ByteBuf buf) {
-        if (this.serializerFactory == null) {
-            synchronized (SerializerFactorySelector.class) {
-                if (this.serializerFactory == null) {
-                    serializerFactory = getSerializerFactory(url, true);
-                }
-            }
-        }
+        SerializerFactory serializerFactory = getSerializerFactory(url);
         return serializerFactory.serializer(url, buf);
     }
 
     @Override
     public InputSerializer deserializer(URL url, ByteBuf buf) {
-        if (this.deserializerFactory == null) {
+        SerializerFactory serializerFactory = getSerializerFactory(url);
+        return serializerFactory.deserializer(url, buf);
+    }
+
+    /**
+     * 尝试从缓存中获取 SerializerFactory，如果没有获取到，那么就根据 url 参数从 extension 中创建一个
+     *
+     * @param url
+     * @return
+     */
+    private SerializerFactory getSerializerFactory(URL url) {
+        String serializerKey = url.getParameter(UrlConstants.SERIALIZER);
+        SerializerFactory serializerFactory = serializerFactories.get(serializerKey);
+        if (serializerFactory == null) {
             synchronized (SerializerFactorySelector.class) {
-                if (this.deserializerFactory == null) {
-                    deserializerFactory = getSerializerFactory(url, false);
+                if (serializerFactories.get(serializerKey) == null) {
+                    serializerFactory = getSerializerFactory(url, false);
+                    assert serializerFactory != null;
+                    serializerFactories.put(serializerKey, serializerFactory);
                 }
             }
         }
-        return deserializerFactory.deserializer(url, buf);
+        return serializerFactory;
     }
 
     @Override
     public byte getSerializerId(URL url) {
+        String serializerKey = url.getParameter(UrlConstants.SERIALIZER);
+        SerializerFactory serializerFactory = serializerFactories.get(serializerKey);
         if (serializerFactory != null)
             return serializerFactory.getSerializerId(url);
-        if (deserializerFactory != null)
-            return deserializerFactory.getSerializerId(url);
         return getSerializerFactory(url, true).getSerializerId(url);
     }
 

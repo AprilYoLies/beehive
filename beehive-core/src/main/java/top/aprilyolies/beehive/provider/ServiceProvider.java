@@ -127,8 +127,10 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
             // 优先使用 -D 参数指定的 port
             String port = System.getProperty("port");
             try {
-                Integer.parseInt(port);
-                strPort = port;
+                if (!StringUtils.isEmpty(port)) {
+                    Integer.parseInt(port);
+                    strPort = port;
+                }
             } catch (NumberFormatException e) {
                 logger.warn("Parameter specified by -D was wrong, ignore this parameter");
             }

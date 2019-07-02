@@ -2,7 +2,9 @@ package top.aprilyolies.beehive.invoker;
 
 import top.aprilyolies.beehive.common.InvokeInfo;
 import top.aprilyolies.beehive.common.URL;
+import top.aprilyolies.beehive.common.UrlConstants;
 import top.aprilyolies.beehive.proxy.support.ConsumerProxy;
+import top.aprilyolies.beehive.proxy.support.ProviderProxy;
 import top.aprilyolies.beehive.proxy.support.Proxy;
 
 import java.lang.reflect.Method;
@@ -44,23 +46,37 @@ public class ProxyWrapperInvoker<T> extends AbstractInvoker<T> {
         Object[] pvs = info.getPvs();
         Object target = info.getTarget();
         if (url.isProvider()) {
-            try {
-                Method method = proxy.getClass().getMethod(methodName, pts);
-                return method.invoke(proxy, pvs);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return null;
+            if (isJdkProxy(url)) {
+                try {
+                    Method method = proxy.getClass().getMethod(methodName, pts);
+                    return method.invoke(proxy, pvs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
+            } else {
+                ProviderProxy providerProxy = (ProviderProxy) proxy;
+                try {
+                    return providerProxy.invokeMethod(target, methodName, pts, pvs);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return null;
+                }
             }
-//            ProviderProxy providerProxy = (ProviderProxy) proxy;
-//            try {
-//                return providerProxy.invokeMethod(target, methodName, pts, pvs);
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return null;
-//            }
+
         } else {
             ConsumerProxy consumerProxy = (ConsumerProxy) proxy;
             return consumerProxy.newInstance();
         }
+    }
+
+    /**
+     * 判断当期是否是采用的 jdk 动态代理方式
+     *
+     * @param url
+     * @return
+     */
+    private boolean isJdkProxy(URL url) {
+        return url.getParameter(UrlConstants.PROXY_FACTORY).equals("jdk");
     }
 }
