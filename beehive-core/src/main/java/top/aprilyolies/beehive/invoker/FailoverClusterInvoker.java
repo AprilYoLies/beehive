@@ -83,12 +83,8 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                     }
                 } else return result;
             } else {
-                if (reInvokeCount++ < MAX_REINVOKE_TIMES) {
-                    retryCountThreadLocal.set(reInvokeCount);
-                    return doInvoke(info);
-                } else {
-                    throw new IllegalStateException("There is none of invoker could be used");
-                }
+                throw new IllegalStateException("There is none of service provider could be use, please check your " +
+                        "registry center that if there is any service has published.");
             }
         } finally {
             retryCountThreadLocal.set(0);
