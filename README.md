@@ -18,7 +18,19 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 * 在客户端实现了两种负载均衡策略的支持（随机选取，轮训选取）
 
 ## 使用方式
-项目中提供了实例程序（位于 beehive-demo）模块下，通过 git clone 将工程拉取下来后，使用 maven 进行安装，完成相应依赖的下载后即可执行。因为需要用到注册中心，所以实例程序中注册中心的地址是我的阿里云服务器地址，正常情况下我会启动 zookeeper 服务，那么示例程序就会将服务注册到我的阿里云服务器的 zookeeper 上，当然你也可以在本机启动一个 zookeeper，然后修改 spring 配置文件中的注册中心地址。
+项目中提供了实例程序（位于 beehive-demo）模块下，通过 git clone 将工程拉取下来后，在根目录下输入如下指令进行安装。
+
+> mvn install -Dmaven.test.skip=true
+
+因为需要用到注册中心，所以实例程序中注册中心的地址是我的阿里云服务器地址，正常情况下我会启动 zookeeper 服务，那么示例程序就会将服务注册到我的阿里云服务器的 zookeeper 上，当然你也可以在本机启动一个 zookeeper，然后修改 spring 配置文件中的注册中心地址。
+
+启动服务器，如果你没有修改实例程序的配置文件，默认使用我阿里云的 zookeeper，输入如下指令：
+
+> java -jar beehive-demo/provider/target/provider-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+启动客户端，没有修改代码的情况下，会从注册中心获取服务信息，输入如下指令：
+
+> java -jar beehive-demo/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar
 
 ## TODO-LIST
 * 底层通信框架的支持有待完善，比如 Mina（我没接触过）
