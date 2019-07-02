@@ -71,6 +71,8 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                 Invoker chain = buildInvokerChain(invoker);
                 Object result = chain.invoke(info);
                 if (result == null) {
+                    // 辅助刷新 invokers
+                    needUpdateInvokers = true;
                     // 返回结果为空进行重试
                     if (reInvokeCount++ < MAX_REINVOKE_TIMES) {
                         retryCountThreadLocal.set(reInvokeCount);

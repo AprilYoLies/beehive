@@ -14,7 +14,7 @@ public class UserConsumer {
         context.start();
         UserService userService = context.getBean("userService", UserService.class);
         long start = System.currentTimeMillis();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 400000; i++) {
             String result = userService.findUserById(i);
             System.out.println("result: " + result);
         }

@@ -69,8 +69,13 @@ public class RemoteInvoker extends AbstractInvoker {
                 }
                 // 连接服务器
                 ch = connectServer();
-                // 进行缓存
-                channelMap.put(channelKey, ch);
+                if (ch != null && ch.isActive() && ch.isOpen()) {
+                    // 进行缓存
+                    channelMap.put(channelKey, ch);
+                } else {
+                    channelMap.remove(channelKey);
+                    return null;
+                }
             }
             // 构建 request 消息
             Request request = buildRequest(info);
@@ -99,6 +104,8 @@ public class RemoteInvoker extends AbstractInvoker {
             }
 //        client.disconnect();
             return result;
+        } catch (Exception e) {
+            return null;
         } finally {
             retryCount = 1;
         }

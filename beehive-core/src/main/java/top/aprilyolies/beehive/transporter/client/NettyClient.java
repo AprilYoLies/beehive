@@ -113,7 +113,7 @@ public class NettyClient extends AbstractClient {
             if (channel != null) {
                 channel.close();
             }
-            e.printStackTrace();
+            logger.error("Connect server " + address + " failed, please check the server address or the server status");
             return null;
         }
     }
