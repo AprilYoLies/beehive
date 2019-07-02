@@ -20,7 +20,7 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 ## 使用方式
 项目中提供了实例程序（位于 beehive-demo）模块下，通过 git clone 将工程拉取下来后，在根目录下输入如下指令进行安装。
 
-> mvn install -Dmaven.test.skip=true
+> mvn clean install -Dmaven.test.skip=true
 
 因为需要用到注册中心，所以实例程序中注册中心的地址是我的阿里云服务器地址，正常情况下我会启动 zookeeper 服务，那么示例程序就会将服务注册到我的阿里云服务器的 zookeeper 上，当然你也可以在本机启动一个 zookeeper，然后修改 spring 配置文件中的注册中心地址。
 
