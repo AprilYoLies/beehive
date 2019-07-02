@@ -33,7 +33,7 @@ public class UrlConstants {
     // 代理工厂
     public static final String PROXY_FACTORY = "proxyFactory";
     // 服务发布使用的协议，这个参数将会决定服务调用的性能
-    public static final String SERVICE_PROTOCOL = "serviceProtocol";
+    public static final String SERVICE_PROTOCOL = "protocol";
     // 默认的服务发布协议，该协议会使用 netty 作为底层通信
     public static final String DEFAULT_SERVICE_PROTOCOL = "beehive";
     // 默认的服务发布协议，该协议会使用 netty 作为底层通信

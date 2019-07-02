@@ -103,6 +103,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         List<Invoker<T>> newInvokers = new ArrayList<>();
         List<String> oldProviders = this.providers;
         @SuppressWarnings("unchecked") List<String> newProviders = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, List.class);
+        newProviders = filterProviders(newProviders);
         List<String> toRemove = new ArrayList<>();
         List<String> toAdd = new ArrayList<>();
         // 获取将要被移除的 provider 集合
@@ -187,11 +188,75 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     private List<Invoker<T>> listInvokers() {
         //noinspection unchecked
         List<String> providers = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, List.class);
+        providers = filterProviders(providers);
         this.providers = providers;
         @SuppressWarnings("unchecked") Map<String, Client> clientCache = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
         Client server = clientCache.get(url.getParameter(UrlConstants.SERVICE));
         assert providers != null;
         return createRemoteInvoker(providers, server);
+    }
+
+    /**
+     * 过滤不符合条件的 provider，如 protocol 不一致，serializer 不一致，service 不一致
+     *
+     * @param providers
+     * @return
+     */
+    private List<String> filterProviders(List<String> providers) {
+        List<String> validProviders = new ArrayList<>();
+        for (String provider : providers) {
+            String decodedProvider = URLDecoder.decode(provider);
+            String providerInfo = provider2ProviderInfo(decodedProvider);
+            URL url = URL.buildFromAddress(providerInfo);
+            boolean isValid = true;
+            isValid = isValid && isServiceMatch(this.url, url);
+            isValid = isValid && isProtocolMatch(this.url, url);
+            isValid = isValid && isSerializerMatch(this.url, url);
+            if (isValid)
+                validProviders.add(provider);
+        }
+        return validProviders;
+    }
+
+    /**
+     * 根据全限定名的 provider 串获取到实际的 provider 信息
+     * 传入 /beehive/top.aprilyolies.service.BeehiveService/providers/beehive://192.168.1.102:7442?protocol=beehive&proxyFactory=jdk&service=top.aprilyolies.service.BeehiveService&serializer=hessian&id=demoService&serverPort=7442
+     * 返回 beehive://192.168.1.102:7442?protocol=beehive&proxyFactory=jdk&service=top.aprilyolies.service.BeehiveService&serializer=hessian&id=demoService&serverPort=7442
+     *
+     * @param provider 包含路径信息的全限定 provider 信息
+     * @return 去掉路径信息的实际的 provider 信息
+     */
+    private String provider2ProviderInfo(String provider) {
+        int idx = provider.indexOf("://");
+        String path = provider.substring(0, idx);
+        int i = path.lastIndexOf("/");
+        return provider.substring(i + 1);
+    }
+
+    private boolean isSerializerMatch(URL ref, URL target) {
+        return ref.getParameter(UrlConstants.SERIALIZER).equals(target.getParameter(UrlConstants.SERIALIZER));
+    }
+
+    /**
+     * 协议是否匹配
+     *
+     * @param ref
+     * @param target
+     * @return
+     */
+    private boolean isProtocolMatch(URL ref, URL target) {
+        return ref.getParameter(UrlConstants.SERVICE_PROTOCOL).equals(target.getProtocol());
+    }
+
+    /**
+     * 服务是否匹配
+     *
+     * @param ref
+     * @param target
+     * @return
+     */
+    private boolean isServiceMatch(URL ref, URL target) {
+        return ref.getParameter(UrlConstants.SERVICE).equals(target.getParameter(UrlConstants.SERVICE));
     }
 
     /**

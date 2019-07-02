@@ -132,6 +132,7 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
             } catch (NumberFormatException e) {
                 logger.warn("Parameter specified by -D was wrong, ignore this parameter");
             }
+            // 构建 provider 信息
             StringBuilder providerInfo = new StringBuilder();
             providerInfo.append(protocol).
                     append("://").
