@@ -5,11 +5,11 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
         https://www.aprilyolies.top/schema/beehive https://www.aprilyolies.top/schema/beehive.xsd">
 
-    <beehive:registry id="registry" address="zookeeper://192.168.95.1:2181"/>
+    <beehive:registry id="registry" address="zookeeper://119.23.247.86:2181"/>
 
     <beehive:reference id="demoService" service="top.aprilyolies.service.BeehiveService" load-balance="poll"
                        serializer="hessian" read-timeout="1000" retry-times="2"/>
 
     <beehive:reference id="userService" service="top.aprilyolies.service.UserService" load-balance="poll"
-                       serializer="fastjson" read-timeout="1000" retry-times="2"/>
+                       serializer="hessian" read-timeout="1000" retry-times="2"/>
 </beans>
