@@ -132,10 +132,35 @@ public class ServiceProvider extends ServiceConfigBean implements ApplicationLis
             } catch (NumberFormatException e) {
                 logger.warn("Parameter specified by -D was wrong, ignore this parameter");
             }
-            return URLEncoder.encode(protocol + "://" + ipAddress + ":" + strPort + "/" + registryUrl.getParameter(UrlConstants.SERVICE));
+            StringBuilder providerInfo = new StringBuilder();
+            providerInfo.append(protocol).
+                    append("://").
+                    append(ipAddress).
+                    append(":").
+                    append(strPort).
+                    append("?");
+            String parameterString = buildParameterString(registryUrl);
+            providerInfo.append(parameterString);
+            return URLEncoder.encode(providerInfo.toString());
         } catch (UnknownHostException e) {
             throw new RuntimeException("Can't get provider ip address", e);
         }
+    }
+
+    /**
+     * 根据 registry url 的参数构建 url 参数字符串
+     *
+     * @param registryUrl
+     * @return
+     */
+    private String buildParameterString(URL registryUrl) {
+        Map<String, String> parameters = registryUrl.getParameters();
+        StringBuilder sb = new StringBuilder();
+        for (String key : parameters.keySet()) {
+            sb.append(key).append("=").append(parameters.get(key)).append("&");
+        }
+        sb.deleteCharAt(sb.length() - 1);
+        return sb.toString();
     }
 
 
