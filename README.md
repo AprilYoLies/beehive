@@ -18,6 +18,9 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 * 在客户端实现了两种负载均衡策略的支持（随机选取，轮训选取）
 
 ## 使用方式
+
+### 基本使用
+
 项目中提供了实例程序（位于 beehive-demo）模块下，通过 git clone 将工程拉取下来后，在根目录下输入如下指令进行安装。
 
 > mvn clean install -Dmaven.test.skip=true
@@ -31,6 +34,23 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 启动客户端，没有修改代码的情况下，会从注册中心获取服务信息，输入如下指令：
 
 > java -jar beehive-demo/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+### 服务切换的测试
+示例程序中提供了两个服务端程序，表示两个服务提供者，测试服务切换需要同时启动这两个程序，指令如下：
+
+> java -cp beehive-demo/provider/target/provider-1.0-SNAPSHOT-jar-with-dependencies.jar top.aprilyolies.provider.Provider
+
+> java -cp beehive-demo/provider/target/provider-1.0-SNAPSHOT-jar-with-dependencies.jar top.aprilyolies.provider.AnotherProvider
+
+启动客户端，没有修改代码的情况下，会从注册中心获取服务信息，输入如下指令：
+
+> java -jar beehive-demo/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+实例程序默认是使用的轮询负载均衡机制，如果过程没错的话，那么你将会看到客户端会交替的从两个 provider 进行 rpc 调用。
+
+尝试关掉其中一个 provider，客户端会侦测到这个变化，随即将这个下线的 provider 剔除，仅仅从剩下的 provider 中进行 rpc 调用。
+
+再尝试重启这个 provider，客户端也会侦测到这个变化，随即将这个 provider 加入到可调用的 providers 列表中，进而进行 rpc 调用。
 
 ## TODO-LIST
 * 底层通信框架的支持有待完善，比如 Mina（我没接触过）
