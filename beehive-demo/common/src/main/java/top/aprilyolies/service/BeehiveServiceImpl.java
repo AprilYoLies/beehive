@@ -10,11 +10,11 @@ import java.net.InetAddress;
 public class BeehiveServiceImpl implements BeehiveService {
     @Override
     public String say(String msg) throws Exception {
-        return "Jim say " + msg + " from " + InetAddress.getLocalHost().getHostAddress();
+        return "Jim say " + msg + " from " + InetAddress.getLocalHost().getHostAddress() + ", [ server id is No.1]";
     }
 
     @Override
     public String see(String msg) throws Exception {
-        return "Jim see " + msg + " from " + InetAddress.getLocalHost().getHostAddress();
+        return "Jim see " + msg + " from " + InetAddress.getLocalHost().getHostAddress() + ", [ server id is No.1]";
     }
 }
