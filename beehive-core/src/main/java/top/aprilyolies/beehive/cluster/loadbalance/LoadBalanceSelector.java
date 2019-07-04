@@ -12,7 +12,7 @@ import top.aprilyolies.beehive.extension.annotation.Selector;
  */
 @Selector
 public class LoadBalanceSelector extends AbstractLoadBalance {
-    ExtensionLoader extensionLoader = ExtensionLoader.getExtensionLoader(LoadBalance.class);
+    private ExtensionLoader extensionLoader = ExtensionLoader.getExtensionLoader(LoadBalance.class);
 
     @Override
     public LoadBalance createLoadBalance(URL url) {
