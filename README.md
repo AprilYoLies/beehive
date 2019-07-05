@@ -15,7 +15,7 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 
 * 整合 spring 容器，对用户代码零入侵，使用方便
 
-* 在客户端实现了两种负载均衡策略的支持（随机选取，轮训选取）
+* 在客户端实现了两种负载均衡策略的支持（随机选取，轮询选取）
 
 ## 使用方式
 
@@ -51,6 +51,45 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 尝试关掉其中一个 provider，客户端会侦测到这个变化，随即将这个下线的 provider 剔除，仅仅从剩下的 provider 中进行 rpc 调用。
 
 再尝试重启这个 provider，客户端也会侦测到这个变化，随即将这个 provider 加入到可调用的 providers 列表中，进而进行 rpc 调用。
+
+## 参数设置说明
+
+### \<beehive:service/\> 标签
+
+* id：为 bean 在 spring 容器中的唯一标识符
+
+* service：将要发布的服务，值为你想要发布的服务的全限定名
+
+* ref：你所发布服务的实现类，它的值为 spring <bean/> 标签的 id 值
+
+* proxy-factory：服务提供端代理类创建的方式，目前支持 javassist 和 jdk 可选
+
+* serializer：序列化器，默认为 fastjson，可选 hessian
+
+* sever-port：服务启动的端口号，默认使用 7440，你也可以再启动程序时通过 -Dport=端口号 来指定，优先级最高
+
+### \<beehive:reference/\> 标签
+
+* id：为 bean 在 spring 容器中的唯一标识符
+
+* service：将要发布的服务，值为你想要发布的服务的全限定名
+
+* load-balance：负载均衡设置，由客户端实现，目前只支持 random 和 poll 两种方式
+
+* proxy-factory：服务提供端代理类创建的方式，目前支持 javassist 和 jdk 可选
+
+* serializer：序列化器，默认为 fastjson，可选 hessian
+
+* read-timeout：指定 rpc 结果读取超时时间，如果本次结果获取失败，将会重试
+
+* retry-times：指定重试次数，即 rpc 结果获取超时重试次数
+
+### \<beehive:registry/\> 标签
+
+* id：为 bean 在 spring 容器中的唯一标识符
+
+* address：注册中心的地址，目前只支持 zookeeper，格式如 “zookeeper://host:port”
+
 
 ## TODO-LIST
 * 底层通信框架的支持有待完善，比如 Mina（我没接触过）
