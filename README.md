@@ -35,6 +35,10 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 
 > java -jar beehive-demo/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar
 
+或者启动多线程的 consumer，输入如下指令：
+
+> java -cp beehive-demo/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar top.aprilyolies.consumer.MultiThreadConsumer
+
 ### 服务切换的测试
 示例程序中提供了两个服务端程序，表示两个服务提供者，测试服务切换需要同时启动这两个程序，指令如下：
 
@@ -45,6 +49,10 @@ beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，
 启动客户端，没有修改代码的情况下，会从注册中心获取服务信息，输入如下指令：
 
 > java -jar beehive-demo/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar
+
+或者启动多线程的 consumer，输入如下指令：
+
+> java -cp beehive-demo/consumer/target/consumer-1.0-SNAPSHOT-jar-with-dependencies.jar top.aprilyolies.consumer.MultiThreadConsumer
 
 实例程序默认是使用的轮询负载均衡机制，如果过程没错的话，那么你将会看到客户端会交替的从两个 provider 进行 rpc 调用。
 
