@@ -51,12 +51,15 @@ public class RpcResult implements Result {
         } else {
             try {
                 lock.lock();
-                finishCondition.await(timeout, TimeUnit.MILLISECONDS);
                 if (!finished) {
-                    throw new RuntimeException("Get result was timeout");
-                } else {
-                    return this.msg;
+                    finishCondition.await(timeout, TimeUnit.MILLISECONDS);
+                    if (!finished) {
+                        throw new RuntimeException("Get result was timeout");
+                    } else {
+                        return this.msg;
+                    }
                 }
+                return this.msg;
             } catch (InterruptedException e) {
                 logger.error("Get result was interrupted");
                 throw new RuntimeException("Get result was interrupted");

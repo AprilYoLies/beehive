@@ -1,4 +1,7 @@
 ## 简介
+
+[官方文档](https://www.aprilyolies.top/2019/07/18/%E8%BD%BB%E9%87%8F%E7%BA%A7RPC%E6%A1%86%E6%9E%B6BEEHIVE%E4%BB%8B%E7%BB%8D/)
+
 beehive 是一款轻量级的 RPC 框架，通过 spring 容器来管理 bean，做到了对用户代码的零入侵，同时通过 spi 拓展机制，实现了自己的 ioc 容器，使得 beehive 能够很方便的对组件进行拓展。
 
 ## 功能特性
