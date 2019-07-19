@@ -26,14 +26,13 @@ public class MultiThreadConsumer {
         context.start();
         ExecutorService executor = Executors.newFixedThreadPool(THREADS, new DemoThreadFactory());
         // 多个线程进行访问
+        BeehiveService service = context.getBean("demoService", BeehiveService.class);
         for (int i = 0; i < THREADS; i++) {
             executor.submit(() -> {
                 try {
                     for (int j = 0; j < 20000; j++) {
-                        BeehiveService service = context.getBean("demoService", BeehiveService.class);
                         String hello = service.say(Thread.currentThread().getName() + " - " + j);
                         System.out.println("result: " + hello);
-                        Thread.sleep(500);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
