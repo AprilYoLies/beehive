@@ -78,7 +78,6 @@ public class RemoteInvoker extends AbstractInvoker {
             // 构建 request 消息
             Request request = buildRequest(info);
             // 发送消息
-            System.out.println(ch);
             ch.writeAndFlush(request);
             // 获取异步的响应结果
             Object result = getResponse(request);

@@ -2,7 +2,6 @@ package top.aprilyolies.consumer;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import top.aprilyolies.service.BeehiveService;
-import top.aprilyolies.service.UserService;
 
 /**
  * @Author EvaJohnson
