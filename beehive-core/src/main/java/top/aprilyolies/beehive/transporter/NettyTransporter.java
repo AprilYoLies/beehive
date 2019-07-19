@@ -33,10 +33,6 @@ public class NettyTransporter extends AbstractTransporter {
                     serverCache.putIfAbsent(serverKey, server);
                 }
             }
-        } else {
-            logger.warn("Service " + url.getPath() + " is configured to publish on " + serverKey + ", but there is " +
-                    "another service has used this port, to avoid port conflict, beehive has change current service " +
-                    url.getPath() + "'s configs to be same with the first service which bind this port first");
         }
         return server;
     }

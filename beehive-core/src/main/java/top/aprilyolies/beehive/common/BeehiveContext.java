@@ -24,6 +24,8 @@ public class BeehiveContext {
 
     // 非线程本地变量
     private static final Map<String, Object> unsafeProperties = new ConcurrentHashMap<>();
+    // 向 BeehiveContext 写入 providers map 时的监视器锁
+    public static final Object providersMonitor = new Object();
 
     static {
         safeProperties.set(new HashMap<>());

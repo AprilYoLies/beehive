@@ -20,9 +20,7 @@ public abstract class AbstractProtocol implements Protocol {
     // 注册器选择器
     protected final RegistryFactory registry = ExtensionLoader.getExtensionLoader(RegistryFactory.class).getExtensionSelectorInstance();
     // transporterSelector 选择器
-    protected final Transporter transporterSelector = ExtensionLoader.getExtensionLoader(Transporter.class).getExtensionSelectorInstance();
-    // 用于缓存 server
-    protected final Map<String, Server> serverCache = new ConcurrentHashMap<>();
+    final Transporter transporterSelector = ExtensionLoader.getExtensionLoader(Transporter.class).getExtensionSelectorInstance();
     // 用于缓存 client
-    protected final Map<String, Client> clientCache = new ConcurrentHashMap<>();
+    Client clientCache;
 }

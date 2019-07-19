@@ -18,7 +18,9 @@ import top.aprilyolies.beehive.invoker.ProxyWrapperInvoker;
 import top.aprilyolies.beehive.proxy.ProxyFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static top.aprilyolies.beehive.common.UrlConstants.*;
 
@@ -92,7 +94,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
             try {
                 List<String> providerUrls = zkClient.getChildren().forPath(providerPath);
                 addProviderRefreshListener(providerPath);
-                BeehiveContext.unsafePut(PROVIDERS, providerUrls);
+                saveProvidersToBeehiveContext(url.getParameter(SERVICE), providerUrls);
                 Invoker<?> invoker = proxyFactory.createProxy(url);
                 if (invoker instanceof ProxyWrapperInvoker) {
                     ProxyWrapperInvoker proxyWrapperInvoker = (ProxyWrapperInvoker) invoker;
@@ -105,6 +107,30 @@ public class ZookeeperRegistry extends AbstractRegistry {
             }
         }
 
+    }
+
+    /**
+     * 用于将 service 对应的 providers 保存到 BeehiveContext 中
+     *
+     * @param service      服务接口名
+     * @param providerUrls 注册中心上的 providers 集合
+     */
+    private void saveProvidersToBeehiveContext(String service, List<String> providerUrls) {
+        Map providers = BeehiveContext.unsafeGet(PROVIDERS, Map.class);
+        if (providers == null) {
+            synchronized (BeehiveContext.providersMonitor) {
+                providers = BeehiveContext.unsafeGet(PROVIDERS, Map.class);
+                if (providers == null) {
+                    providers = new HashMap<>();
+                    BeehiveContext.unsafePut(PROVIDERS, providers);
+                    //noinspection unchecked
+                    providers.put(service, providerUrls);
+                }
+            }
+        } else {
+            //noinspection unchecked
+            providers.put(service, providerUrls);
+        }
     }
 
     /**
@@ -264,7 +290,7 @@ public class ZookeeperRegistry extends AbstractRegistry {
                         providerUrls.add(data.getPath());
                     }
                     // 这里是保存到 concurrent hash map 中，能够保证可见性
-                    BeehiveContext.unsafePut(PROVIDERS, providerUrls);
+                    saveProvidersToBeehiveContext(url.getParameter(SERVICE), providerUrls);
                 }
 
             }

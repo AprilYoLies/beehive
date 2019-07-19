@@ -13,7 +13,7 @@
                      ref="demoServiceImpl" proxy-factory="jdk" serializer="hessian" server-port="7442"/>
 
     <beehive:service id="userService" service="top.aprilyolies.service.UserService"
-                     ref="userServiceImpl" proxy-factory="javassist" serializer="hessian" server-port="7442"/>
+                     ref="userServiceImpl" proxy-factory="javassist" serializer="hessian" server-port="7443"/>
 
     <beehive:registry id="registry" address="zookeeper://119.23.247.86:2181"/>
 </beans>

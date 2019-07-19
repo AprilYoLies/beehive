@@ -17,8 +17,11 @@ import java.net.InetAddress;
 import java.net.URLDecoder;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static top.aprilyolies.beehive.common.UrlConstants.PROVIDERS;
 
 /**
  * @Author EvaJohnson
@@ -100,7 +103,8 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         List<Invoker<T>> oldInvokers = this.invokers;
         List<Invoker<T>> newInvokers = new ArrayList<>();
         List<String> oldProviders = this.providers;
-        @SuppressWarnings("unchecked") List<String> newProviders = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, List.class);
+        Map<String, List<String>> providersMap = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, Map.class);
+        List<String> newProviders = providersMap.get(url.getParameter(UrlConstants.SERVICE));
         newProviders = filterProviders(newProviders);
         List<String> toRemove = new ArrayList<>();
         List<String> toAdd = new ArrayList<>();
@@ -142,10 +146,9 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
      * @return
      */
     private List<Invoker<T>> buildInvokers(List<String> providers) {
-        @SuppressWarnings("unchecked") Map<String, Client> clientCache = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
-        Client server = clientCache.get(url.getParameter(UrlConstants.SERVICE));
+        Client client = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Client.class);
         assert providers != null;
-        return createRemoteInvoker(providers, server);
+        return createRemoteInvoker(providers, client);
     }
 
     /**
@@ -185,13 +188,13 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
 
     private List<Invoker<T>> listInvokers() {
         //noinspection unchecked
-        List<String> providers = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, List.class);
+        Map<String, List<String>> providersMap = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, Map.class);
+        List<String> providers = providersMap.get(url.getParameter(UrlConstants.SERVICE));
         providers = filterProviders(providers);
         this.providers = providers;
-        @SuppressWarnings("unchecked") Map<String, Client> clientCache = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Map.class);
-        Client server = clientCache.get(url.getParameter(UrlConstants.SERVICE));
+        Client client = BeehiveContext.unsafeGet(UrlConstants.CONSUMERS_TRANSPORT, Client.class);
         assert providers != null;
-        return createRemoteInvoker(providers, server);
+        return createRemoteInvoker(providers, client);
     }
 
     /**
@@ -327,5 +330,27 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         protected Integer initialValue() {
             return 0;
         }
+    }
+
+    /**
+     * 用于将 service 对应的 providers 保存到 BeehiveContext 中
+     *
+     * @param service      服务接口名
+     * @param providerUrls 注册中心上的 providers 集合
+     */
+    private void saveProvidersToBeehiveContext(String service, List<String> providerUrls) {
+        Map providers = BeehiveContext.unsafeGet(PROVIDERS, Map.class);
+        if (providers == null) {
+            synchronized (BeehiveContext.providersMonitor) {
+                providers = BeehiveContext.unsafeGet(PROVIDERS, Map.class);
+                if (providers == null) {
+                    providers = new HashMap<>();
+                    //noinspection unchecked
+                    providers.put(service, providerUrls);
+                }
+            }
+        }
+        //noinspection unchecked
+        providers.put(service, providerUrls);
     }
 }

@@ -17,23 +17,18 @@ public class BeehiveProtocol extends AbstractProtocol {
 
     @Override
     public void publish(URL url) {
-        String serverKey = url.getParameter(UrlConstants.SERVICE);
-        Server server = serverCache.get(serverKey);
-        if (server == null) {
-            synchronized (this) {
-                serverCache.computeIfAbsent(serverKey, k -> doPublish(url));
-            }
-        }
+        prepareServiceUrl(url);
+        transporterSelector.bind(url);
     }
 
     @Override
     public void subscribe(URL url) {
-        String serverKey = url.getParameter(UrlConstants.SERVICE);
-        Client client = clientCache.get(serverKey);
-        if (client == null) {
+        if (clientCache == null) {
             synchronized (this) {
-                clientCache.computeIfAbsent(serverKey, k -> doSubscribe(url));
-                BeehiveContext.unsafePut(UrlConstants.CONSUMERS_TRANSPORT, clientCache);
+                if (clientCache == null) {
+                    clientCache = doSubscribe(url);
+                    BeehiveContext.unsafePut(UrlConstants.CONSUMERS_TRANSPORT, clientCache);
+                }
             }
         }
     }
@@ -41,11 +36,6 @@ public class BeehiveProtocol extends AbstractProtocol {
     private Client doSubscribe(URL url) {
         prepareServiceUrl(url);
         return transporterSelector.connect(url);
-    }
-
-    private Server doPublish(URL url) {
-        prepareServiceUrl(url);
-        return transporterSelector.bind(url);
     }
 
     /**

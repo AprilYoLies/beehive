@@ -56,4 +56,6 @@ public class UrlConstants {
     public static final String RETRY_TIMES = "retryTimes";
     // 服务启动的端口，默认为 7440
     public static final String SERVER_PORT = "serverPort";
+    // 服务端通信终端 key
+    public static final String SERVER = "server";
 }
