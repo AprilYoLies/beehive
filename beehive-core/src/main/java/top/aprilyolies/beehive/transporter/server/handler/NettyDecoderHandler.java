@@ -44,6 +44,8 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
     // 事件标志V
     protected static final byte EVENT_FLAG = (byte) 0x20;   // event 消息的标志      0010 0000
 
+    private int count = 0;
+
     private final URL url;
 
     public NettyDecoderHandler(URL url) {
@@ -52,14 +54,18 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
 
     @Override
     protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) {
-        serializer = extensionSelector.deserializer(url, in);
         while (in.isReadable()) {
             int readerIndex = in.readerIndex();
+            serializer = extensionSelector.deserializer(url, in);
+            int pre = count;
             Object result = prepareDecode(ctx, in, out);
             if (result == EMPTY_RESULT) {
                 in.readerIndex(readerIndex);
+                count = pre;
                 break;
             } else {
+                int len = count - pre;
+                in.readerIndex(readerIndex + len);
                 out.add(result);
             }
         }
@@ -102,7 +108,7 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
         if (readable < tt) {    // 也就是说目前接受到的数据还不够 header + 包长度得到的总长度
             return EMPTY_RESULT;
         }
-
+        count += tt;
         // limit input stream.通过 ChannelBufferInputStream 对 buffer 进行封装，记录了内容读取的上下界
         // ChannelBufferInputStream -> NettyBackedCahnnelBuffer -> Netty 原生 buf
         return doDecode(header); // 解码除开 header 以外的信息
