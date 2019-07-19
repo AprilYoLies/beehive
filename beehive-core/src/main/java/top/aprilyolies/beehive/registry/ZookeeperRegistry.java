@@ -42,10 +42,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
     // 注册路径
     private String registryPath;
 
-    public String getRegistryPath() {
-        return registryPath;
-    }
-
     public ZookeeperRegistry(URL url) {
         this.url = url;
         String address = getRegistryAddress(url);
@@ -93,7 +89,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
             this.registryPath = providerPath;
             try {
                 List<String> providerUrls = zkClient.getChildren().forPath(providerPath);
-                addProviderRefreshListener(providerPath);
                 saveProvidersToBeehiveContext(url.getParameter(SERVICE), providerUrls);
                 Invoker<?> invoker = proxyFactory.createProxy(url);
                 if (invoker instanceof ProxyWrapperInvoker) {
@@ -130,22 +125,6 @@ public class ZookeeperRegistry extends AbstractRegistry {
         } else {
             //noinspection unchecked
             providers.put(service, providerUrls);
-        }
-    }
-
-    /**
-     * 为 consumer 添加一个监听器，用于监测 provider 更新消息
-     *
-     * @param providerPath
-     */
-    private void addProviderRefreshListener(String providerPath) {
-        try {
-            PathChildrenCache pathCache = new PathChildrenCache(zkClient, providerPath, true);
-            pathCache.start();
-            pathCache.getListenable().addListener(new ProviderRefreshListener(pathCache));
-        } catch (Exception e) {
-            logger.error("Add provider refresh listener failed, the target path was " + providerPath + ", the curator client was " + zkClient);
-            e.printStackTrace();
         }
     }
 
@@ -266,34 +245,4 @@ public class ZookeeperRegistry extends AbstractRegistry {
         return zkClient;
     }
 
-    /**
-     * 该 listener 用于刷新 provider 信息
-     */
-    private class ProviderRefreshListener implements PathChildrenCacheListener {
-        private final PathChildrenCache pathCache;
-
-        public ProviderRefreshListener(PathChildrenCache pathCache) {
-            this.pathCache = pathCache;
-        }
-
-        @Override
-        public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
-            PathChildrenCacheEvent.Type eventType = event.getType();
-            // 如果 child 信息发生变化，进行更新
-            switch (eventType) {
-                case CHILD_ADDED:
-                case CHILD_REMOVED:
-                case CHILD_UPDATED: {
-                    List<ChildData> currentData = pathCache.getCurrentData();
-                    List<String> providerUrls = new ArrayList<>(currentData.size());
-                    for (ChildData data : currentData) {
-                        providerUrls.add(data.getPath());
-                    }
-                    // 这里是保存到 concurrent hash map 中，能够保证可见性
-                    saveProvidersToBeehiveContext(url.getParameter(SERVICE), providerUrls);
-                }
-
-            }
-        }
-    }
 }

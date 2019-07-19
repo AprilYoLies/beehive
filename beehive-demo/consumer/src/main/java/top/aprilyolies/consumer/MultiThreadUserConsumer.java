@@ -25,12 +25,12 @@ public class MultiThreadUserConsumer {
         ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("consumer.xml");
         context.start();
         ExecutorService executor = Executors.newFixedThreadPool(THREADS, new DemoThreadFactory());
+        UserService service = context.getBean("userService", UserService.class);
         // 多个线程进行访问
         for (int i = 0; i < THREADS; i++) {
             executor.submit(() -> {
                 try {
                     for (int j = 0; j < 200000; j++) {
-                        UserService service = context.getBean("userService", UserService.class);
                         String result = service.findUserById(j);
                         System.out.println("result: " + result);
                         Thread.sleep(500);

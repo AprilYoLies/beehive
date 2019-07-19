@@ -149,9 +149,9 @@ public abstract class AbstractConfig implements InitializingBean, ApplicationCon
 
         // 关闭注册的 Registry
         public static void closeAll() {
-//            for (Registry registry : registries) {
-//                registry.close();
-//            }
+            for (Registry registry : registries) {
+                registry.close();
+            }
             for (EndPoint endPoint : endPoints) {
                 endPoint.close();
             }

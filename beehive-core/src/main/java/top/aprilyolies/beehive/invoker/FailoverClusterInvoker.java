@@ -1,6 +1,7 @@
 package top.aprilyolies.beehive.invoker;
 
 import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.recipes.cache.ChildData;
 import org.apache.curator.framework.recipes.cache.PathChildrenCache;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheEvent;
 import org.apache.curator.framework.recipes.cache.PathChildrenCacheListener;
@@ -21,7 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static top.aprilyolies.beehive.common.UrlConstants.PROVIDERS;
+import static top.aprilyolies.beehive.common.UrlConstants.*;
+import static top.aprilyolies.beehive.common.UrlConstants.PATH_SEPARATOR;
 
 /**
  * @Author EvaJohnson
@@ -33,7 +35,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     // 缓存的 invokers 信息
     private volatile List<Invoker<T>> invokers;
     // 缓存注册中心信息
-    private static Registry regsitry;
+    private volatile Registry registry;
     // 最大重复 invoke 次数
     private final int MAX_REINVOKE_TIMES = 5;
     // 记录当前重复 invoke 的次数
@@ -52,15 +54,18 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
     @Override
     protected Object doInvoke(InvokeInfo info) {
         try {
-            if (this.invokers == null) {
-                invokers = listInvokers();
+            if (this.invokers == null || registry == null) {
+                synchronized (this) {
+                    if (invokers == null || registry == null) {
+                        invokers = listInvokers();
+                        Registry registry = BeehiveContext.unsafeGet(REGISTRIES, Registry.class);
+                        addInvokersRefreshListener(this.registry);
+                        this.registry = registry;
+                    }
+                }
             }
             if (needUpdateInvokers) {
                 updateInvokers();
-            }
-            if (regsitry == null) {
-                regsitry = BeehiveContext.unsafeGet(UrlConstants.REGISTRIES, Registry.class);
-                addInvokersRefreshListener(regsitry);
             }
             int reInvokeCount = retryCountThreadLocal.get();
             LoadBalance loadBalance = loadBalanceThreadLocal.get();
@@ -161,15 +166,34 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
             if (regsitry instanceof ZookeeperRegistry) {
                 ZookeeperRegistry zkRegistry = (ZookeeperRegistry) regsitry;
                 CuratorFramework client = zkRegistry.getClient();
-                String registryPath = zkRegistry.getRegistryPath();
+                String registryPath = getProviderPath(url);
                 PathChildrenCache pathCache = new PathChildrenCache(client, registryPath, true);
                 pathCache.start();
-                pathCache.getListenable().addListener(new InvokersRefreshListener());
+                pathCache.getListenable().addListener(new InvokersRefreshListener(pathCache));
             }
         } catch (Exception e) {
             logger.error("Can't add invokers refresh listener");
             e.printStackTrace();
         }
+    }
+
+    /**
+     * 获取 provider 路径信息
+     *
+     * @param url
+     * @return
+     */
+    private String getProviderPath(URL url) {
+        String group = url.getParameterElseDefault(GROUP_KEY, DEFAULT_GROUP);
+        String service = url.getParameter(SERVICE);
+        String category = PROVIDERS;
+        StringBuilder sb = new StringBuilder(PATH_SEPARATOR).
+                append(group).
+                append(PATH_SEPARATOR).
+                append(service).
+                append(PATH_SEPARATOR).
+                append(category);
+        return sb.toString();
     }
 
     private Invoker<T> selectInvoker(LoadBalance loadBalance, List<Invoker<T>> invokers) {
@@ -186,7 +210,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
         return loadBalanceSelector.createLoadBalance(url);
     }
 
-    private List<Invoker<T>> listInvokers() {
+    private synchronized List<Invoker<T>> listInvokers() {
         //noinspection unchecked
         Map<String, List<String>> providersMap = BeehiveContext.unsafeGet(UrlConstants.PROVIDERS, Map.class);
         List<String> providers = providersMap.get(url.getParameter(UrlConstants.SERVICE));
@@ -302,6 +326,12 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
      * invokers 刷新监听器
      */
     private class InvokersRefreshListener implements PathChildrenCacheListener {
+        private final PathChildrenCache pathCache;
+
+        public InvokersRefreshListener(PathChildrenCache pathCache) {
+            this.pathCache = pathCache;
+        }
+
         @Override
         public void childEvent(CuratorFramework client, PathChildrenCacheEvent event) throws Exception {
             PathChildrenCacheEvent.Type type = event.getType();
@@ -309,6 +339,13 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                 case CHILD_ADDED:
                 case CHILD_REMOVED:
                 case CHILD_UPDATED: {
+                    List<ChildData> currentData = pathCache.getCurrentData();
+                    List<String> providerUrls = new ArrayList<>(currentData.size());
+                    for (ChildData data : currentData) {
+                        providerUrls.add(data.getPath());
+                    }
+                    // 这里是保存到 concurrent hash map 中，能够保证可见性
+                    saveProvidersToBeehiveContext(url.getParameter(SERVICE), providerUrls);
                     FailoverClusterInvoker.this.needUpdateInvokers = true;
                 }
             }
