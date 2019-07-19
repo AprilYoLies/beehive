@@ -138,9 +138,7 @@ public class NettyClient extends AbstractClient {
      * @return 构建的 channel key
      */
     private String createChannelKey(InetSocketAddress address) {
-        String addressKey = address.toString();
-        String threadKey = Thread.currentThread().getName();
-        return addressKey + threadKey;
+        return address.toString();
     }
 
     /**

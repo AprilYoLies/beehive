@@ -30,7 +30,7 @@ public class MultiThreadUserConsumer {
         for (int i = 0; i < THREADS; i++) {
             executor.submit(() -> {
                 try {
-                    for (int j = 0; j < 200000; j++) {
+                    for (int j = 0; j < 1; j++) {
                         String result = service.findUserById(j);
                         System.out.println("result: " + result);
                         Thread.sleep(500);
