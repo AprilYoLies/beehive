@@ -59,7 +59,7 @@ public class FailoverClusterInvoker<T> extends AbstractInvoker {
                     if (invokers == null || registry == null) {
                         invokers = listInvokers();
                         Registry registry = BeehiveContext.unsafeGet(REGISTRIES, Registry.class);
-                        addInvokersRefreshListener(this.registry);
+                        addInvokersRefreshListener(registry);
                         this.registry = registry;
                     }
                 }

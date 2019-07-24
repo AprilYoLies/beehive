@@ -26,7 +26,6 @@ public class MultiConsumer {
                 e.printStackTrace();
             }
         }).start();
-        Thread.sleep(2000);
         for (int i = 0; i < 50000; i++) {
             String hello = demoService.say("world - " + i);
             System.out.println("result: " + hello);
