@@ -127,55 +127,48 @@ public class NettyDecoderHandler extends ByteToMessageDecoder {
             res.setStatus(status);
             // 判断当前相应是否为事件响应
             try {
-                try {
-                    if ((flag & EVENT_FLAG) == 0) {
-                        res.setType(MessageType.RESPONSE);
-                        Object msg = serializer.readObject();
-                        res.setData(msg);
-                    } else {
-                        res.setType(MessageType.HEARTBEAT_RESPONSE);
-                        Object msg = serializer.readObject();
-                        res.setData(msg);
-                    }
-                } catch (Exception e) {
-                    logger.error("Decode message error, please check provider and consumer use the same serializer");
+                if ((flag & EVENT_FLAG) == 0) {
+                    res.setType(MessageType.RESPONSE);
+                    Object msg = serializer.readObject();
+                    res.setData(msg);
+                } else {
+                    res.setType(MessageType.HEARTBEAT_RESPONSE);
+                    Object msg = serializer.readObject();
+                    res.setData(msg);
                 }
-            } catch (Throwable e) {
-                e.printStackTrace();
+            } catch (Exception e) {
+                logger.error("Decode message error, please check provider and consumer use the same serializer");
             }
             return res;
         } else {
             // decode request.
             Request req = new Request(id);
             try {
-                try {
-                    // 判断是否是事件类型的 request
-                    if ((flag & EVENT_FLAG) == 0) {
-                        // 设置 req 为非事件类型的 request
-                        req.setType(MessageType.REQUEST);
-                        String serviceName = serializer.readUTF();
-                        // 逆编码过程，逐个提取出对应的属性
-                        String methodName = serializer.readUTF();
-                        String ptsDesc = serializer.readUTF();
-                        // 将参数 desc 串转换为对应的 class
-                        Class<?>[] pts = ReflectUtils.desc2classArray(ptsDesc);
-                        Object[] pvs = new Object[pts.length];
-                        // 根据参数类型提取出每个参数
-                        for (int i = 0; i < pvs.length; i++) {
-                            pvs[i] = serializer.readObject(pts[i]);
-                        }
-                        // 重构 RpcInfo 信息
-                        RpcInfo info = new RpcInfo(methodName, pts, pvs, serviceName);
-                        req.setData(info);
-                    } else {
-                        Object msg = serializer.readObject();
-                        req.setType(MessageType.HEARTBEAT_REQUEST);
-                        req.setData(msg);
+                // 判断是否是事件类型的 request
+                if ((flag & EVENT_FLAG) == 0) {
+                    // 设置 req 为非事件类型的 request
+                    req.setType(MessageType.REQUEST);
+                    String serviceName = serializer.readUTF();
+                    // 逆编码过程，逐个提取出对应的属性
+                    String methodName = serializer.readUTF();
+                    String ptsDesc = serializer.readUTF();
+                    // 将参数 desc 串转换为对应的 class
+                    Class<?>[] pts = ReflectUtils.desc2classArray(ptsDesc);
+                    Object[] pvs = new Object[pts.length];
+                    // 根据参数类型提取出每个参数
+                    for (int i = 0; i < pvs.length; i++) {
+                        pvs[i] = serializer.readObject(pts[i]);
                     }
-                } catch (Exception e) {
-                    logger.error("Decode message error, please check provider and consumer use the same serializer");
+                    // 重构 RpcInfo 信息
+                    RpcInfo info = new RpcInfo(methodName, pts, pvs, serviceName);
+                    req.setData(info);
+                } else {
+                    Object msg = serializer.readObject();
+                    req.setType(MessageType.HEARTBEAT_REQUEST);
+                    req.setData(msg);
                 }
             } catch (Exception e) {
+                logger.error("Decode message error, please check provider and consumer use the same serializer");
                 e.printStackTrace();
                 return EMPTY_RESULT;
             }
