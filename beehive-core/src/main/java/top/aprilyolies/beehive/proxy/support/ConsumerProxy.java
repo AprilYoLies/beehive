@@ -252,7 +252,7 @@ public abstract class ConsumerProxy implements Proxy {
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            return handler.invoke(this, method, args);
+            return handler.invoke(proxy, method, args);
         }
     }
 
